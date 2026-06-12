@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { isDefaultCategory } from "@/domain/categories";
+import { loadPinyinSearchModule } from "@/domain/pinyin-search-loader";
 import { moveLink, reorderCategories } from "@/domain/reorder";
 import { selectCategorySections } from "@/domain/selectors";
 import {
@@ -58,6 +59,14 @@ export type CategoryDraftDeletePlan =
 export type CategoryDraft = {
   categories: Category[];
   deletePlans: CategoryDraftDeletePlan[];
+};
+
+type PinyinSectionsState = {
+  categories: Category[];
+  links: Link[];
+  query: string;
+  sortMode: SortMode;
+  sections: CategorySection[];
 };
 
 /** State, derived data, and persistence actions consumed by the page. */
@@ -266,6 +275,7 @@ export function useDeckStore(): DeckStore {
   const [query, setQuery] = useState("");
   const [initialized, setInitialized] = useState(() => Boolean(initialDeckMirror));
   const [error, setError] = useState<string | null>(null);
+  const [pinyinSectionsState, setPinyinSectionsState] = useState<PinyinSectionsState | null>(null);
   const categoriesRef = useRef<Category[]>(initialDeckMirror?.categories ?? []);
   const linksRef = useRef<Link[]>(initialDeckMirror?.links ?? []);
   const interfaceSizeRef = useRef<InterfaceSize>(
@@ -389,10 +399,49 @@ export function useDeckStore(): DeckStore {
     };
   }, [updateCategoriesState, updateInterfaceSizeState, updateLinksState, updateSortModeState]);
 
-  const sections = useMemo(
+  useEffect(() => {
+    let canceled = false;
+    const hasQuery = query.trim().length > 0;
+
+    if (!hasQuery) {
+      return;
+    }
+
+    void loadPinyinSearchModule()
+      .then(({ selectPinyinCategorySections }) => {
+        if (!canceled) {
+          setPinyinSectionsState({
+            categories,
+            links,
+            query,
+            sortMode,
+            sections: selectPinyinCategorySections(categories, links, query, sortMode),
+          });
+        }
+      })
+      .catch((searchError: unknown) => {
+        if (!canceled) {
+          setError(`Search failed: ${getErrorMessage(searchError)}`);
+        }
+      });
+
+    return () => {
+      canceled = true;
+    };
+  }, [categories, links, query, sortMode]);
+
+  const lightweightSections = useMemo(
     () => selectCategorySections(categories, links, query, sortMode),
-    [categories, query, links, sortMode],
+    [categories, links, query, sortMode],
   );
+  const sections =
+    pinyinSectionsState &&
+    pinyinSectionsState.categories === categories &&
+    pinyinSectionsState.links === links &&
+    pinyinSectionsState.query === query &&
+    pinyinSectionsState.sortMode === sortMode
+      ? pinyinSectionsState.sections
+      : lightweightSections;
 
   const exportDeck = useCallback(async (): Promise<DeckExportFile> => {
     try {

@@ -1,6 +1,6 @@
 // Provides domain selectors for UI display.
 
-import { createSearchIndex, matchesSearchIndex, normalizeSearchText } from "./search";
+import { normalizeSearchText, searchPartsMatchNormalizedQuery } from "./search";
 import type { Category, CategorySection, Link, SortMode } from "./types";
 
 /** Creates a stable new array sorted by the domain order field. */
@@ -15,7 +15,7 @@ function getVisitedTime(link: Link): number {
 }
 
 /** Applies the display sort mode to a link list. */
-function sortLinks(links: Link[], sortMode: SortMode): Link[] {
+export function sortLinks(links: Link[], sortMode: SortMode): Link[] {
   switch (sortMode) {
     case "mostVisited":
       return [...links].sort(
@@ -35,8 +35,8 @@ function sortLinks(links: Link[], sortMode: SortMode): Link[] {
 }
 
 /** Checks whether the link fields match the query. */
-function linkMatchesQuery(link: Link, query: string): boolean {
-  return matchesSearchIndex(query, createSearchIndex([link.name, link.url, link.note ?? ""]));
+function linkMatchesQuery(link: Link, normalizedQuery: string): boolean {
+  return searchPartsMatchNormalizedQuery([link.name, link.url, link.note ?? ""], normalizedQuery);
 }
 
 /** Builds displayable category groups from categories, query, and sort mode. */
@@ -56,7 +56,7 @@ export function selectCategorySections(
     }
 
     const categoryMatches = normalizedQuery
-      ? matchesSearchIndex(normalizedQuery, createSearchIndex([category.name]))
+      ? searchPartsMatchNormalizedQuery([category.name], normalizedQuery)
       : false;
     const visibleLinks =
       !normalizedQuery || categoryMatches

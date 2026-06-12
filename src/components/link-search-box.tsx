@@ -10,11 +10,17 @@ import { cn } from "@/lib/utils";
 type LinkSearchBoxProps = {
   value: string;
   onChange: (value: string) => void;
+  onFocus?: () => void;
   interfaceSizeConfig: InterfaceSizeConfig;
 };
 
 /** Provides link search input with an icon and clear action. */
-export function LinkSearchBox({ value, onChange, interfaceSizeConfig }: LinkSearchBoxProps) {
+export function LinkSearchBox({
+  value,
+  onChange,
+  onFocus,
+  interfaceSizeConfig,
+}: LinkSearchBoxProps) {
   return (
     <div className="flex flex-col gap-2">
       <label htmlFor="link-search" className="sr-only">
@@ -27,6 +33,7 @@ export function LinkSearchBox({ value, onChange, interfaceSizeConfig }: LinkSear
           type="search"
           value={value}
           onChange={(event) => onChange(event.target.value)}
+          onFocus={onFocus}
           placeholder="Search links, notes, or URLs..."
           className={cn(
             "bg-card shadow-none",

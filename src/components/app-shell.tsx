@@ -1,6 +1,6 @@
 // Start page app shell that connects the deck store and composes the main page regions.
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { Data, Draggable, Droppable } from "@dnd-kit/abstract";
 import { KeyboardSensor, PointerActivationConstraints, PointerSensor } from "@dnd-kit/dom";
 import { move as moveSortableItems } from "@dnd-kit/helpers";
@@ -19,6 +19,7 @@ import { LinkSearchBox } from "@/components/link-search-box";
 import { PreferencesDialog } from "@/components/preferences-dialog";
 import { LinkDialog } from "@/components/link-dialog";
 import { getInterfaceSizeConfig } from "@/domain/interface-size";
+import { preloadPinyinSearchModule } from "@/domain/pinyin-search-loader";
 import type { Category, CategorySection as CategorySectionData, Link } from "@/domain/types";
 import { useDeckStore } from "@/hooks/use-deck-store";
 import { cn } from "@/lib/utils";
@@ -179,6 +180,27 @@ export function AppShell() {
       .sort((left, right) => left.order - right.order)
       .map((category) => sectionByCategoryId.get(category.id) ?? { category, links: [] });
   }, [categories, displaySections, hasQuery]);
+
+  useEffect(() => {
+    const idleWindow = window as Window & {
+      requestIdleCallback?: Window["requestIdleCallback"];
+      cancelIdleCallback?: Window["cancelIdleCallback"];
+    };
+
+    if (idleWindow.requestIdleCallback && idleWindow.cancelIdleCallback) {
+      const idleId = idleWindow.requestIdleCallback(preloadPinyinSearchModule, { timeout: 3000 });
+
+      return () => {
+        idleWindow.cancelIdleCallback?.(idleId);
+      };
+    }
+
+    const timeoutId = globalThis.setTimeout(preloadPinyinSearchModule, 1000);
+
+    return () => {
+      globalThis.clearTimeout(timeoutId);
+    };
+  }, []);
 
   /** Opens a blank form for adding a link from the global action. */
   function handleCreateLink(): void {
@@ -347,6 +369,7 @@ export function AppShell() {
           <LinkSearchBox
             value={query}
             onChange={setQuery}
+            onFocus={preloadPinyinSearchModule}
             interfaceSizeConfig={interfaceSizeConfig}
           />
         </div>
