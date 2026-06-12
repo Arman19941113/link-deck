@@ -21,27 +21,7 @@ import type {
   SortMode,
 } from "@/domain/types";
 import { normalizeUrl } from "@/domain/url";
-import {
-  clearStoredDeckData,
-  deleteCategoryRecord,
-  deleteIconFile,
-  deleteLinkRecord,
-  deleteLinks,
-  getInitialInterfaceSize,
-  getIconFile as getStoredIconFile,
-  loadDeck,
-  recordLinkVisit,
-  replaceStoredDeck,
-  resetStoredDeckToDefaults,
-  saveCategories,
-  saveCategory,
-  saveCategoryDraftChanges,
-  saveIconFile,
-  saveInterfaceSize,
-  saveLink,
-  saveLinks,
-  saveSortMode,
-} from "@/storage/deck-db";
+import { storageService } from "@/services";
 
 /** Fields submitted by the UI when adding or editing a saved link. */
 export type LinkInput = {
@@ -87,7 +67,7 @@ export type DeckStore = {
   interfaceSize: InterfaceSize;
   sortMode: SortMode;
   query: string;
-  loading: boolean;
+  initialized: boolean;
   error: string | null;
   sections: CategorySection[];
   setInterfaceSize: (interfaceSize: InterfaceSize) => void;
@@ -272,34 +252,75 @@ function getChangedLinks(previousLinks: Link[], nextLinks: Link[]): Link[] {
 
 /** Creates the data-store hook consumed directly by the app page. */
 export function useDeckStore(): DeckStore {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [links, setLinks] = useState<Link[]>([]);
-  const [interfaceSize, setInterfaceSizeState] =
-    useState<InterfaceSize>(getInitialInterfaceSize);
-  const [sortMode, setSortModeState] = useState<SortMode>("manual");
+  const [initialDeckMirror] = useState(storageService.getInitialDeckSnapshotMirror);
+  const [categories, setCategories] = useState<Category[]>(
+    () => initialDeckMirror?.categories ?? [],
+  );
+  const [links, setLinks] = useState<Link[]>(() => initialDeckMirror?.links ?? []);
+  const [interfaceSize, setInterfaceSizeState] = useState<InterfaceSize>(
+    () => initialDeckMirror?.interfaceSize ?? storageService.getInitialInterfaceSize(),
+  );
+  const [sortMode, setSortModeState] = useState<SortMode>(
+    () => initialDeckMirror?.sortMode ?? "manual",
+  );
   const [query, setQuery] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [initialized, setInitialized] = useState(() => Boolean(initialDeckMirror));
   const [error, setError] = useState<string | null>(null);
-  const categoriesRef = useRef<Category[]>([]);
-  const linksRef = useRef<Link[]>([]);
+  const categoriesRef = useRef<Category[]>(initialDeckMirror?.categories ?? []);
+  const linksRef = useRef<Link[]>(initialDeckMirror?.links ?? []);
+  const interfaceSizeRef = useRef<InterfaceSize>(
+    initialDeckMirror?.interfaceSize ?? storageService.getInitialInterfaceSize(),
+  );
+  const sortModeRef = useRef<SortMode>(initialDeckMirror?.sortMode ?? "manual");
 
-  const updateCategoriesState = useCallback((nextCategories: Category[]) => {
-    categoriesRef.current = nextCategories;
-    setCategories(nextCategories);
+  const saveCurrentDeckMirror = useCallback(() => {
+    if (!categoriesRef.current.length && !linksRef.current.length) {
+      return;
+    }
+
+    storageService.saveDeckSnapshotMirror({
+      categories: categoriesRef.current,
+      links: linksRef.current,
+      interfaceSize: interfaceSizeRef.current,
+      sortMode: sortModeRef.current,
+    });
   }, []);
 
-  const updateLinksState = useCallback((nextLinks: Link[]) => {
-    linksRef.current = nextLinks;
-    setLinks(nextLinks);
-  }, []);
+  const updateCategoriesState = useCallback(
+    (nextCategories: Category[]) => {
+      categoriesRef.current = nextCategories;
+      setCategories(nextCategories);
+      saveCurrentDeckMirror();
+    },
+    [saveCurrentDeckMirror],
+  );
 
-  const updateInterfaceSizeState = useCallback((nextInterfaceSize: InterfaceSize) => {
-    setInterfaceSizeState(nextInterfaceSize);
-  }, []);
+  const updateLinksState = useCallback(
+    (nextLinks: Link[]) => {
+      linksRef.current = nextLinks;
+      setLinks(nextLinks);
+      saveCurrentDeckMirror();
+    },
+    [saveCurrentDeckMirror],
+  );
 
-  const updateSortModeState = useCallback((nextSortMode: SortMode) => {
-    setSortModeState(nextSortMode);
-  }, []);
+  const updateInterfaceSizeState = useCallback(
+    (nextInterfaceSize: InterfaceSize) => {
+      interfaceSizeRef.current = nextInterfaceSize;
+      setInterfaceSizeState(nextInterfaceSize);
+      saveCurrentDeckMirror();
+    },
+    [saveCurrentDeckMirror],
+  );
+
+  const updateSortModeState = useCallback(
+    (nextSortMode: SortMode) => {
+      sortModeRef.current = nextSortMode;
+      setSortModeState(nextSortMode);
+      saveCurrentDeckMirror();
+    },
+    [saveCurrentDeckMirror],
+  );
 
   const applyStoredDeckState = useCallback(
     (deck: {
@@ -323,7 +344,7 @@ export function useDeckStore(): DeckStore {
     }
 
     try {
-      await deleteIconFile(iconId);
+      await storageService.deleteIconFile(iconId);
     } catch (cleanupError) {
       setError(`Icon file cleanup failed: ${getErrorMessage(cleanupError)}`);
     }
@@ -334,7 +355,7 @@ export function useDeckStore(): DeckStore {
 
     async function load(): Promise<void> {
       try {
-        const deck = await loadDeck();
+        const deck = await storageService.loadDeck();
 
         if (canceled) {
           return;
@@ -356,7 +377,7 @@ export function useDeckStore(): DeckStore {
         }
       } finally {
         if (!canceled) {
-          setLoading(false);
+          setInitialized(true);
         }
       }
     }
@@ -375,7 +396,7 @@ export function useDeckStore(): DeckStore {
 
   const exportDeck = useCallback(async (): Promise<DeckExportFile> => {
     try {
-      const deck = await loadDeck();
+      const deck = await storageService.loadDeck();
 
       setError(null);
 
@@ -389,7 +410,7 @@ export function useDeckStore(): DeckStore {
   const importDeck = useCallback(
     async (json: string): Promise<void> => {
       const deck = await parseDeckExportFile(json);
-      const storedDeck = await replaceStoredDeck(deck);
+      const storedDeck = await storageService.replaceDeck(deck);
 
       applyStoredDeckState(storedDeck);
       setError(null);
@@ -399,7 +420,7 @@ export function useDeckStore(): DeckStore {
 
   const resetDeckToDefaults = useCallback(async (): Promise<void> => {
     try {
-      const deck = await resetStoredDeckToDefaults();
+      const deck = await storageService.resetDeckToDefaults();
 
       applyStoredDeckState(deck);
       setError(null);
@@ -411,7 +432,7 @@ export function useDeckStore(): DeckStore {
 
   const clearDeckData = useCallback(async (): Promise<void> => {
     try {
-      const deck = await clearStoredDeckData();
+      const deck = await storageService.clearDeckData();
 
       applyStoredDeckState(deck);
       setError(null);
@@ -424,7 +445,7 @@ export function useDeckStore(): DeckStore {
   const setInterfaceSize = useCallback(
     (nextInterfaceSize: InterfaceSize): void => {
       updateInterfaceSizeState(nextInterfaceSize);
-      void saveInterfaceSize(nextInterfaceSize).catch(() => undefined);
+      void storageService.saveInterfaceSize(nextInterfaceSize).catch(() => undefined);
     },
     [updateInterfaceSizeState],
   );
@@ -432,7 +453,7 @@ export function useDeckStore(): DeckStore {
   const setSortMode = useCallback(
     (nextSortMode: SortMode): void => {
       updateSortModeState(nextSortMode);
-      void saveSortMode(nextSortMode).catch(() => undefined);
+      void storageService.saveSortMode(nextSortMode).catch(() => undefined);
     },
     [updateSortModeState],
   );
@@ -472,7 +493,7 @@ export function useDeckStore(): DeckStore {
 
       if (input.iconFile) {
         try {
-          savedIconFile = await saveIconFile(input.iconFile);
+          savedIconFile = await storageService.saveIconFile(input.iconFile);
         } catch (iconError) {
           setError(getErrorMessage(iconError));
           throw iconError;
@@ -537,9 +558,9 @@ export function useDeckStore(): DeckStore {
 
       try {
         if (changedLinks.length === 1) {
-          await saveLink(changedLinks[0]);
+          await storageService.saveLink(changedLinks[0]);
         } else {
-          await saveLinks(changedLinks);
+          await storageService.saveLinks(changedLinks);
         }
       } catch (upsertError) {
         if (savedIconFile) {
@@ -571,7 +592,7 @@ export function useDeckStore(): DeckStore {
       const localIconId = getLocalIconId(targetLink.icon);
 
       try {
-        await deleteLinkRecord(link.id);
+        await storageService.deleteLink(link.id);
       } catch (deleteError) {
         setError(getErrorMessage(deleteError));
         throw deleteError;
@@ -605,7 +626,7 @@ export function useDeckStore(): DeckStore {
 
       void (async () => {
         try {
-          const updatedLink = await recordLinkVisit(link.id);
+          const updatedLink = await storageService.recordLinkVisit(link.id);
 
           if (updatedLink) {
             updateLinksState(mergeLink(linksRef.current, updatedLink));
@@ -640,7 +661,7 @@ export function useDeckStore(): DeckStore {
       };
 
       try {
-        await saveCategory(category);
+        await storageService.saveCategory(category);
         updateCategoriesState(mergeCategory(categoriesRef.current, category));
         setError(null);
 
@@ -676,7 +697,7 @@ export function useDeckStore(): DeckStore {
       };
 
       try {
-        await saveCategory(nextCategory);
+        await storageService.saveCategory(nextCategory);
         updateCategoriesState(mergeCategory(categoriesRef.current, nextCategory));
         setError(null);
       } catch (renameError) {
@@ -733,8 +754,8 @@ export function useDeckStore(): DeckStore {
 
       try {
         if (!categoryLinks.length) {
-          await deleteCategoryRecord(categoryId);
-          await saveCategories(nextCategories);
+          await storageService.deleteCategory(categoryId);
+          await storageService.saveCategories(nextCategories);
           updateCategoriesState(nextCategories);
           setError(null);
           return;
@@ -759,9 +780,9 @@ export function useDeckStore(): DeckStore {
             updatedAt: now,
           }));
 
-          await saveLinks(movedLinks);
-          await deleteCategoryRecord(categoryId);
-          await saveCategories(nextCategories);
+          await storageService.saveLinks(movedLinks);
+          await storageService.deleteCategory(categoryId);
+          await storageService.saveCategories(nextCategories);
 
           updateLinksState(mergeLinks(linksRef.current, movedLinks));
           updateCategoriesState(nextCategories);
@@ -777,9 +798,9 @@ export function useDeckStore(): DeckStore {
               .filter((iconId): iconId is string => iconId !== null),
           ),
         ];
-        await deleteLinks(deletedLinkIds);
-        await deleteCategoryRecord(categoryId);
-        await saveCategories(nextCategories);
+        await storageService.deleteLinks(deletedLinkIds);
+        await storageService.deleteCategory(categoryId);
+        await storageService.saveCategories(nextCategories);
 
         const nextLinks = removeLinks(linksRef.current, deletedLinkIds);
 
@@ -963,7 +984,7 @@ export function useDeckStore(): DeckStore {
       }
 
       try {
-        await saveCategoryDraftChanges({
+        await storageService.saveCategoryDraftChanges({
           categoriesToSave,
           categoryIdsToDelete,
           linksToSave,
@@ -1008,7 +1029,7 @@ export function useDeckStore(): DeckStore {
       const changedLinks = getChangedLinks(latestLinks, nextLinks);
 
       try {
-        await saveLinks(changedLinks);
+        await storageService.saveLinks(changedLinks);
         updateLinksState(mergeLinks(linksRef.current, changedLinks));
         setError(null);
       } catch (moveError) {
@@ -1025,7 +1046,7 @@ export function useDeckStore(): DeckStore {
       const nextCategories = reorderCategories(latestCategories, activeCategoryId, overCategoryId);
 
       try {
-        await saveCategories(nextCategories);
+        await storageService.saveCategories(nextCategories);
         updateCategoriesState(nextCategories);
         setError(null);
       } catch (reorderError) {
@@ -1042,7 +1063,7 @@ export function useDeckStore(): DeckStore {
     interfaceSize,
     sortMode,
     query,
-    loading,
+    initialized,
     error,
     sections,
     setInterfaceSize,
@@ -1057,7 +1078,7 @@ export function useDeckStore(): DeckStore {
     saveCategoryDraft,
     moveLinkToCategory,
     reorderCategoryList,
-    getIconFile: getStoredIconFile,
+    getIconFile: storageService.getIconFile,
     exportDeck,
     importDeck,
     resetDeckToDefaults,

@@ -11,8 +11,10 @@ import type {
   IconFile,
   InterfaceSize,
   Link,
+  LinkIcon,
   SortMode,
 } from "@/domain/types";
+import { getLocalStorage, setLocalStorage } from "@/lib/storage";
 
 type SettingsRecord = {
   id: "settings";
@@ -69,38 +71,139 @@ const DATABASE_VERSION = 2;
 const SETTINGS_ID: SettingsRecord["id"] = "settings";
 const DEFAULT_SORT_MODE: SortMode = "manual";
 const INTERFACE_SIZE_STORAGE_KEY = "link-deck.interface-size";
+const DECK_SNAPSHOT_STORAGE_KEY = "link-deck.deck-snapshot";
+const DECK_SNAPSHOT_MIRROR_VERSION = 1;
+const SORT_MODE_VALUES = new Set<SortMode>(["manual", "mostVisited", "recentVisited", "name"]);
+
+/** Lightweight deck data mirrored for synchronous first-paint rendering. */
+export type DeckSnapshotMirror = {
+  version: typeof DECK_SNAPSHOT_MIRROR_VERSION;
+  categories: Category[];
+  links: Link[];
+  interfaceSize: InterfaceSize;
+  sortMode: SortMode;
+};
+
+/** Checks whether a parsed JSON value can be inspected as an object. */
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+/** Checks unknown stored settings before using them as sort-mode state. */
+function isSortMode(value: unknown): value is SortMode {
+  return typeof value === "string" && SORT_MODE_VALUES.has(value as SortMode);
+}
+
+/** Checks persisted icon settings before trusting a mirrored link record. */
+function isLinkIcon(value: unknown): value is LinkIcon {
+  if (!isRecord(value) || typeof value.type !== "string") {
+    return false;
+  }
+
+  if (value.type === "auto") {
+    return true;
+  }
+
+  if (value.type === "builtin") {
+    return (
+      typeof value.slug === "string" &&
+      typeof value.title === "string" &&
+      typeof value.hex === "string"
+    );
+  }
+
+  if (value.type === "url") {
+    return typeof value.url === "string";
+  }
+
+  if (value.type === "file") {
+    return (
+      typeof value.fileId === "string" &&
+      typeof value.name === "string" &&
+      typeof value.mimeType === "string"
+    );
+  }
+
+  return false;
+}
+
+/** Checks a mirrored category before using it for the first render. */
+function isCategory(value: unknown): value is Category {
+  return (
+    isRecord(value) &&
+    typeof value.id === "string" &&
+    typeof value.name === "string" &&
+    typeof value.order === "number" &&
+    typeof value.createdAt === "string" &&
+    typeof value.updatedAt === "string"
+  );
+}
+
+/** Checks a mirrored link before using it for the first render. */
+function isLink(value: unknown): value is Link {
+  return (
+    isRecord(value) &&
+    typeof value.id === "string" &&
+    typeof value.categoryId === "string" &&
+    typeof value.name === "string" &&
+    typeof value.url === "string" &&
+    (value.note === undefined || typeof value.note === "string") &&
+    isLinkIcon(value.icon) &&
+    typeof value.order === "number" &&
+    typeof value.visitCount === "number" &&
+    (value.lastVisitedAt === undefined || typeof value.lastVisitedAt === "string") &&
+    typeof value.createdAt === "string" &&
+    typeof value.updatedAt === "string"
+  );
+}
+
+/** Checks a parsed first-paint mirror before using it as initial UI data. */
+function isDeckSnapshotMirror(value: unknown): value is DeckSnapshotMirror {
+  return (
+    isRecord(value) &&
+    value.version === DECK_SNAPSHOT_MIRROR_VERSION &&
+    Array.isArray(value.categories) &&
+    value.categories.every(isCategory) &&
+    Array.isArray(value.links) &&
+    value.links.every(isLink) &&
+    isInterfaceSize(value.interfaceSize) &&
+    isSortMode(value.sortMode)
+  );
+}
 
 /** Reads the synchronous interface-size mirror used to avoid first-paint layout jumps. */
 function readInterfaceSizeMirror(): InterfaceSize | null {
-  if (typeof window === "undefined") {
-    return null;
-  }
+  const storedInterfaceSize = getLocalStorage<unknown>(INTERFACE_SIZE_STORAGE_KEY);
 
-  try {
-    const storedInterfaceSize = window.localStorage.getItem(INTERFACE_SIZE_STORAGE_KEY);
-
-    return isInterfaceSize(storedInterfaceSize) ? storedInterfaceSize : null;
-  } catch {
-    return null;
-  }
+  return isInterfaceSize(storedInterfaceSize) ? storedInterfaceSize : null;
 }
 
 /** Keeps a small settings mirror outside IndexedDB so initial React state can match the last choice. */
 function saveInterfaceSizeMirror(interfaceSize: InterfaceSize): void {
-  if (typeof window === "undefined") {
-    return;
-  }
-
-  try {
-    window.localStorage.setItem(INTERFACE_SIZE_STORAGE_KEY, interfaceSize);
-  } catch {
-    // IndexedDB remains the source of truth when localStorage is unavailable.
-  }
+  setLocalStorage(INTERFACE_SIZE_STORAGE_KEY, interfaceSize);
 }
 
 /** Returns the best synchronous initial interface size before IndexedDB has opened. */
 export function getInitialInterfaceSize(): InterfaceSize {
   return readInterfaceSizeMirror() ?? DEFAULT_INTERFACE_SIZE;
+}
+
+/** Reads the synchronous deck mirror used to avoid a blank first render on refresh. */
+export function getInitialDeckSnapshotMirror(): DeckSnapshotMirror | null {
+  const storedDeckSnapshot = getLocalStorage<unknown>(DECK_SNAPSHOT_STORAGE_KEY);
+
+  return isDeckSnapshotMirror(storedDeckSnapshot) ? storedDeckSnapshot : null;
+}
+
+/** Keeps a lightweight deck mirror outside IndexedDB so refresh can paint existing content immediately. */
+export function saveDeckSnapshotMirror(snapshot: Omit<DeckSnapshotMirror, "version">): void {
+  setLocalStorage(DECK_SNAPSHOT_STORAGE_KEY, {
+    version: DECK_SNAPSHOT_MIRROR_VERSION,
+    categories: snapshot.categories,
+    links: snapshot.links,
+    interfaceSize: snapshot.interfaceSize,
+    sortMode: snapshot.sortMode,
+  });
 }
 
 const dbPromise = openDB<LinkDeckDb>(DATABASE_NAME, DATABASE_VERSION, {
@@ -238,7 +341,7 @@ export async function loadDeck(): Promise<StoredDeckSnapshot> {
 
   saveInterfaceSizeMirror(interfaceSize);
 
-  return {
+  const snapshot: StoredDeckSnapshot = {
     id: "local",
     name: "Local Deck",
     categories,
@@ -250,6 +353,10 @@ export async function loadDeck(): Promise<StoredDeckSnapshot> {
     createdAt: getDeckTimestamp(records, "createdAt"),
     updatedAt: getDeckTimestamp(records, "updatedAt"),
   };
+
+  saveDeckSnapshotMirror(snapshot);
+
+  return snapshot;
 }
 
 /** Replaces all persisted deck data in one transaction. */
@@ -287,6 +394,7 @@ export async function replaceStoredDeck(deck: StoredDeckSnapshot): Promise<Store
 
   await tx.done;
   saveInterfaceSizeMirror(deck.interfaceSize);
+  saveDeckSnapshotMirror(deck);
 
   return deck;
 }

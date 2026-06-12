@@ -137,7 +137,7 @@ export function AppShell() {
     interfaceSize,
     sortMode,
     query,
-    loading,
+    initialized,
     error,
     sections,
     setInterfaceSize,
@@ -298,18 +298,6 @@ export function AppShell() {
     setDragLinkIdGroups(null);
   }
 
-  if (loading) {
-    return (
-      <main className="min-h-svh bg-background text-foreground">
-        <div className="mx-auto flex min-h-svh w-full max-w-7xl items-center justify-center px-6 py-6">
-          <div className="rounded-md border bg-card px-4 py-3 text-sm text-muted-foreground">
-            Loading links...
-          </div>
-        </div>
-      </main>
-    );
-  }
-
   const sectionList = (
     <div className={interfaceSizeConfig.page.stackClassName}>
       {visibleSections.map((section, categoryIndex) => (
@@ -384,7 +372,7 @@ export function AppShell() {
           ) : (
             sectionList
           )
-        ) : (
+        ) : !initialized ? null : error ? null : (
           <DeckEmptyState hasQuery={hasQuery} />
         )}
       </div>

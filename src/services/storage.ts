@@ -1,0 +1,55 @@
+// Application-facing storage service for Link Deck persistence operations.
+
+import {
+  clearStoredDeckData,
+  deleteCategoryRecord,
+  deleteIconFile,
+  deleteLinkRecord,
+  deleteLinks,
+  getIconFile,
+  getInitialDeckSnapshotMirror,
+  getInitialInterfaceSize,
+  loadDeck,
+  recordLinkVisit,
+  replaceStoredDeck,
+  resetStoredDeckToDefaults,
+  saveCategories,
+  saveCategory,
+  saveCategoryDraftChanges,
+  saveDeckSnapshotMirror,
+  saveIconFile,
+  saveInterfaceSize,
+  saveLink,
+  saveLinks,
+  saveSortMode,
+  type CategoryDraftPersistInput,
+  type DeckSnapshotMirror,
+  type StoredDeckSnapshot,
+} from "@/storage/deck-db";
+
+/** Collects all app-level storage operations behind one service boundary. */
+export const storageService = {
+  clearDeckData: clearStoredDeckData,
+  deleteCategory: deleteCategoryRecord,
+  deleteIconFile,
+  deleteLink: deleteLinkRecord,
+  deleteLinks,
+  getIconFile,
+  getInitialDeckSnapshotMirror,
+  getInitialInterfaceSize,
+  loadDeck,
+  recordLinkVisit,
+  replaceDeck: replaceStoredDeck,
+  resetDeckToDefaults: resetStoredDeckToDefaults,
+  saveCategories,
+  saveCategory,
+  saveCategoryDraftChanges,
+  saveDeckSnapshotMirror,
+  saveIconFile,
+  saveInterfaceSize,
+  saveLink,
+  saveLinks,
+  saveSortMode,
+};
+
+export type { CategoryDraftPersistInput, DeckSnapshotMirror, StoredDeckSnapshot };
