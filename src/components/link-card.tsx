@@ -226,7 +226,7 @@ export function LinkCard({
         <AlertDialogContent size="default" className={interfaceSizeConfig.dialog.contentClassName}>
           <AlertDialogHeader className={interfaceSizeConfig.dialog.headerClassName}>
             <AlertDialogTitle className={interfaceSizeConfig.dialog.titleClassName}>Delete link</AlertDialogTitle>
-            <AlertDialogDescription className={cn('break-words', interfaceSizeConfig.dialog.descriptionClassName)}>
+            <AlertDialogDescription className={cn('wrap-break-word', interfaceSizeConfig.dialog.descriptionClassName)}>
               Delete "{link.name}"? This removes the link from your deck.
             </AlertDialogDescription>
           </AlertDialogHeader>

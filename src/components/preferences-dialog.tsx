@@ -1217,7 +1217,7 @@ function PreferencesDialogContent({
                 {pendingDeleteCategory ? (
                   <div className="flex flex-col gap-3 rounded-md border border-destructive/30 bg-card p-3">
                     <div className="flex flex-col gap-1">
-                      <p className="break-words text-sm font-medium text-destructive">
+                      <p className="wrap-break-word text-sm font-medium text-destructive">
                         Delete "{pendingDeleteCategory.name}"
                       </p>
                       <p className="text-sm text-muted-foreground">

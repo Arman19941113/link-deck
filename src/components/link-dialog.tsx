@@ -340,7 +340,7 @@ function LinkDialogForm({
       className={cn(
         'grid-rows-[auto_auto] overflow-y-auto',
         interfaceSizeConfig.dialog.surfaceClassName,
-        '!h-auto !max-h-[calc(100svh-2rem)]',
+        'h-auto! max-h-[calc(100svh-2rem)]!',
       )}
     >
       <DialogHeader className={interfaceSizeConfig.dialog.headerClassName}>

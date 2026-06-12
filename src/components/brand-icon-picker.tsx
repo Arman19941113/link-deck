@@ -267,7 +267,7 @@ export function BrandIconPicker({ value, disabled = false, interfaceSizeConfig, 
                   type="button"
                   variant={selected ? 'secondary' : 'ghost'}
                   className={cn(
-                    'h-[38px] justify-start gap-2 border border-transparent px-2 text-left',
+                    'h-9.5 justify-start gap-2 border border-transparent px-2 text-left',
                     selected && 'border-accent/50',
                   )}
                   disabled={disabled}

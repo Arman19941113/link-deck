@@ -10,6 +10,8 @@
     "format:check": "oxfmt --check .",
     "lint": "oxlint --fix",
     "lint:check": "oxlint",
+    "tailwind:lint": "tailwint --fix \"src/**/*.{tsx,ts,css}\"",
+    "tailwind:lint:check": "tailwint \"src/**/*.{tsx,ts,css}\"",
     "typecheck": "tsc -b",
     "preview": "vite preview"
   },
@@ -42,6 +44,7 @@
     "@vitejs/plugin-react": "^6.0.1",
     "oxfmt": "^0.53.0",
     "oxlint": "^1.69.0",
+    "tailwint": "^1.1.13",
     "typescript": "~6.0.2",
     "vite": "^8.0.12"
   }

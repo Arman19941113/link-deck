@@ -331,7 +331,7 @@ export function AppShell() {
 
   return (
     <main className="min-h-svh bg-background text-foreground">
-      <div className="sticky top-0 z-20 border-b border-border/60 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/85">
+      <div className="sticky top-0 z-20 border-b border-border/60 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/85">
         <div className={cn(interfaceSizeConfig.page.className, interfaceSizeConfig.page.stackClassName, 'min-h-0')}>
           <AppTopBar
             interfaceSizeConfig={interfaceSizeConfig}
