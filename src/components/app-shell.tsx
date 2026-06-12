@@ -1,60 +1,53 @@
 // Start page app shell that connects the deck store and composes the main page regions.
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import type { Data, Draggable, Droppable } from "@dnd-kit/abstract";
-import { KeyboardSensor, PointerActivationConstraints, PointerSensor } from "@dnd-kit/dom";
-import { move as moveSortableItems } from "@dnd-kit/helpers";
-import {
-  DragDropProvider,
-  type DragEndEvent,
-  type DragOverEvent,
-  type DragStartEvent,
-} from "@dnd-kit/react";
-import { AlertCircle } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from 'react'
+import type { Data, Draggable, Droppable } from '@dnd-kit/abstract'
+import { KeyboardSensor, PointerActivationConstraints, PointerSensor } from '@dnd-kit/dom'
+import { move as moveSortableItems } from '@dnd-kit/helpers'
+import { DragDropProvider, type DragEndEvent, type DragOverEvent, type DragStartEvent } from '@dnd-kit/react'
+import { AlertCircle } from 'lucide-react'
 
-import { CategorySection } from "@/components/category-section";
-import { AppTopBar } from "@/components/app-top-bar";
-import { DeckEmptyState } from "@/components/deck-empty-state";
-import { LinkSearchBox } from "@/components/link-search-box";
-import { PreferencesDialog } from "@/components/preferences-dialog";
-import { LinkDialog } from "@/components/link-dialog";
-import { getInterfaceSizeConfig } from "@/domain/interface-size";
-import { preloadPinyinSearchModule } from "@/domain/pinyin-search-loader";
-import type { Category, CategorySection as CategorySectionData, Link } from "@/domain/types";
-import { useDeckStore } from "@/hooks/use-deck-store";
-import { cn } from "@/lib/utils";
+import { CategorySection } from '@/components/category-section'
+import { AppTopBar } from '@/components/app-top-bar'
+import { DeckEmptyState } from '@/components/deck-empty-state'
+import { LinkSearchBox } from '@/components/link-search-box'
+import { PreferencesDialog } from '@/components/preferences-dialog'
+import { LinkDialog } from '@/components/link-dialog'
+import { getInterfaceSizeConfig } from '@/domain/interface-size'
+import { preloadPinyinSearchModule } from '@/domain/pinyin-search-loader'
+import type { Category, CategorySection as CategorySectionData, Link } from '@/domain/types'
+import { useDeckStore } from '@/hooks/use-deck-store'
+import { cn } from '@/lib/utils'
 
-type LinkIdGroups = Record<string, string[]>;
+type LinkIdGroups = Record<string, string[]>
 
 const linkDragSensors = [
   PointerSensor.configure({
     activationConstraints: [new PointerActivationConstraints.Distance({ value: 6 })],
     activatorElements(source) {
-      return [source.element, source.handle];
+      return [source.element, source.handle]
     },
     preventActivation(_event, source) {
-      return source.type !== "link";
+      return source.type !== 'link'
     },
   }),
   KeyboardSensor,
-];
+]
 
 /** Gets the full manually ordered link sequence for a category so visible drop positions can map to real indexes. */
 function getManuallySortedLinks(links: Link[], categoryId: string): Link[] {
-  return links
-    .filter((link) => link.categoryId === categoryId)
-    .sort((left, right) => left.order - right.order);
+  return links.filter(link => link.categoryId === categoryId).sort((left, right) => left.order - right.order)
 }
 
 /** Builds sortable id groups from persisted link records. */
 function getLinkIdGroups(categories: Category[], links: Link[]): LinkIdGroups {
-  const groups = Object.fromEntries(categories.map((category) => [category.id, [] as string[]]));
+  const groups = Object.fromEntries(categories.map(category => [category.id, [] as string[]]))
 
   for (const category of categories) {
-    groups[category.id] = getManuallySortedLinks(links, category.id).map((link) => link.id);
+    groups[category.id] = getManuallySortedLinks(links, category.id).map(link => link.id)
   }
 
-  return groups;
+  return groups
 }
 
 /** Builds visible category sections from lightweight sortable id groups. */
@@ -63,75 +56,73 @@ function getSectionsFromLinkIdGroups(
   links: Link[],
   groups: LinkIdGroups,
 ): CategorySectionData[] {
-  const linkById = new Map(links.map((link) => [link.id, link]));
+  const linkById = new Map(links.map(link => [link.id, link]))
 
   return [...categories]
     .sort((left, right) => left.order - right.order)
-    .map((category) => ({
+    .map(category => ({
       category,
       links: (groups[category.id] ?? [])
-        .map((linkId) => linkById.get(linkId))
+        .map(linkId => linkById.get(linkId))
         .filter((link): link is Link => Boolean(link)),
-    }));
+    }))
 }
 
 /** Compares sortable id groups so pointer moves that do not change a target avoid rerendering. */
 function areLinkIdGroupsEqual(left: LinkIdGroups, right: LinkIdGroups): boolean {
-  const leftKeys = Object.keys(left);
-  const rightKeys = Object.keys(right);
+  const leftKeys = Object.keys(left)
+  const rightKeys = Object.keys(right)
 
   return (
     leftKeys.length === rightKeys.length &&
-    leftKeys.every((key) => {
-      const leftIds = left[key] ?? [];
-      const rightIds = right[key] ?? [];
+    leftKeys.every(key => {
+      const leftIds = left[key] ?? []
+      const rightIds = right[key] ?? []
 
-      return (
-        leftIds.length === rightIds.length && leftIds.every((id, index) => id === rightIds[index])
-      );
+      return leftIds.length === rightIds.length && leftIds.every((id, index) => id === rightIds[index])
     })
-  );
+  )
 }
 
 /** Finds the final category and index for a link in sortable id groups. */
 function getLinkTargetFromGroups(groups: LinkIdGroups, linkId: string) {
   for (const [categoryId, linkIds] of Object.entries(groups)) {
-    const index = linkIds.indexOf(linkId);
+    const index = linkIds.indexOf(linkId)
 
     if (index >= 0) {
-      return { categoryId, index };
+      return { categoryId, index }
     }
   }
 
-  return null;
+  return null
 }
 
 /** Reads link metadata attached to new dnd-kit sortable entities. */
 function getLinkDragData(entity: Draggable<Data> | Droppable<Data> | null | undefined) {
-  const data = entity?.data;
+  const data = entity?.data
 
   if (
     data &&
-    typeof data === "object" &&
-    "type" in data &&
-    data.type === "link" &&
-    "linkId" in data &&
-    typeof data.linkId === "string"
+    typeof data === 'object' &&
+    'type' in data &&
+    data.type === 'link' &&
+    'linkId' in data &&
+    typeof data.linkId === 'string'
   ) {
-    return data as { categoryId: string; linkId: string; type: "link" };
+    return data as { categoryId: string; linkId: string; type: 'link' }
   }
 
-  return null;
+  return null
 }
 
 /** Composes start page data, status messages, and navigation display regions. */
 export function AppShell() {
-  const [linkDialogOpen, setLinkDialogOpen] = useState(false);
-  const [editingLink, setEditingLink] = useState<Link | null>(null);
-  const [addingLinkCategoryId, setAddingLinkCategoryId] = useState<string | null>(null);
-  const [preferencesOpen, setPreferencesOpen] = useState(false);
-  const [dragLinkIdGroups, setDragLinkIdGroups] = useState<LinkIdGroups | null>(null);
-  const dragLinkIdGroupsRef = useRef<LinkIdGroups | null>(null);
+  const [linkDialogOpen, setLinkDialogOpen] = useState(false)
+  const [editingLink, setEditingLink] = useState<Link | null>(null)
+  const [addingLinkCategoryId, setAddingLinkCategoryId] = useState<string | null>(null)
+  const [preferencesOpen, setPreferencesOpen] = useState(false)
+  const [dragLinkIdGroups, setDragLinkIdGroups] = useState<LinkIdGroups | null>(null)
+  const dragLinkIdGroupsRef = useRef<LinkIdGroups | null>(null)
   const {
     categories,
     links,
@@ -154,170 +145,168 @@ export function AppShell() {
     importDeck,
     resetDeckToDefaults,
     clearDeckData,
-  } = useDeckStore();
-  const interfaceSizeConfig = getInterfaceSizeConfig(interfaceSize);
-  const isManualSort = sortMode === "manual";
-  const hasQuery = query.trim().length > 0;
-  const isLinkDragEnabled = isManualSort && !hasQuery;
-  const baseLinkIdGroups = useMemo(() => getLinkIdGroups(categories, links), [categories, links]);
+  } = useDeckStore()
+  const interfaceSizeConfig = getInterfaceSizeConfig(interfaceSize)
+  const isManualSort = sortMode === 'manual'
+  const hasQuery = query.trim().length > 0
+  const isLinkDragEnabled = isManualSort && !hasQuery
+  const baseLinkIdGroups = useMemo(() => getLinkIdGroups(categories, links), [categories, links])
   const displaySections = useMemo(
     () =>
       dragLinkIdGroups && isLinkDragEnabled
         ? getSectionsFromLinkIdGroups(categories, links, dragLinkIdGroups)
         : sections,
     [categories, dragLinkIdGroups, isLinkDragEnabled, sections, links],
-  );
+  )
   const visibleSections = useMemo(() => {
     if (hasQuery) {
-      return displaySections;
+      return displaySections
     }
 
-    const sectionByCategoryId = new Map(
-      displaySections.map((section) => [section.category.id, section] as const),
-    );
+    const sectionByCategoryId = new Map(displaySections.map(section => [section.category.id, section] as const))
 
     return [...categories]
       .sort((left, right) => left.order - right.order)
-      .map((category) => sectionByCategoryId.get(category.id) ?? { category, links: [] });
-  }, [categories, displaySections, hasQuery]);
+      .map(category => sectionByCategoryId.get(category.id) ?? { category, links: [] })
+  }, [categories, displaySections, hasQuery])
 
   useEffect(() => {
     const idleWindow = window as Window & {
-      requestIdleCallback?: Window["requestIdleCallback"];
-      cancelIdleCallback?: Window["cancelIdleCallback"];
-    };
-
-    if (idleWindow.requestIdleCallback && idleWindow.cancelIdleCallback) {
-      const idleId = idleWindow.requestIdleCallback(preloadPinyinSearchModule, { timeout: 3000 });
-
-      return () => {
-        idleWindow.cancelIdleCallback?.(idleId);
-      };
+      requestIdleCallback?: Window['requestIdleCallback']
+      cancelIdleCallback?: Window['cancelIdleCallback']
     }
 
-    const timeoutId = globalThis.setTimeout(preloadPinyinSearchModule, 1000);
+    if (idleWindow.requestIdleCallback && idleWindow.cancelIdleCallback) {
+      const idleId = idleWindow.requestIdleCallback(preloadPinyinSearchModule, { timeout: 3000 })
+
+      return () => {
+        idleWindow.cancelIdleCallback?.(idleId)
+      }
+    }
+
+    const timeoutId = globalThis.setTimeout(preloadPinyinSearchModule, 1000)
 
     return () => {
-      globalThis.clearTimeout(timeoutId);
-    };
-  }, []);
+      globalThis.clearTimeout(timeoutId)
+    }
+  }, [])
 
   /** Opens a blank form for adding a link from the global action. */
   function handleCreateLink(): void {
-    setEditingLink(null);
-    setAddingLinkCategoryId(null);
-    setLinkDialogOpen(true);
+    setEditingLink(null)
+    setAddingLinkCategoryId(null)
+    setLinkDialogOpen(true)
   }
 
   /** Opens a blank form for adding a link. */
   function handleAddLink(categoryId: string): void {
-    setEditingLink(null);
-    setAddingLinkCategoryId(categoryId);
-    setLinkDialogOpen(true);
+    setEditingLink(null)
+    setAddingLinkCategoryId(categoryId)
+    setLinkDialogOpen(true)
   }
 
   /** Opens the edit form with the current link data. */
   function handleEditLink(link: Link): void {
-    setEditingLink(link);
-    setAddingLinkCategoryId(null);
-    setLinkDialogOpen(true);
+    setEditingLink(link)
+    setAddingLinkCategoryId(null)
+    setLinkDialogOpen(true)
   }
 
   /** Clears edit state when closing the link dialog so the next add does not reuse stale data. */
   function handleLinkDialogOpenChange(open: boolean): void {
-    setLinkDialogOpen(open);
+    setLinkDialogOpen(open)
 
     if (!open) {
-      setEditingLink(null);
-      setAddingLinkCategoryId(null);
+      setEditingLink(null)
+      setAddingLinkCategoryId(null)
     }
   }
 
   /** Records the initial id groups before sorting starts. */
   function handleLinkDragStart(event: DragStartEvent): void {
-    const activeData = getLinkDragData(event.operation.source);
+    const activeData = getLinkDragData(event.operation.source)
 
     if (!activeData) {
-      return;
+      return
     }
 
-    dragLinkIdGroupsRef.current = baseLinkIdGroups;
+    dragLinkIdGroupsRef.current = baseLinkIdGroups
   }
 
   /** Updates only lightweight id groups while dnd-kit handles visual clone feedback. */
   function handleLinkDragOver(event: DragOverEvent): void {
-    const activeData = getLinkDragData(event.operation.source);
+    const activeData = getLinkDragData(event.operation.source)
 
     if (!activeData || !event.operation.target) {
-      return;
+      return
     }
 
-    const currentGroups = dragLinkIdGroupsRef.current ?? baseLinkIdGroups;
-    const nextGroups = moveSortableItems(currentGroups, event);
+    const currentGroups = dragLinkIdGroupsRef.current ?? baseLinkIdGroups
+    const nextGroups = moveSortableItems(currentGroups, event)
 
     if (areLinkIdGroupsEqual(currentGroups, nextGroups)) {
-      return;
+      return
     }
 
-    dragLinkIdGroupsRef.current = nextGroups;
-    setDragLinkIdGroups(nextGroups);
+    dragLinkIdGroupsRef.current = nextGroups
+    setDragLinkIdGroups(nextGroups)
   }
 
   /** Moves a link based on release position, letting the store rewrite order for same-category and cross-category moves. */
   function handleLinkDragEnd(event: DragEndEvent): void {
     if (!isLinkDragEnabled) {
-      resetLinkDragState();
-      return;
+      resetLinkDragState()
+      return
     }
 
-    const activeData = getLinkDragData(event.operation.source);
+    const activeData = getLinkDragData(event.operation.source)
 
     if (!activeData) {
-      resetLinkDragState();
-      return;
+      resetLinkDragState()
+      return
     }
 
     if (event.canceled) {
-      resetLinkDragState();
-      return;
+      resetLinkDragState()
+      return
     }
 
     const finalGroups =
       dragLinkIdGroupsRef.current ??
-      (event.operation.target ? moveSortableItems(baseLinkIdGroups, event) : baseLinkIdGroups);
-    const finalTarget = getLinkTargetFromGroups(finalGroups, activeData.linkId);
+      (event.operation.target ? moveSortableItems(baseLinkIdGroups, event) : baseLinkIdGroups)
+    const finalTarget = getLinkTargetFromGroups(finalGroups, activeData.linkId)
 
     if (!finalTarget) {
-      resetLinkDragState();
-      return;
+      resetLinkDragState()
+      return
     }
 
-    const initialTarget = getLinkTargetFromGroups(baseLinkIdGroups, activeData.linkId);
+    const initialTarget = getLinkTargetFromGroups(baseLinkIdGroups, activeData.linkId)
 
     if (
       initialTarget &&
       initialTarget.categoryId === finalTarget.categoryId &&
       initialTarget.index === finalTarget.index
     ) {
-      resetLinkDragState();
-      return;
+      resetLinkDragState()
+      return
     }
 
-    setDragLinkIdGroups(finalGroups);
+    setDragLinkIdGroups(finalGroups)
 
     void moveLinkToCategory(activeData.linkId, finalTarget.categoryId, finalTarget.index)
       .catch((moveError: unknown) => {
-        console.error("Failed to move link", moveError);
+        console.error('Failed to move link', moveError)
       })
       .finally(() => {
-        resetLinkDragState();
-      });
+        resetLinkDragState()
+      })
   }
 
   /** Clears temporary UI state used during link dragging. */
   function resetLinkDragState(): void {
-    dragLinkIdGroupsRef.current = null;
-    setDragLinkIdGroups(null);
+    dragLinkIdGroupsRef.current = null
+    setDragLinkIdGroups(null)
   }
 
   const sectionList = (
@@ -338,18 +327,12 @@ export function AppShell() {
         />
       ))}
     </div>
-  );
+  )
 
   return (
     <main className="min-h-svh bg-background text-foreground">
       <div className="sticky top-0 z-20 border-b border-border/60 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/85">
-        <div
-          className={cn(
-            interfaceSizeConfig.page.className,
-            interfaceSizeConfig.page.stackClassName,
-            "min-h-0",
-          )}
-        >
+        <div className={cn(interfaceSizeConfig.page.className, interfaceSizeConfig.page.stackClassName, 'min-h-0')}>
           <AppTopBar
             interfaceSizeConfig={interfaceSizeConfig}
             onAddLink={handleCreateLink}
@@ -375,13 +358,7 @@ export function AppShell() {
         </div>
       </div>
 
-      <div
-        className={cn(
-          interfaceSizeConfig.page.className,
-          interfaceSizeConfig.page.stackClassName,
-          "min-h-0",
-        )}
-      >
+      <div className={cn(interfaceSizeConfig.page.className, interfaceSizeConfig.page.stackClassName, 'min-h-0')}>
         {visibleSections.length > 0 ? (
           isLinkDragEnabled ? (
             <DragDropProvider
@@ -426,5 +403,5 @@ export function AppShell() {
         clearDeckData={clearDeckData}
       />
     </main>
-  );
+  )
 }

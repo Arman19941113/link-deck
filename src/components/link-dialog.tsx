@@ -1,11 +1,11 @@
 // Link add and edit dialog that collects form fields and submits them to the deck store.
 
-import type { ChangeEvent, FormEvent } from "react";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Upload } from "lucide-react";
+import type { ChangeEvent, FormEvent } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { Upload } from 'lucide-react'
 
-import { BuiltinIconField } from "@/components/brand-icon-picker";
-import { Button } from "@/components/ui/button";
+import { BuiltinIconField } from '@/components/brand-icon-picker'
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -13,94 +13,80 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { DEFAULT_CATEGORY_ID } from "@/domain/categories";
-import type { InterfaceSizeConfig } from "@/domain/interface-size";
-import { DEFAULT_BUILTIN_ICON } from "@/domain/brand-icons";
-import type { Category, IconFile, Link, LinkIcon } from "@/domain/types";
-import type { LinkInput } from "@/hooks/use-deck-store";
-import { cn } from "@/lib/utils";
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
+import { DEFAULT_CATEGORY_ID } from '@/domain/categories'
+import type { InterfaceSizeConfig } from '@/domain/interface-size'
+import { DEFAULT_BUILTIN_ICON } from '@/domain/brand-icons'
+import type { Category, IconFile, Link, LinkIcon } from '@/domain/types'
+import type { LinkInput } from '@/hooks/use-deck-store'
+import { cn } from '@/lib/utils'
 
-type IconMode = "auto" | "builtin" | "url" | "file";
-type BuiltinIconValue = Extract<LinkIcon, { type: "builtin" }>;
+type IconMode = 'auto' | 'builtin' | 'url' | 'file'
+type BuiltinIconValue = Extract<LinkIcon, { type: 'builtin' }>
 
 type LinkDialogProps = {
-  open: boolean;
-  link?: Link | null;
-  initialCategoryId?: string | null;
-  categories: Category[];
-  interfaceSizeConfig: InterfaceSizeConfig;
-  getIconFile: (id: string) => Promise<IconFile | undefined>;
-  onOpenChange: (open: boolean) => void;
-  upsertLink: (input: LinkInput) => Promise<Link>;
-};
+  open: boolean
+  link?: Link | null
+  initialCategoryId?: string | null
+  categories: Category[]
+  interfaceSizeConfig: InterfaceSizeConfig
+  getIconFile: (id: string) => Promise<IconFile | undefined>
+  onOpenChange: (open: boolean) => void
+  upsertLink: (input: LinkInput) => Promise<Link>
+}
 
-type LinkDialogFormProps = Omit<LinkDialogProps, "open">;
+type LinkDialogFormProps = Omit<LinkDialogProps, 'open'>
 
-const ICON_FILE_ACCEPT = ".png,.jpg,.jpeg,.webp,.svg,image/png,image/jpeg,image/webp,image/svg+xml";
-const MAX_ICON_FILE_SIZE = 1024 * 1024;
-const ACCEPTED_ICON_MIME_TYPES = new Set([
-  "image/png",
-  "image/jpeg",
-  "image/webp",
-  "image/svg+xml",
-]);
-const EXPLICIT_HTTP_SCHEME = /^https?:\/\//i;
+const ICON_FILE_ACCEPT = '.png,.jpg,.jpeg,.webp,.svg,image/png,image/jpeg,image/webp,image/svg+xml'
+const MAX_ICON_FILE_SIZE = 1024 * 1024
+const ACCEPTED_ICON_MIME_TYPES = new Set(['image/png', 'image/jpeg', 'image/webp', 'image/svg+xml'])
+const EXPLICIT_HTTP_SCHEME = /^https?:\/\//i
 
 /** Derives the form icon mode from the current saved link icon settings. */
 function getInitialIconMode(link?: Link | null): IconMode {
-  if (!link || link.icon.type === "auto") {
-    return "auto";
+  if (!link || link.icon.type === 'auto') {
+    return 'auto'
   }
 
-  return link.icon.type;
+  return link.icon.type
 }
 
 /** Converts unknown errors into short messages shown inside the dialog. */
 function getDialogErrorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : "Save failed. Please try again later.";
+  return error instanceof Error ? error.message : 'Save failed. Please try again later.'
 }
 
 /** Creates a readable default title when the user leaves the title field empty. */
 function getFallbackLinkName(url: string): string {
-  const trimmedUrl = url.trim();
+  const trimmedUrl = url.trim()
 
   if (!trimmedUrl) {
-    return "";
+    return ''
   }
 
   try {
-    const parsedUrl = new URL(
-      EXPLICIT_HTTP_SCHEME.test(trimmedUrl) ? trimmedUrl : `https://${trimmedUrl}`,
-    );
-    return parsedUrl.host.replace(/^www\./i, "") || trimmedUrl;
+    const parsedUrl = new URL(EXPLICIT_HTTP_SCHEME.test(trimmedUrl) ? trimmedUrl : `https://${trimmedUrl}`)
+    return parsedUrl.host.replace(/^www\./i, '') || trimmedUrl
   } catch {
-    return trimmedUrl;
+    return trimmedUrl
   }
 }
 
 /** Formats selected file sizes for compact helper text. */
 function formatFileSize(size: number): string {
   if (size < 1024) {
-    return `${size} B`;
+    return `${size} B`
   }
 
   if (size < 1024 * 1024) {
-    return `${Math.round(size / 1024)} KB`;
+    return `${Math.round(size / 1024)} KB`
   }
 
-  return `${(size / (1024 * 1024)).toFixed(1)} MB`;
+  return `${(size / (1024 * 1024)).toFixed(1)} MB`
 }
 
 /** Dialog shell for adding or editing a saved link, using a key to reset internal form state. */
@@ -117,9 +103,9 @@ export function LinkDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <LinkDialogForm
-        key={`${open ? "open" : "closed"}-${link?.id ?? "new"}-${
-          initialCategoryId ?? "default"
-        }-${link?.updatedAt ?? ""}-${categories[0]?.id ?? "none"}`}
+        key={`${open ? 'open' : 'closed'}-${link?.id ?? 'new'}-${
+          initialCategoryId ?? 'default'
+        }-${link?.updatedAt ?? ''}-${categories[0]?.id ?? 'none'}`}
         link={link}
         initialCategoryId={initialCategoryId}
         categories={categories}
@@ -129,7 +115,7 @@ export function LinkDialog({
         upsertLink={upsertLink}
       />
     </Dialog>
-  );
+  )
 }
 
 /** Form content for adding or editing a saved link. */
@@ -142,202 +128,194 @@ function LinkDialogForm({
   onOpenChange,
   upsertLink,
 }: LinkDialogFormProps) {
-  const sortedCategories = useMemo(
-    () => [...categories].sort((left, right) => left.order - right.order),
-    [categories],
-  );
+  const sortedCategories = useMemo(() => [...categories].sort((left, right) => left.order - right.order), [categories])
   const defaultCategoryId =
-    sortedCategories.find((category) => category.id === DEFAULT_CATEGORY_ID)?.id ??
-    sortedCategories[0]?.id ??
-    "";
-  const [name, setName] = useState(link?.name ?? "");
-  const [url, setUrl] = useState(link?.url ?? "");
-  const [categoryId, setCategoryId] = useState(
-    link?.categoryId ?? initialCategoryId ?? defaultCategoryId,
-  );
-  const [note, setNote] = useState(link?.note ?? "");
-  const [iconMode, setIconMode] = useState<IconMode>(getInitialIconMode(link));
+    sortedCategories.find(category => category.id === DEFAULT_CATEGORY_ID)?.id ?? sortedCategories[0]?.id ?? ''
+  const [name, setName] = useState(link?.name ?? '')
+  const [url, setUrl] = useState(link?.url ?? '')
+  const [categoryId, setCategoryId] = useState(link?.categoryId ?? initialCategoryId ?? defaultCategoryId)
+  const [note, setNote] = useState(link?.note ?? '')
+  const [iconMode, setIconMode] = useState<IconMode>(getInitialIconMode(link))
   const [builtinIcon, setBuiltinIcon] = useState<BuiltinIconValue | null>(
-    link?.icon.type === "builtin" ? link.icon : null,
-  );
-  const [iconUrl, setIconUrl] = useState(link?.icon.type === "url" ? link.icon.url : "");
-  const [iconFile, setIconFile] = useState<File | null>(null);
-  const selectedIconPreviewUrlRef = useRef<string | null>(null);
-  const [selectedIconPreviewUrl, setSelectedIconPreviewUrl] = useState<string | null>(null);
+    link?.icon.type === 'builtin' ? link.icon : null,
+  )
+  const [iconUrl, setIconUrl] = useState(link?.icon.type === 'url' ? link.icon.url : '')
+  const [iconFile, setIconFile] = useState<File | null>(null)
+  const selectedIconPreviewUrlRef = useRef<string | null>(null)
+  const [selectedIconPreviewUrl, setSelectedIconPreviewUrl] = useState<string | null>(null)
   const [savedIconPreview, setSavedIconPreview] = useState<{
-    fileId: string;
-    size: number;
-    url: string;
-  } | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [isSaving, setIsSaving] = useState(false);
-  const dialogTitle = link ? "Edit link" : "Add link";
-  const errorId = "link-dialog-error";
-  const selectedCategoryId = categoryId || defaultCategoryId;
-  const hasCategories = categories.length > 0;
-  const shouldShowCategorySelect = Boolean(link) || !initialCategoryId;
-  const savedIconFileId = link?.icon.type === "file" ? link.icon.fileId : null;
+    fileId: string
+    size: number
+    url: string
+  } | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [isSaving, setIsSaving] = useState(false)
+  const dialogTitle = link ? 'Edit link' : 'Add link'
+  const errorId = 'link-dialog-error'
+  const selectedCategoryId = categoryId || defaultCategoryId
+  const hasCategories = categories.length > 0
+  const shouldShowCategorySelect = Boolean(link) || !initialCategoryId
+  const savedIconFileId = link?.icon.type === 'file' ? link.icon.fileId : null
   const currentSavedIconPreview =
-    savedIconFileId && savedIconPreview?.fileId === savedIconFileId ? savedIconPreview : null;
+    savedIconFileId && savedIconPreview?.fileId === savedIconFileId ? savedIconPreview : null
   const isIconFileInvalid = Boolean(
-    iconFile &&
-    (!ACCEPTED_ICON_MIME_TYPES.has(iconFile.type) || iconFile.size > MAX_ICON_FILE_SIZE),
-  );
+    iconFile && (!ACCEPTED_ICON_MIME_TYPES.has(iconFile.type) || iconFile.size > MAX_ICON_FILE_SIZE),
+  )
 
   const currentFileLabel = useMemo(() => {
     if (iconFile) {
-      return iconFile.name;
+      return iconFile.name
     }
 
-    return link?.icon.type === "file" ? link.icon.name : "";
-  }, [iconFile, link]);
+    return link?.icon.type === 'file' ? link.icon.name : ''
+  }, [iconFile, link])
   const currentFileMeta = iconFile
     ? formatFileSize(iconFile.size)
     : currentSavedIconPreview
       ? formatFileSize(currentSavedIconPreview.size)
-      : "";
-  const currentFilePreviewUrl = selectedIconPreviewUrl ?? currentSavedIconPreview?.url ?? null;
+      : ''
+  const currentFilePreviewUrl = selectedIconPreviewUrl ?? currentSavedIconPreview?.url ?? null
 
   useEffect(() => {
     return () => {
       if (selectedIconPreviewUrlRef.current) {
-        URL.revokeObjectURL(selectedIconPreviewUrlRef.current);
+        URL.revokeObjectURL(selectedIconPreviewUrlRef.current)
       }
-    };
-  }, []);
+    }
+  }, [])
 
   useEffect(() => {
     if (!savedIconFileId) {
-      return;
+      return
     }
-    let canceled = false;
-    let previewUrl: string | null = null;
+    let canceled = false
+    let previewUrl: string | null = null
 
-    void getIconFile(savedIconFileId).then((savedIconFile) => {
+    void getIconFile(savedIconFileId).then(savedIconFile => {
       if (canceled || !savedIconFile) {
-        return;
+        return
       }
 
-      previewUrl = URL.createObjectURL(savedIconFile.blob);
+      previewUrl = URL.createObjectURL(savedIconFile.blob)
       setSavedIconPreview({
         fileId: savedIconFileId,
         size: savedIconFile.size,
         url: previewUrl,
-      });
-    });
+      })
+    })
 
     return () => {
-      canceled = true;
+      canceled = true
 
       if (previewUrl) {
-        URL.revokeObjectURL(previewUrl);
+        URL.revokeObjectURL(previewUrl)
       }
-    };
-  }, [getIconFile, savedIconFileId]);
+    }
+  }, [getIconFile, savedIconFileId])
 
   /** Clears the pending local file selection and releases its preview URL. */
   function clearSelectedIconFile(): void {
-    setIconFile(null);
+    setIconFile(null)
 
     if (selectedIconPreviewUrlRef.current) {
-      URL.revokeObjectURL(selectedIconPreviewUrlRef.current);
-      selectedIconPreviewUrlRef.current = null;
+      URL.revokeObjectURL(selectedIconPreviewUrlRef.current)
+      selectedIconPreviewUrlRef.current = null
     }
 
-    setSelectedIconPreviewUrl(null);
+    setSelectedIconPreviewUrl(null)
   }
 
   /** Validates file size and stores the pending icon upload. */
   function handleIconFileChange(event: ChangeEvent<HTMLInputElement>): void {
-    const file = event.target.files?.[0] ?? null;
+    const file = event.target.files?.[0] ?? null
 
-    clearSelectedIconFile();
+    clearSelectedIconFile()
 
     if (!file) {
-      setError(null);
-      return;
+      setError(null)
+      return
     }
 
-    setIconFile(file);
+    setIconFile(file)
 
     if (!ACCEPTED_ICON_MIME_TYPES.has(file.type)) {
-      setError("Choose a PNG, JPEG, WebP, or SVG icon");
-      return;
+      setError('Choose a PNG, JPEG, WebP, or SVG icon')
+      return
     }
 
-    const previewUrl = URL.createObjectURL(file);
+    const previewUrl = URL.createObjectURL(file)
 
-    selectedIconPreviewUrlRef.current = previewUrl;
-    setSelectedIconPreviewUrl(previewUrl);
+    selectedIconPreviewUrlRef.current = previewUrl
+    setSelectedIconPreviewUrl(previewUrl)
 
     if (file.size > MAX_ICON_FILE_SIZE) {
-      setError("Icon files cannot exceed 1024KB");
-      return;
+      setError('Icon files cannot exceed 1024KB')
+      return
     }
 
-    setError(null);
+    setError(null)
   }
 
   /** Builds link input and calls the store save action. */
   async function handleSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
-    event.preventDefault();
+    event.preventDefault()
 
     if (isSaving) {
-      return;
+      return
     }
 
-    const trimmedUrl = url.trim();
-    const trimmedName = name.trim() || getFallbackLinkName(trimmedUrl);
-    const trimmedIconUrl = iconUrl.trim();
+    const trimmedUrl = url.trim()
+    const trimmedName = name.trim() || getFallbackLinkName(trimmedUrl)
+    const trimmedIconUrl = iconUrl.trim()
 
     if (!trimmedUrl) {
-      setError("Enter a link URL");
-      return;
+      setError('Enter a link URL')
+      return
     }
 
     if (!selectedCategoryId) {
-      setError("Select a category");
-      return;
+      setError('Select a category')
+      return
     }
 
-    if (iconMode === "builtin" && !builtinIcon) {
-      setError("Choose a built-in icon");
-      return;
+    if (iconMode === 'builtin' && !builtinIcon) {
+      setError('Choose a built-in icon')
+      return
     }
 
-    if (iconMode === "url" && !trimmedIconUrl) {
-      setError("Enter an icon URL");
-      return;
+    if (iconMode === 'url' && !trimmedIconUrl) {
+      setError('Enter an icon URL')
+      return
     }
 
-    if (iconMode === "file" && iconFile && !ACCEPTED_ICON_MIME_TYPES.has(iconFile.type)) {
-      setError("Choose a PNG, JPEG, WebP, or SVG icon");
-      return;
+    if (iconMode === 'file' && iconFile && !ACCEPTED_ICON_MIME_TYPES.has(iconFile.type)) {
+      setError('Choose a PNG, JPEG, WebP, or SVG icon')
+      return
     }
 
-    if (iconMode === "file" && iconFile && iconFile.size > MAX_ICON_FILE_SIZE) {
-      setError("Icon files cannot exceed 1024KB");
-      return;
+    if (iconMode === 'file' && iconFile && iconFile.size > MAX_ICON_FILE_SIZE) {
+      setError('Icon files cannot exceed 1024KB')
+      return
     }
 
-    if (iconMode === "file" && !iconFile && link?.icon.type !== "file") {
-      setError("Choose a local icon file");
-      return;
+    if (iconMode === 'file' && !iconFile && link?.icon.type !== 'file') {
+      setError('Choose a local icon file')
+      return
     }
 
     const icon: LinkIcon | undefined =
-      iconMode === "auto"
-        ? { type: "auto" }
-        : iconMode === "builtin"
+      iconMode === 'auto'
+        ? { type: 'auto' }
+        : iconMode === 'builtin'
           ? (builtinIcon ?? undefined)
-          : iconMode === "url"
-            ? { type: "url", url: trimmedIconUrl }
-            : link?.icon.type === "file"
+          : iconMode === 'url'
+            ? { type: 'url', url: trimmedIconUrl }
+            : link?.icon.type === 'file'
               ? link.icon
-              : undefined;
+              : undefined
 
-    setIsSaving(true);
-    setError(null);
+    setIsSaving(true)
+    setError(null)
 
     try {
       await upsertLink({
@@ -347,37 +325,32 @@ function LinkDialogForm({
         url: trimmedUrl,
         note,
         icon,
-        iconFile: iconMode === "file" ? iconFile : null,
-      });
-      onOpenChange(false);
+        iconFile: iconMode === 'file' ? iconFile : null,
+      })
+      onOpenChange(false)
     } catch (saveError) {
-      setError(getDialogErrorMessage(saveError));
+      setError(getDialogErrorMessage(saveError))
     } finally {
-      setIsSaving(false);
+      setIsSaving(false)
     }
   }
 
   return (
     <DialogContent
       className={cn(
-        "grid-rows-[auto_auto] overflow-y-auto",
+        'grid-rows-[auto_auto] overflow-y-auto',
         interfaceSizeConfig.dialog.surfaceClassName,
-        "!h-auto !max-h-[calc(100svh-2rem)]",
+        '!h-auto !max-h-[calc(100svh-2rem)]',
       )}
     >
       <DialogHeader className={interfaceSizeConfig.dialog.headerClassName}>
-        <DialogTitle className={interfaceSizeConfig.dialog.titleClassName}>
-          {dialogTitle}
-        </DialogTitle>
+        <DialogTitle className={interfaceSizeConfig.dialog.titleClassName}>{dialogTitle}</DialogTitle>
         <DialogDescription className={interfaceSizeConfig.dialog.descriptionClassName}>
           Save the link details and choose how its icon should appear.
         </DialogDescription>
       </DialogHeader>
 
-      <form
-        className={interfaceSizeConfig.dialog.formClassName}
-        onSubmit={(event) => void handleSubmit(event)}
-      >
+      <form className={interfaceSizeConfig.dialog.formClassName} onSubmit={event => void handleSubmit(event)}>
         <div className={interfaceSizeConfig.dialog.fieldClassName}>
           <Label htmlFor="link-dialog-url" className={interfaceSizeConfig.control.labelClassName}>
             Link URL
@@ -391,7 +364,7 @@ function LinkDialogForm({
             placeholder="https://example.com"
             disabled={isSaving}
             aria-invalid={!url.trim() && Boolean(error)}
-            onChange={(event) => setUrl(event.target.value)}
+            onChange={event => setUrl(event.target.value)}
           />
         </div>
 
@@ -403,10 +376,7 @@ function LinkDialogForm({
           }
         >
           <div className={interfaceSizeConfig.dialog.fieldClassName}>
-            <Label
-              htmlFor="link-dialog-name"
-              className={interfaceSizeConfig.control.labelClassName}
-            >
+            <Label htmlFor="link-dialog-name" className={interfaceSizeConfig.control.labelClassName}>
               Title
             </Label>
             <Input
@@ -415,33 +385,26 @@ function LinkDialogForm({
               value={name}
               placeholder="Use link address if empty"
               disabled={isSaving}
-              onChange={(event) => setName(event.target.value)}
+              onChange={event => setName(event.target.value)}
             />
           </div>
 
           {shouldShowCategorySelect ? (
             <div className={interfaceSizeConfig.dialog.fieldClassName}>
-              <Label
-                htmlFor="link-dialog-category"
-                className={interfaceSizeConfig.control.labelClassName}
-              >
+              <Label htmlFor="link-dialog-category" className={interfaceSizeConfig.control.labelClassName}>
                 Category
               </Label>
-              <Select
-                value={selectedCategoryId}
-                disabled={isSaving || !hasCategories}
-                onValueChange={setCategoryId}
-              >
+              <Select value={selectedCategoryId} disabled={isSaving || !hasCategories} onValueChange={setCategoryId}>
                 <SelectTrigger
                   id="link-dialog-category"
-                  className={cn("w-full", interfaceSizeConfig.control.inputClassName)}
+                  className={cn('w-full', interfaceSizeConfig.control.inputClassName)}
                   aria-invalid={!selectedCategoryId && Boolean(error)}
                 >
                   <SelectValue placeholder="Select a category" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    {sortedCategories.map((category) => (
+                    {sortedCategories.map(category => (
                       <SelectItem key={category.id} value={category.id}>
                         {category.name}
                       </SelectItem>
@@ -459,42 +422,36 @@ function LinkDialogForm({
           </Label>
           <Textarea
             id="link-dialog-note"
-            className={cn(
-              interfaceSizeConfig.control.textareaClassName,
-              "h-auto min-h-0 resize-none",
-            )}
+            className={cn(interfaceSizeConfig.control.textareaClassName, 'h-auto min-h-0 resize-none')}
             value={note}
             rows={2}
             disabled={isSaving}
-            onChange={(event) => setNote(event.target.value)}
+            onChange={event => setNote(event.target.value)}
           />
         </div>
 
         <div className={interfaceSizeConfig.dialog.gridClassName}>
           <div className={interfaceSizeConfig.dialog.fieldClassName}>
-            <Label
-              htmlFor="link-dialog-icon-mode"
-              className={interfaceSizeConfig.control.labelClassName}
-            >
+            <Label htmlFor="link-dialog-icon-mode" className={interfaceSizeConfig.control.labelClassName}>
               Icon source
             </Label>
             <Select
               value={iconMode}
               disabled={isSaving}
-              onValueChange={(value) => {
-                setIconMode(value as IconMode);
-                if (value === "builtin" && !builtinIcon) {
-                  setBuiltinIcon(DEFAULT_BUILTIN_ICON);
+              onValueChange={value => {
+                setIconMode(value as IconMode)
+                if (value === 'builtin' && !builtinIcon) {
+                  setBuiltinIcon(DEFAULT_BUILTIN_ICON)
                 }
-                if (value !== "file") {
-                  clearSelectedIconFile();
+                if (value !== 'file') {
+                  clearSelectedIconFile()
                 }
-                setError(null);
+                setError(null)
               }}
             >
               <SelectTrigger
                 id="link-dialog-icon-mode"
-                className={cn("w-full", interfaceSizeConfig.control.inputClassName)}
+                className={cn('w-full', interfaceSizeConfig.control.inputClassName)}
               >
                 <SelectValue />
               </SelectTrigger>
@@ -509,30 +466,27 @@ function LinkDialogForm({
             </Select>
           </div>
 
-          {iconMode === "auto" ? (
+          {iconMode === 'auto' ? (
             <p className="self-end text-xs leading-5 text-muted-foreground">
               Use the website favicon automatically. If it is unavailable, show the title initial.
             </p>
           ) : null}
 
-          {iconMode === "builtin" ? (
+          {iconMode === 'builtin' ? (
             <BuiltinIconField
               value={builtinIcon}
               disabled={isSaving}
               interfaceSizeConfig={interfaceSizeConfig}
-              onChange={(icon) => {
-                setBuiltinIcon(icon);
-                setError(null);
+              onChange={icon => {
+                setBuiltinIcon(icon)
+                setError(null)
               }}
             />
           ) : null}
 
-          {iconMode === "url" ? (
+          {iconMode === 'url' ? (
             <div className={interfaceSizeConfig.dialog.fieldClassName}>
-              <Label
-                htmlFor="link-dialog-icon-url"
-                className={interfaceSizeConfig.control.labelClassName}
-              >
+              <Label htmlFor="link-dialog-icon-url" className={interfaceSizeConfig.control.labelClassName}>
                 Icon URL
               </Label>
               <Input
@@ -543,17 +497,14 @@ function LinkDialogForm({
                 placeholder="https://example.com/icon.png"
                 disabled={isSaving}
                 aria-invalid={!iconUrl.trim() && Boolean(error)}
-                onChange={(event) => setIconUrl(event.target.value)}
+                onChange={event => setIconUrl(event.target.value)}
               />
             </div>
           ) : null}
 
-          {iconMode === "file" ? (
+          {iconMode === 'file' ? (
             <div className={interfaceSizeConfig.dialog.fieldClassName}>
-              <Label
-                htmlFor="link-dialog-icon-file"
-                className={interfaceSizeConfig.control.labelClassName}
-              >
+              <Label htmlFor="link-dialog-icon-file" className={interfaceSizeConfig.control.labelClassName}>
                 Local file
               </Label>
               <Input
@@ -569,11 +520,10 @@ function LinkDialogForm({
                 htmlFor="link-dialog-icon-file"
                 className={cn(
                   interfaceSizeConfig.control.inputClassName,
-                  "flex cursor-pointer items-center gap-3 border border-input bg-card shadow-xs transition-[border-color,box-shadow,opacity]",
-                  "peer-focus-visible:border-ring peer-focus-visible:ring-[3px] peer-focus-visible:ring-ring/50",
-                  isSaving && "cursor-not-allowed opacity-50",
-                  isIconFileInvalid &&
-                    "border-destructive ring-[3px] ring-destructive/20 dark:ring-destructive/40",
+                  'flex cursor-pointer items-center gap-3 border border-input bg-card shadow-xs transition-[border-color,box-shadow,opacity]',
+                  'peer-focus-visible:border-ring peer-focus-visible:ring-[3px] peer-focus-visible:ring-ring/50',
+                  isSaving && 'cursor-not-allowed opacity-50',
+                  isIconFileInvalid && 'border-destructive ring-[3px] ring-destructive/20 dark:ring-destructive/40',
                 )}
               >
                 <div className="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-sm bg-muted text-muted-foreground">
@@ -585,19 +535,13 @@ function LinkDialogForm({
                 </div>
                 {currentFileLabel ? (
                   <div className="flex min-w-0 flex-1 items-center gap-2">
-                    <p className="min-w-0 flex-1 truncate text-sm leading-tight font-medium">
-                      {currentFileLabel}
-                    </p>
+                    <p className="min-w-0 flex-1 truncate text-sm leading-tight font-medium">{currentFileLabel}</p>
                     {currentFileMeta ? (
-                      <p className="shrink-0 text-xs leading-5 text-muted-foreground">
-                        {currentFileMeta}
-                      </p>
+                      <p className="shrink-0 text-xs leading-5 text-muted-foreground">{currentFileMeta}</p>
                     ) : null}
                   </div>
                 ) : (
-                  <p className="min-w-0 flex-1 truncate text-sm leading-tight font-medium">
-                    Choose an icon file
-                  </p>
+                  <p className="min-w-0 flex-1 truncate text-sm leading-tight font-medium">Choose an icon file</p>
                 )}
               </Label>
             </div>
@@ -605,16 +549,12 @@ function LinkDialogForm({
         </div>
 
         {error ? (
-          <p
-            id={errorId}
-            role="alert"
-            className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive"
-          >
+          <p id={errorId} role="alert" className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
             {error}
           </p>
         ) : null}
 
-        <DialogFooter className={cn("mt-3", interfaceSizeConfig.dialog.footerClassName)}>
+        <DialogFooter className={cn('mt-3', interfaceSizeConfig.dialog.footerClassName)}>
           <Button
             type="button"
             variant="outline"
@@ -624,15 +564,11 @@ function LinkDialogForm({
           >
             Cancel
           </Button>
-          <Button
-            type="submit"
-            size={interfaceSizeConfig.control.buttonSize}
-            disabled={isSaving || !hasCategories}
-          >
-            {isSaving ? "Saving..." : "Save link"}
+          <Button type="submit" size={interfaceSizeConfig.control.buttonSize} disabled={isSaving || !hasCategories}>
+            {isSaving ? 'Saving...' : 'Save link'}
           </Button>
         </DialogFooter>
       </form>
     </DialogContent>
-  );
+  )
 }

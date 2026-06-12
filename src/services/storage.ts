@@ -25,7 +25,7 @@ import {
   type CategoryDraftPersistInput,
   type DeckSnapshotMirror,
   type StoredDeckSnapshot,
-} from "@/storage/deck-db";
+} from '@/storage/deck-db'
 
 /** Collects all app-level storage operations behind one service boundary. */
 export const storageService = {
@@ -50,6 +50,6 @@ export const storageService = {
   saveLink,
   saveLinks,
   saveSortMode,
-};
+}
 
-export type { CategoryDraftPersistInput, DeckSnapshotMirror, StoredDeckSnapshot };
+export type { CategoryDraftPersistInput, DeckSnapshotMirror, StoredDeckSnapshot }

@@ -1,5 +1,5 @@
-import { AppShell } from "@/components/app-shell";
-import { Toaster } from "@/components/ui/sonner";
+import { AppShell } from '@/components/app-shell'
+import { Toaster } from '@/components/ui/sonner'
 
 /** Renders the Link Deck start page app. */
 function App() {
@@ -8,7 +8,7 @@ function App() {
       <AppShell />
       <Toaster richColors closeButton position="top-center" />
     </>
-  );
+  )
 }
 
-export default App;
+export default App

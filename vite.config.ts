@@ -1,11 +1,11 @@
-import path from "node:path";
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import tailwindcss from "@tailwindcss/vite";
+import path from 'node:path'
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
 
-import { vendorChunkGroups } from "./config/vite/vendor-chunks";
+import { vendorChunkGroups } from './config/vite/vendor-chunks'
 
-const siteBasePath = process.env.VITE_BASE_PATH ?? "/";
+const siteBasePath = process.env.VITE_BASE_PATH ?? '/'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -13,7 +13,7 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
+      '@': path.resolve(__dirname, './src'),
     },
   },
   build: {
@@ -25,4 +25,4 @@ export default defineConfig({
       },
     },
   },
-});
+})
