@@ -4,7 +4,7 @@ import type { ChangeEvent, FormEvent } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Upload } from "lucide-react";
 
-import { BuiltinIconField } from "@/components/simple-icon-picker";
+import { BuiltinIconField } from "@/components/brand-icon-picker";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -27,7 +27,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { DEFAULT_CATEGORY_ID } from "@/domain/categories";
 import type { InterfaceSizeConfig } from "@/domain/interface-size";
-import { DEFAULT_BUILTIN_ICON } from "@/domain/simple-icons";
+import { DEFAULT_BUILTIN_ICON } from "@/domain/brand-icons";
 import type { Category, IconFile, Link, LinkIcon } from "@/domain/types";
 import type { LinkInput } from "@/hooks/use-deck-store";
 import { cn } from "@/lib/utils";

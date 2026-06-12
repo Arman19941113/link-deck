@@ -3,11 +3,7 @@
 import { useEffect, useState } from "react";
 import { Link as LinkIconGlyph } from "lucide-react";
 
-import {
-  isGenericLinkBuiltinIcon,
-  loadBuiltinIcon,
-  type BuiltinIconRenderData,
-} from "@/domain/simple-icons";
+import { isGenericLinkBuiltinIcon, loadBuiltinIcon } from "@/domain/brand-icons";
 import type { IconFile, Link } from "@/domain/types";
 import { getFaviconUrl } from "@/domain/url";
 import { cn } from "@/lib/utils";
@@ -29,11 +25,6 @@ function getFallbackLetter(name: string): string {
 /** Loads images from link icon settings and shows a text placeholder on failure. */
 export function LinkIcon({ link, getIconFile, imageClassName, wrapperClassName }: LinkIconProps) {
   const [localIcon, setLocalIcon] = useState<{ fileId: string; url: string } | null>(null);
-  const [builtinIconState, setBuiltinIconState] = useState<{
-    icon: BuiltinIconRenderData | null;
-    missing: boolean;
-    slug: string;
-  } | null>(null);
   const [failedImageUrl, setFailedImageUrl] = useState<string | null>(null);
   const [loadedImageUrl, setLoadedImageUrl] = useState<string | null>(null);
   const icon = link.icon;
@@ -77,40 +68,6 @@ export function LinkIcon({ link, getIconFile, imageClassName, wrapperClassName }
   }, [getIconFile, icon]);
 
   useEffect(() => {
-    let canceled = false;
-
-    if (icon.type !== "builtin") {
-      return undefined;
-    }
-
-    void loadBuiltinIcon(icon.slug)
-      .then((loadedIcon) => {
-        if (canceled) {
-          return;
-        }
-
-        setBuiltinIconState({
-          slug: icon.slug,
-          icon: loadedIcon,
-          missing: !loadedIcon,
-        });
-      })
-      .catch(() => {
-        if (!canceled) {
-          setBuiltinIconState({
-            slug: icon.slug,
-            icon: null,
-            missing: true,
-          });
-        }
-      });
-
-    return () => {
-      canceled = true;
-    };
-  }, [icon]);
-
-  useEffect(() => {
     if (icon.type !== "auto" || !imageUrl || loadedImageUrl === imageUrl) {
       return undefined;
     }
@@ -143,11 +100,9 @@ export function LinkIcon({ link, getIconFile, imageClassName, wrapperClassName }
       );
     }
 
-    const loadedBuiltinIcon = builtinIconState?.slug === icon.slug ? builtinIconState.icon : null;
-    const builtinIconMissing =
-      builtinIconState?.slug === icon.slug ? builtinIconState.missing : false;
+    const loadedBuiltinIcon = loadBuiltinIcon(icon.slug);
 
-    if (builtinIconMissing) {
+    if (!loadedBuiltinIcon) {
       return (
         <span
           className={cn(
@@ -161,24 +116,6 @@ export function LinkIcon({ link, getIconFile, imageClassName, wrapperClassName }
       );
     }
 
-    if (!loadedBuiltinIcon) {
-      return (
-        <span
-          className={cn(
-            "flex shrink-0 items-center justify-center border bg-secondary",
-            wrapperClassName ?? "size-11 rounded-md text-sm",
-          )}
-          aria-label={icon.title}
-        >
-          <span
-            className={cn("rounded-sm", imageClassName ?? "size-7")}
-            style={{ backgroundColor: `#${icon.hex}` }}
-            aria-hidden="true"
-          />
-        </span>
-      );
-    }
-
     return (
       <span
         className={cn(
@@ -187,14 +124,13 @@ export function LinkIcon({ link, getIconFile, imageClassName, wrapperClassName }
         )}
       >
         <svg
-          viewBox="0 0 24 24"
+          viewBox={`0 0 ${loadedBuiltinIcon.width} ${loadedBuiltinIcon.height}`}
           role="img"
           aria-label={loadedBuiltinIcon.title}
           className={cn("object-contain", imageClassName ?? "size-7 rounded-sm")}
-          fill={`#${loadedBuiltinIcon.hex}`}
-        >
-          <path d={loadedBuiltinIcon.path} />
-        </svg>
+          style={{ color: `#${loadedBuiltinIcon.color}` }}
+          dangerouslySetInnerHTML={{ __html: loadedBuiltinIcon.body }}
+        />
       </span>
     );
   }

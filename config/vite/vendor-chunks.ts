@@ -1,11 +1,6 @@
 // Defines package-based Rolldown chunk groups for the Vite production build.
 export const vendorChunkGroups = [
   {
-    name: "vendor-simple-icons",
-    test: /(?:\0)?virtual:common-simple-icons/,
-    priority: 60,
-  },
-  {
     name: "vendor-react",
     test: vendorPackagePattern(["react", "react-dom", "scheduler"]),
     priority: 50,

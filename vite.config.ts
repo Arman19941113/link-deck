@@ -3,7 +3,6 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 
-import { commonSimpleIconsPlugin } from "./config/vite/common-simple-icons-plugin";
 import { vendorChunkGroups } from "./config/vite/vendor-chunks";
 
 const siteBasePath = process.env.VITE_BASE_PATH ?? "/";
@@ -11,7 +10,7 @@ const siteBasePath = process.env.VITE_BASE_PATH ?? "/";
 // https://vite.dev/config/
 export default defineConfig({
   base: siteBasePath,
-  plugins: [commonSimpleIconsPlugin(), react(), tailwindcss()],
+  plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

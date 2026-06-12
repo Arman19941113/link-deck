@@ -1,6 +1,6 @@
-// Built-in Simple Icons picker used by the link add and edit dialog.
+// Built-in BrandIcon picker used by the link add and edit dialog.
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Check, Link as LinkIconGlyph, Shuffle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -17,28 +17,29 @@ import { Label } from "@/components/ui/label";
 import type { InterfaceSizeConfig } from "@/domain/interface-size";
 import {
   createBuiltinIconRef,
+  getBuiltinIconMetadata,
   getRandomDefaultBuiltinIcon,
   isGenericLinkBuiltinIcon,
   loadBuiltinIcon,
   searchBuiltinIcons,
-  type BuiltinIconSearchResult,
-} from "@/domain/simple-icons";
+  type BrandIconSearchResult,
+} from "@/domain/brand-icons";
 import type { LinkIcon } from "@/domain/types";
 import { cn } from "@/lib/utils";
 
 type BuiltinIconValue = Extract<LinkIcon, { type: "builtin" }>;
 
-type SimpleIconPickerProps = {
+type BrandIconPickerProps = {
   value: BuiltinIconValue | null;
   disabled?: boolean;
   interfaceSizeConfig: InterfaceSizeConfig;
   onChange: (icon: BuiltinIconValue) => void;
 };
 
-type BuiltinIconFieldProps = SimpleIconPickerProps;
+type BuiltinIconFieldProps = BrandIconPickerProps;
 
-type SimpleIconPreviewProps = {
-  icon: BuiltinIconSearchResult;
+type BrandIconPreviewProps = {
+  icon: BrandIconSearchResult;
   className?: string;
   decorative?: boolean;
 };
@@ -50,33 +51,9 @@ function getBuiltinIconActionInsetClassName(
   return buttonSize === "default" ? "py-1 pr-[3px] pl-3" : "py-0.5 pr-px pl-3";
 }
 
-/** Displays a Simple Icons path using its brand color. */
-function SimpleIconPreview({ icon, className, decorative = false }: SimpleIconPreviewProps) {
-  const [loadedIcon, setLoadedIcon] = useState<{
-    path: string | null;
-    slug: string;
-  } | null>(null);
-  const isGenericLinkIcon = isGenericLinkBuiltinIcon(icon.slug);
-
-  useEffect(() => {
-    let canceled = false;
-
-    if (isGenericLinkIcon) {
-      return undefined;
-    }
-
-    void loadBuiltinIcon(icon.slug)
-      .then((loadedIcon) => {
-        if (!canceled) {
-          setLoadedIcon({ slug: icon.slug, path: loadedIcon?.path ?? null });
-        }
-      })
-      .catch(() => undefined);
-
-    return () => {
-      canceled = true;
-    };
-  }, [icon.slug, isGenericLinkIcon]);
+/** Displays a built-in BrandIcon from its local SVG data. */
+function BrandIconPreview({ icon, className, decorative = false }: BrandIconPreviewProps) {
+  const isGenericLinkIcon = isGenericLinkBuiltinIcon(icon.key);
 
   if (isGenericLinkIcon) {
     return (
@@ -85,18 +62,18 @@ function SimpleIconPreview({ icon, className, decorative = false }: SimpleIconPr
         aria-hidden={decorative || undefined}
         aria-label={decorative ? undefined : icon.title}
         className={cn("size-4 shrink-0", className)}
-        style={{ color: `#${icon.hex}` }}
+        style={{ color: `#${icon.color}` }}
       />
     );
   }
 
-  const path = loadedIcon?.slug === icon.slug ? loadedIcon.path : null;
+  const loadedIcon = loadBuiltinIcon(icon.key);
 
-  if (!path) {
+  if (!loadedIcon) {
     return (
       <span
         className={cn("size-4 shrink-0 rounded-sm", className)}
-        style={{ backgroundColor: `#${icon.hex}` }}
+        style={{ backgroundColor: `#${icon.color}` }}
         role={decorative ? undefined : "img"}
         aria-hidden={decorative || undefined}
         aria-label={decorative ? undefined : icon.title}
@@ -106,15 +83,14 @@ function SimpleIconPreview({ icon, className, decorative = false }: SimpleIconPr
 
   return (
     <svg
-      viewBox="0 0 24 24"
+      viewBox={`0 0 ${loadedIcon.width} ${loadedIcon.height}`}
       role={decorative ? undefined : "img"}
       aria-hidden={decorative || undefined}
       aria-label={decorative ? undefined : icon.title}
       className={cn("size-4 shrink-0", className)}
-      fill={`#${icon.hex}`}
-    >
-      <path d={path} />
-    </svg>
+      style={{ color: `#${loadedIcon.color}` }}
+      dangerouslySetInnerHTML={{ __html: loadedIcon.body }}
+    />
   );
 }
 
@@ -127,10 +103,7 @@ export function BuiltinIconField({
 }: BuiltinIconFieldProps) {
   const [chooserOpen, setChooserOpen] = useState(false);
   const [draftIcon, setDraftIcon] = useState<BuiltinIconValue | null>(value);
-  const selectedIcon = useMemo(
-    () => (value ? { slug: value.slug, title: value.title, hex: value.hex } : null),
-    [value],
-  );
+  const selectedIcon = useMemo(() => (value ? getBuiltinIconMetadata(value) : null), [value]);
 
   /** Opens the chooser with the current saved draft value. */
   function handleOpenChooser(): void {
@@ -144,7 +117,7 @@ export function BuiltinIconField({
       return;
     }
 
-    onChange(await getRandomDefaultBuiltinIcon(value?.slug));
+    onChange(getRandomDefaultBuiltinIcon(value?.slug));
   }
 
   /** Commits the icon selected inside the chooser dialog. */
@@ -170,7 +143,7 @@ export function BuiltinIconField({
         >
           <span className="flex min-w-0 flex-1 items-center gap-3">
             {selectedIcon ? (
-              <SimpleIconPreview icon={selectedIcon} className="size-5" />
+              <BrandIconPreview icon={selectedIcon} className="size-5" />
             ) : (
               <span className="size-5 rounded-sm bg-muted" aria-hidden="true" />
             )}
@@ -218,12 +191,12 @@ export function BuiltinIconField({
               Choose built-in icon
             </DialogTitle>
             <DialogDescription className={interfaceSizeConfig.dialog.descriptionClassName}>
-              Search Simple Icons and confirm the icon for this link.
+              Search built-in brand icons and confirm the icon for this link.
             </DialogDescription>
           </DialogHeader>
 
           <div className="min-h-0">
-            <SimpleIconPicker
+            <BrandIconPicker
               value={draftIcon}
               disabled={disabled}
               interfaceSizeConfig={interfaceSizeConfig}
@@ -256,43 +229,15 @@ export function BuiltinIconField({
 }
 
 /** Lets the user search and choose a serializable built-in icon reference. */
-export function SimpleIconPicker({
+export function BrandIconPicker({
   value,
   disabled = false,
   interfaceSizeConfig,
   onChange,
-}: SimpleIconPickerProps) {
+}: BrandIconPickerProps) {
   const [query, setQuery] = useState("");
-  const [searchState, setSearchState] = useState<{
-    query: string | null;
-    results: BuiltinIconSearchResult[];
-  }>({ query: null, results: [] });
-  const selectedIcon = useMemo(
-    () => (value ? { slug: value.slug, title: value.title, hex: value.hex } : null),
-    [value],
-  );
-  const isLoading = searchState.query !== query;
-  const results = searchState.results;
-
-  useEffect(() => {
-    let canceled = false;
-
-    void searchBuiltinIcons(query)
-      .then((nextResults) => {
-        if (!canceled) {
-          setSearchState({ query, results: nextResults });
-        }
-      })
-      .catch(() => {
-        if (!canceled) {
-          setSearchState({ query, results: [] });
-        }
-      });
-
-    return () => {
-      canceled = true;
-    };
-  }, [query]);
+  const selectedIcon = useMemo(() => (value ? getBuiltinIconMetadata(value) : null), [value]);
+  const results = useMemo(() => searchBuiltinIcons(query), [query]);
 
   return (
     <div className="flex h-full min-h-0 flex-col rounded-md border bg-secondary/20 p-3">
@@ -300,7 +245,7 @@ export function SimpleIconPicker({
         <div className="mb-3 flex items-center justify-between gap-3 rounded-md border bg-background px-3 py-2">
           <span className="flex min-w-0 items-center gap-2">
             {selectedIcon ? (
-              <SimpleIconPreview icon={selectedIcon} className="size-5" decorative />
+              <BrandIconPreview icon={selectedIcon} className="size-5" decorative />
             ) : (
               <span
                 className="size-5 rounded-sm"
@@ -333,21 +278,15 @@ export function SimpleIconPicker({
         />
       </div>
 
-      {isLoading ? (
-        <div data-result-list className="mt-3 min-h-0 flex-1 overflow-y-auto">
-          <p className="rounded-md bg-background px-3 py-2 text-sm text-muted-foreground">
-            Loading built-in icons...
-          </p>
-        </div>
-      ) : results.length ? (
+      {results.length ? (
         <div data-result-list className="mt-3 min-h-0 flex-1 overflow-y-auto">
           <div className="grid gap-2 sm:grid-cols-3">
             {results.map((icon) => {
-              const selected = value?.slug === icon.slug;
+              const selected = value?.slug === icon.key;
 
               return (
                 <Button
-                  key={icon.slug}
+                  key={icon.key}
                   type="button"
                   variant={selected ? "secondary" : "ghost"}
                   className={cn(
@@ -357,7 +296,7 @@ export function SimpleIconPicker({
                   disabled={disabled}
                   onClick={() => onChange(createBuiltinIconRef(icon))}
                 >
-                  <SimpleIconPreview icon={icon} decorative />
+                  <BrandIconPreview icon={icon} decorative />
                   <span className="min-w-0">
                     <span className="block truncate text-sm">{icon.title}</span>
                   </span>
