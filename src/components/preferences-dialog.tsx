@@ -90,6 +90,7 @@ const PREFERENCES_TABS: Array<{ value: PreferencesTab; label: string }> = [
   { value: 'data', label: 'Data' },
   { value: 'shortcuts', label: 'Shortcuts' },
 ]
+const CATEGORY_PANEL_CONTROL_TAB_INDEX = -1
 
 /** Converts unknown errors into preference dialog messages. */
 function getDialogErrorMessage(error: unknown): string {
@@ -202,6 +203,7 @@ function SortableCategoryRow({
         ...attributes,
         ...listeners,
         'aria-label': `Drag category ${category.name}`,
+        tabIndex: CATEGORY_PANEL_CONTROL_TAB_INDEX,
       }
 
   return (
@@ -1182,6 +1184,7 @@ function PreferencesDialogContent({
                                       variant="ghost"
                                       size={interfaceSizeConfig.control.iconButtonSize}
                                       disabled={isBusy}
+                                      tabIndex={CATEGORY_PANEL_CONTROL_TAB_INDEX}
                                       aria-label="Cancel rename"
                                       onClick={cancelRename}
                                     >
@@ -1192,6 +1195,7 @@ function PreferencesDialogContent({
                                       variant="ghost"
                                       size={interfaceSizeConfig.control.iconButtonSize}
                                       disabled={isBusy}
+                                      tabIndex={CATEGORY_PANEL_CONTROL_TAB_INDEX}
                                       aria-label={`Save ${category.name}`}
                                       onClick={() => handleRename(category.id)}
                                     >
@@ -1206,6 +1210,7 @@ function PreferencesDialogContent({
                                         variant="ghost"
                                         size={interfaceSizeConfig.control.iconButtonSize}
                                         disabled={isBusy || !canDeleteCategory}
+                                        tabIndex={CATEGORY_PANEL_CONTROL_TAB_INDEX}
                                         aria-label={
                                           canDeleteCategory
                                             ? `Delete ${category.name}`
@@ -1221,6 +1226,7 @@ function PreferencesDialogContent({
                                       variant="ghost"
                                       size={interfaceSizeConfig.control.iconButtonSize}
                                       disabled={isBusy}
+                                      tabIndex={CATEGORY_PANEL_CONTROL_TAB_INDEX}
                                       aria-label={`Rename ${category.name}`}
                                       onClick={() => startRename(category)}
                                     >
@@ -1282,6 +1288,7 @@ function PreferencesDialogContent({
                           <SelectTrigger
                             id="preferences-category-delete-mode"
                             className={cn('w-full', interfaceSizeConfig.control.inputClassName)}
+                            tabIndex={CATEGORY_PANEL_CONTROL_TAB_INDEX}
                           >
                             <SelectValue />
                           </SelectTrigger>
@@ -1311,6 +1318,7 @@ function PreferencesDialogContent({
                               id="preferences-category-delete-target"
                               className={cn('w-full', interfaceSizeConfig.control.inputClassName)}
                               aria-invalid={!targetCategoryId && Boolean(error)}
+                              tabIndex={CATEGORY_PANEL_CONTROL_TAB_INDEX}
                             >
                               <SelectValue placeholder="Select a category" />
                             </SelectTrigger>
@@ -1334,6 +1342,7 @@ function PreferencesDialogContent({
                         variant="outline"
                         size={interfaceSizeConfig.control.buttonSize}
                         disabled={isBusy}
+                        tabIndex={CATEGORY_PANEL_CONTROL_TAB_INDEX}
                         onClick={() => {
                           setPendingDeleteCategoryId(null)
                           setError(null)
@@ -1346,6 +1355,7 @@ function PreferencesDialogContent({
                         variant="destructive"
                         size={interfaceSizeConfig.control.buttonSize}
                         disabled={isBusy}
+                        tabIndex={CATEGORY_PANEL_CONTROL_TAB_INDEX}
                         onClick={confirmPendingDelete}
                       >
                         Confirm delete
@@ -1376,6 +1386,7 @@ function PreferencesDialogContent({
                 variant="outline"
                 size={interfaceSizeConfig.control.buttonSize}
                 disabled={isBusy}
+                tabIndex={CATEGORY_PANEL_CONTROL_TAB_INDEX}
                 onClick={requestClose}
               >
                 Cancel
@@ -1384,6 +1395,7 @@ function PreferencesDialogContent({
                 type="button"
                 size={interfaceSizeConfig.control.buttonSize}
                 disabled={isBusy || !isDirty}
+                tabIndex={CATEGORY_PANEL_CONTROL_TAB_INDEX}
                 onClick={() => void handleSaveDraft()}
               >
                 Save
