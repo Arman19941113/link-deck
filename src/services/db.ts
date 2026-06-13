@@ -1,12 +1,9 @@
-// Wraps Link Deck IndexedDB reads and writes so UI code does not depend on low-level database APIs.
-
 import { openDB, type DBSchema, type IDBPDatabase } from 'idb'
 
 import { createDefaultCategory, DEFAULT_CATEGORY_ID } from '@/domain/categories'
 import { createDefaultDeck } from '@/domain/default-data'
-import { DEFAULT_INTERFACE_SIZE, isInterfaceSize } from '@/domain/interface-size'
-import type { Category, DeckSnapshot, IconFile, InterfaceSize, Link, LinkIcon, SortMode } from '@/domain/types'
-import { getLocalStorage, setLocalStorage } from '@/lib/storage'
+import { DEFAULT_INTERFACE_SIZE } from '@/domain/interface-size'
+import type { Category, DeckSnapshot, IconFile, InterfaceSize, Link, SortMode } from '@/domain/types'
 
 type SettingsRecord = {
   id: 'settings'
@@ -62,132 +59,27 @@ const DATABASE_NAME = 'link-deck'
 const DATABASE_VERSION = 2
 const SETTINGS_ID: SettingsRecord['id'] = 'settings'
 const DEFAULT_SORT_MODE: SortMode = 'manual'
-const INTERFACE_SIZE_STORAGE_KEY = 'link-deck.interface-size'
-const DECK_SNAPSHOT_STORAGE_KEY = 'link-deck.deck-snapshot'
-const DECK_SNAPSHOT_MIRROR_VERSION = 1
-const SORT_MODE_VALUES = new Set<SortMode>(['manual', 'mostVisited', 'recentVisited', 'name'])
 
-/** Lightweight deck data mirrored for synchronous first-paint rendering. */
-export type DeckSnapshotMirror = {
-  version: typeof DECK_SNAPSHOT_MIRROR_VERSION
-  categories: Category[]
-  links: Link[]
-  interfaceSize: InterfaceSize
-  sortMode: SortMode
-}
-
-/** Checks whether a parsed JSON value can be inspected as an object. */
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null
-}
-
-/** Checks unknown stored settings before using them as sort-mode state. */
-function isSortMode(value: unknown): value is SortMode {
-  return typeof value === 'string' && SORT_MODE_VALUES.has(value as SortMode)
-}
-
-/** Checks persisted icon settings before trusting a mirrored link record. */
-function isLinkIcon(value: unknown): value is LinkIcon {
-  if (!isRecord(value) || typeof value.type !== 'string') {
-    return false
-  }
-
-  if (value.type === 'auto') {
-    return true
-  }
-
-  if (value.type === 'builtin') {
-    return typeof value.slug === 'string' && typeof value.title === 'string' && typeof value.hex === 'string'
-  }
-
-  if (value.type === 'url') {
-    return typeof value.url === 'string'
-  }
-
-  if (value.type === 'file') {
-    return typeof value.fileId === 'string' && typeof value.name === 'string' && typeof value.mimeType === 'string'
-  }
-
-  return false
-}
-
-/** Checks a mirrored category before using it for the first render. */
-function isCategory(value: unknown): value is Category {
-  return (
-    isRecord(value) &&
-    typeof value.id === 'string' &&
-    typeof value.name === 'string' &&
-    typeof value.order === 'number' &&
-    typeof value.createdAt === 'string' &&
-    typeof value.updatedAt === 'string'
-  )
-}
-
-/** Checks a mirrored link before using it for the first render. */
-function isLink(value: unknown): value is Link {
-  return (
-    isRecord(value) &&
-    typeof value.id === 'string' &&
-    typeof value.categoryId === 'string' &&
-    typeof value.name === 'string' &&
-    typeof value.url === 'string' &&
-    (value.note === undefined || typeof value.note === 'string') &&
-    isLinkIcon(value.icon) &&
-    typeof value.order === 'number' &&
-    typeof value.visitCount === 'number' &&
-    (value.lastVisitedAt === undefined || typeof value.lastVisitedAt === 'string') &&
-    typeof value.createdAt === 'string' &&
-    typeof value.updatedAt === 'string'
-  )
-}
-
-/** Checks a parsed first-paint mirror before using it as initial UI data. */
-function isDeckSnapshotMirror(value: unknown): value is DeckSnapshotMirror {
-  return (
-    isRecord(value) &&
-    value.version === DECK_SNAPSHOT_MIRROR_VERSION &&
-    Array.isArray(value.categories) &&
-    value.categories.every(isCategory) &&
-    Array.isArray(value.links) &&
-    value.links.every(isLink) &&
-    isInterfaceSize(value.interfaceSize) &&
-    isSortMode(value.sortMode)
-  )
-}
-
-/** Reads the synchronous interface-size mirror used to avoid first-paint layout jumps. */
-function readInterfaceSizeMirror(): InterfaceSize | null {
-  const storedInterfaceSize = getLocalStorage<unknown>(INTERFACE_SIZE_STORAGE_KEY)
-
-  return isInterfaceSize(storedInterfaceSize) ? storedInterfaceSize : null
-}
-
-/** Keeps a small settings mirror outside IndexedDB so initial React state can match the last choice. */
-function saveInterfaceSizeMirror(interfaceSize: InterfaceSize): void {
-  setLocalStorage(INTERFACE_SIZE_STORAGE_KEY, interfaceSize)
-}
-
-/** Returns the best synchronous initial interface size before IndexedDB has opened. */
-export function getInitialInterfaceSize(): InterfaceSize {
-  return readInterfaceSizeMirror() ?? DEFAULT_INTERFACE_SIZE
-}
-
-/** Reads the synchronous deck mirror used to avoid a blank first render on refresh. */
-export function getInitialDeckSnapshotMirror(): DeckSnapshotMirror | null {
-  const storedDeckSnapshot = getLocalStorage<unknown>(DECK_SNAPSHOT_STORAGE_KEY)
-
-  return isDeckSnapshotMirror(storedDeckSnapshot) ? storedDeckSnapshot : null
-}
-
-/** Keeps a lightweight deck mirror outside IndexedDB so refresh can paint existing content immediately. */
-export function saveDeckSnapshotMirror(snapshot: Omit<DeckSnapshotMirror, 'version'>): void {
-  setLocalStorage(DECK_SNAPSHOT_STORAGE_KEY, {
-    version: DECK_SNAPSHOT_MIRROR_VERSION,
-    categories: snapshot.categories,
-    links: snapshot.links,
-    interfaceSize: snapshot.interfaceSize,
-    sortMode: snapshot.sortMode,
-  })
+/** Public IndexedDB operations for deck data, settings, and uploaded icon blobs. */
+export const dbService = {
+  clearDeckData,
+  deleteCategory,
+  deleteIconFile,
+  deleteLink,
+  deleteLinks,
+  getIconFile,
+  loadDeck,
+  recordLinkVisit,
+  replaceDeck,
+  resetDeckToDefaults,
+  saveCategories,
+  saveCategory,
+  saveCategoryDraftChanges,
+  saveIconFile,
+  saveInterfaceSize,
+  saveLink,
+  saveLinks,
+  saveSortMode,
 }
 
 const dbPromise = openDB<LinkDeckDb>(DATABASE_NAME, DATABASE_VERSION, {
@@ -298,7 +190,7 @@ async function ensureDefaultCategory(): Promise<void> {
 }
 
 /** Reads the full deck snapshot, seeding default data first when the database is empty. */
-export async function loadDeck(): Promise<StoredDeckSnapshot> {
+async function loadDeck(): Promise<StoredDeckSnapshot> {
   await seedIfEmpty()
   await ensureDefaultCategory()
 
@@ -313,8 +205,6 @@ export async function loadDeck(): Promise<StoredDeckSnapshot> {
   const records = [...categories, ...links, ...iconFiles]
   const interfaceSize = settings?.interfaceSize ?? DEFAULT_INTERFACE_SIZE
 
-  saveInterfaceSizeMirror(interfaceSize)
-
   const snapshot: StoredDeckSnapshot = {
     id: 'local',
     name: 'Local Deck',
@@ -328,13 +218,11 @@ export async function loadDeck(): Promise<StoredDeckSnapshot> {
     updatedAt: getDeckTimestamp(records, 'updatedAt'),
   }
 
-  saveDeckSnapshotMirror(snapshot)
-
   return snapshot
 }
 
 /** Replaces all persisted deck data in one transaction. */
-export async function replaceStoredDeck(deck: StoredDeckSnapshot): Promise<StoredDeckSnapshot> {
+async function replaceDeck(deck: StoredDeckSnapshot): Promise<StoredDeckSnapshot> {
   const db = await dbPromise
   const tx = db.transaction(['categories', 'links', 'icons', 'settings'], 'readwrite')
   const categoryStore = tx.objectStore('categories')
@@ -367,14 +255,12 @@ export async function replaceStoredDeck(deck: StoredDeckSnapshot): Promise<Store
   })
 
   await tx.done
-  saveInterfaceSizeMirror(deck.interfaceSize)
-  saveDeckSnapshotMirror(deck)
 
   return deck
 }
 
 /** Restores the bundled default deck and default sort mode. */
-export async function resetStoredDeckToDefaults(): Promise<StoredDeckSnapshot> {
+async function resetDeckToDefaults(): Promise<StoredDeckSnapshot> {
   const deck = createDefaultDeck()
   const storedDeck: StoredDeckSnapshot = {
     ...deck,
@@ -383,11 +269,11 @@ export async function resetStoredDeckToDefaults(): Promise<StoredDeckSnapshot> {
     sortMode: DEFAULT_SORT_MODE,
   }
 
-  return replaceStoredDeck(storedDeck)
+  return replaceDeck(storedDeck)
 }
 
 /** Clears user data while leaving one usable default category. */
-export async function clearStoredDeckData(): Promise<StoredDeckSnapshot> {
+async function clearDeckData(): Promise<StoredDeckSnapshot> {
   const now = new Date().toISOString()
   const storedDeck: StoredDeckSnapshot = {
     id: 'local',
@@ -402,11 +288,11 @@ export async function clearStoredDeckData(): Promise<StoredDeckSnapshot> {
     updatedAt: now,
   }
 
-  return replaceStoredDeck(storedDeck)
+  return replaceDeck(storedDeck)
 }
 
 /** Saves category records in bulk. */
-export async function saveCategories(categories: Category[]): Promise<void> {
+async function saveCategories(categories: Category[]): Promise<void> {
   const db = await dbPromise
   const tx = db.transaction('categories', 'readwrite')
 
@@ -418,7 +304,7 @@ export async function saveCategories(categories: Category[]): Promise<void> {
 }
 
 /** Saves a single category record. */
-export async function saveCategory(category: Category): Promise<void> {
+async function saveCategory(category: Category): Promise<void> {
   const db = await dbPromise
   const tx = db.transaction('categories', 'readwrite')
 
@@ -428,7 +314,7 @@ export async function saveCategory(category: Category): Promise<void> {
 }
 
 /** Saves link records in bulk. */
-export async function saveLinks(links: Link[]): Promise<void> {
+async function saveLinks(links: Link[]): Promise<void> {
   const db = await dbPromise
   const tx = db.transaction('links', 'readwrite')
 
@@ -440,7 +326,7 @@ export async function saveLinks(links: Link[]): Promise<void> {
 }
 
 /** Saves a single link record. */
-export async function saveLink(link: Link): Promise<void> {
+async function saveLink(link: Link): Promise<void> {
   const db = await dbPromise
   const tx = db.transaction('links', 'readwrite')
 
@@ -450,7 +336,7 @@ export async function saveLink(link: Link): Promise<void> {
 }
 
 /** Appends one visit count to the current database record. */
-export async function recordLinkVisit(linkId: string, visitedAt = new Date().toISOString()): Promise<Link | undefined> {
+async function recordLinkVisit(linkId: string, visitedAt = new Date().toISOString()): Promise<Link | undefined> {
   const db = await dbPromise
   const tx = db.transaction('links', 'readwrite')
   const link = await tx.store.get(linkId)
@@ -475,7 +361,7 @@ export async function recordLinkVisit(linkId: string, visitedAt = new Date().toI
 }
 
 /** Deletes a single link record. */
-export async function deleteLinkRecord(linkId: string): Promise<void> {
+async function deleteLink(linkId: string): Promise<void> {
   const db = await dbPromise
   const tx = db.transaction('links', 'readwrite')
 
@@ -485,7 +371,7 @@ export async function deleteLinkRecord(linkId: string): Promise<void> {
 }
 
 /** Deletes link records in bulk. */
-export async function deleteLinks(linkIds: string[]): Promise<void> {
+async function deleteLinks(linkIds: string[]): Promise<void> {
   const db = await dbPromise
   const tx = db.transaction('links', 'readwrite')
 
@@ -497,7 +383,7 @@ export async function deleteLinks(linkIds: string[]): Promise<void> {
 }
 
 /** Commits category and link changes from the category draft in one transaction. */
-export async function saveCategoryDraftChanges({
+async function saveCategoryDraftChanges({
   categoriesToSave,
   categoryIdsToDelete,
   linksToSave,
@@ -528,7 +414,7 @@ export async function saveCategoryDraftChanges({
 }
 
 /** Deletes a single category record. */
-export async function deleteCategoryRecord(categoryId: string): Promise<void> {
+async function deleteCategory(categoryId: string): Promise<void> {
   const db = await dbPromise
   const tx = db.transaction('categories', 'readwrite')
 
@@ -551,23 +437,20 @@ async function saveSettingsPatch(patch: Partial<Pick<SettingsRecord, 'interfaceS
   })
 
   await tx.done
-  if (patch.interfaceSize) {
-    saveInterfaceSizeMirror(patch.interfaceSize)
-  }
 }
 
 /** Saves the current global interface size. */
-export async function saveInterfaceSize(interfaceSize: InterfaceSize): Promise<void> {
+async function saveInterfaceSize(interfaceSize: InterfaceSize): Promise<void> {
   return saveSettingsPatch({ interfaceSize })
 }
 
 /** Saves the current link sort mode. */
-export async function saveSortMode(sortMode: SortMode): Promise<void> {
+async function saveSortMode(sortMode: SortMode): Promise<void> {
   return saveSettingsPatch({ sortMode })
 }
 
 /** Saves a user-uploaded icon file and returns a record links can reference. */
-export async function saveIconFile(file: File): Promise<IconFile> {
+async function saveIconFile(file: File): Promise<IconFile> {
   const iconFile: IconFile = {
     id: crypto.randomUUID(),
     blob: file,
@@ -587,14 +470,14 @@ export async function saveIconFile(file: File): Promise<IconFile> {
 }
 
 /** Reads a saved local icon file by id. */
-export async function getIconFile(id: string): Promise<IconFile | undefined> {
+async function getIconFile(id: string): Promise<IconFile | undefined> {
   const db = await dbPromise
 
   return db.get('icons', id)
 }
 
 /** Deletes a saved local icon file. */
-export async function deleteIconFile(id: string): Promise<void> {
+async function deleteIconFile(id: string): Promise<void> {
   const db = await dbPromise
   const tx = db.transaction('icons', 'readwrite')
 

@@ -1,27 +1,10 @@
-// Browser theme service for local preference persistence and document-level appearance updates.
-
-import { DEFAULT_THEME_PREFERENCE, isThemePreference } from '@/domain/theme'
 import type { ThemePreference } from '@/domain/types'
-import { getLocalStorage, setLocalStorage } from '@/lib/storage'
 
-const THEME_PREFERENCE_STORAGE_KEY = 'link-deck.theme'
 const LIGHT_THEME_COLOR = '#f5f1ec'
 const DARK_THEME_COLOR = '#181715'
 const COLOR_SCHEME_MEDIA_QUERY = '(prefers-color-scheme: dark)'
 
 type ResolvedTheme = 'light' | 'dark'
-
-/** Reads the saved theme preference from localStorage. */
-export function getInitialThemePreference(): ThemePreference {
-  const storedThemePreference = getLocalStorage<unknown>(THEME_PREFERENCE_STORAGE_KEY)
-
-  return isThemePreference(storedThemePreference) ? storedThemePreference : DEFAULT_THEME_PREFERENCE
-}
-
-/** Saves the selected theme preference to localStorage. */
-export function saveThemePreference(themePreference: ThemePreference): void {
-  setLocalStorage(THEME_PREFERENCE_STORAGE_KEY, themePreference)
-}
 
 /** Applies the selected or system-resolved theme to the document root. */
 export function applyThemePreference(themePreference: ThemePreference): ResolvedTheme {

@@ -1,7 +1,7 @@
 // Converts Link Deck snapshots to and from a portable JSON backup format.
 
 import type { Category, IconFile, InterfaceSize, Link, SortMode } from '@/domain/types'
-import type { StoredDeckSnapshot } from '@/storage/deck-db'
+import type { StoredDeckSnapshot } from '@/services/db'
 
 type ExportedIconFile = Omit<IconFile, 'blob'> & {
   dataUrl: string

@@ -29,12 +29,7 @@ import { preloadPinyinSearchModule } from '@/domain/pinyin-search-loader'
 import type { Category, CategorySection as CategorySectionData, Link, ThemePreference } from '@/domain/types'
 import { useDeckStore } from '@/hooks/use-deck-store'
 import { cn } from '@/lib/utils'
-import {
-  applyThemePreference,
-  getInitialThemePreference,
-  saveThemePreference,
-  subscribeThemePreference,
-} from '@/services'
+import { applyThemePreference, storageService, subscribeThemePreference } from '@/services'
 
 type LinkIdGroups = Record<string, string[]>
 
@@ -148,7 +143,7 @@ export function AppShell() {
   const [addingLinkCategoryId, setAddingLinkCategoryId] = useState<string | null>(null)
   const [preferencesOpen, setPreferencesOpen] = useState(false)
   const [preferencesInitialTab, setPreferencesInitialTab] = useState<PreferencesTab>('general')
-  const [themePreference, setThemePreferenceState] = useState<ThemePreference>(getInitialThemePreference)
+  const [themePreference, setThemePreferenceState] = useState<ThemePreference>(storageService.getTheme)
   const [shortcutDeleteLink, setShortcutDeleteLink] = useState<Link | null>(null)
   const [isShortcutDeleting, setIsShortcutDeleting] = useState(false)
   const [dragLinkIdGroups, setDragLinkIdGroups] = useState<LinkIdGroups | null>(null)
@@ -312,7 +307,7 @@ export function AppShell() {
   /** Persists the app appearance preference and applies it to the document root. */
   function handleThemePreferenceChange(nextThemePreference: ThemePreference): void {
     setThemePreferenceState(nextThemePreference)
-    saveThemePreference(nextThemePreference)
+    storageService.setTheme(nextThemePreference)
     applyThemePreference(nextThemePreference)
   }
 
