@@ -1,14 +1,14 @@
-import type { ThemePreference } from '@/domain/types'
-
-const LIGHT_THEME_COLOR = '#f5f1ec'
-const DARK_THEME_COLOR = '#181715'
-const COLOR_SCHEME_MEDIA_QUERY = '(prefers-color-scheme: dark)'
-
-type ResolvedTheme = 'light' | 'dark'
+import {
+  COLOR_SCHEME_MEDIA_QUERY,
+  THEME_COLOR_BY_RESOLVED_THEME,
+  resolveThemePreference,
+  type ThemePreference,
+  type ResolvedTheme,
+} from '@/domain/settings/theme'
 
 /** Applies the selected or system-resolved theme to the document root. */
 export function applyThemePreference(themePreference: ThemePreference): ResolvedTheme {
-  const resolvedTheme = resolveThemePreference(themePreference)
+  const resolvedTheme = resolveThemePreference(themePreference, prefersDarkColorScheme())
 
   if (typeof document === 'undefined') {
     return resolvedTheme
@@ -24,7 +24,7 @@ export function applyThemePreference(themePreference: ThemePreference): Resolved
   return resolvedTheme
 }
 
-/** Watches system theme changes when the app is set to Auto. */
+/** Watches the system color scheme only when the app is set to Auto. */
 export function subscribeThemePreference(themePreference: ThemePreference, onChange: () => void): () => void {
   if (themePreference !== 'auto' || typeof window === 'undefined' || !window.matchMedia) {
     return () => undefined
@@ -37,19 +37,6 @@ export function subscribeThemePreference(themePreference: ThemePreference, onCha
   return () => {
     mediaQuery.removeEventListener('change', onChange)
   }
-}
-
-/** Returns the concrete theme that should be rendered for a preference. */
-function resolveThemePreference(themePreference: ThemePreference): ResolvedTheme {
-  if (themePreference === 'dark') {
-    return 'dark'
-  }
-
-  if (themePreference === 'light') {
-    return 'light'
-  }
-
-  return prefersDarkColorScheme() ? 'dark' : 'light'
 }
 
 /** Checks the current system color scheme in browsers that support matchMedia. */
@@ -65,5 +52,5 @@ function updateThemeColor(resolvedTheme: ResolvedTheme): void {
     return
   }
 
-  themeColor.content = resolvedTheme === 'dark' ? DARK_THEME_COLOR : LIGHT_THEME_COLOR
+  themeColor.content = THEME_COLOR_BY_RESOLVED_THEME[resolvedTheme]
 }
