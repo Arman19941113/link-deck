@@ -412,14 +412,6 @@ function PreferencesDialogContent({
   const errorId = 'preferences-category-error'
 
   useEffect(() => {
-    if (activeTab !== 'categories' || isBusy) {
-      return
-    }
-
-    newNameInputRef.current?.focus()
-  }, [activeTab, isBusy])
-
-  useEffect(() => {
     if (!editingCategoryId) {
       return
     }
@@ -875,6 +867,27 @@ function PreferencesDialogContent({
     preferencesTabRefs.current.get(activeTab)?.focus({ preventScroll: true })
   }
 
+  /** Moves between preference panels from the settings navigation. */
+  function handlePreferencesTabKeyDown(event: KeyboardEvent<HTMLButtonElement>, tab: PreferencesTab): void {
+    if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') {
+      return
+    }
+
+    event.preventDefault()
+
+    const currentIndex = PREFERENCES_TABS.findIndex(preferencesTab => preferencesTab.value === tab)
+    const direction = event.key === 'ArrowDown' ? 1 : -1
+    const nextIndex = (currentIndex + direction + PREFERENCES_TABS.length) % PREFERENCES_TABS.length
+    const nextTab = PREFERENCES_TABS[nextIndex]?.value
+
+    if (!nextTab) {
+      return
+    }
+
+    setActiveTab(nextTab)
+    preferencesTabRefs.current.get(nextTab)?.focus({ preventScroll: true })
+  }
+
   return (
     <>
       <DialogContent
@@ -932,6 +945,7 @@ function PreferencesDialogContent({
                 className="justify-start"
                 aria-current={activeTab === tab.value ? 'page' : undefined}
                 onClick={() => setActiveTab(tab.value)}
+                onKeyDown={event => handlePreferencesTabKeyDown(event, tab.value)}
               >
                 {tab.label}
               </Button>
