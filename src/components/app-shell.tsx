@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Data, Draggable, Droppable } from '@dnd-kit/abstract'
-import { KeyboardSensor, PointerActivationConstraints, PointerSensor } from '@dnd-kit/dom'
+import { PointerActivationConstraints, PointerSensor } from '@dnd-kit/dom'
 import { move as moveSortableItems } from '@dnd-kit/helpers'
 import { DragDropProvider, type DragEndEvent, type DragOverEvent, type DragStartEvent } from '@dnd-kit/react'
 import { AlertCircle } from 'lucide-react'
@@ -31,7 +31,6 @@ const linkDragSensors = [
       return source.type !== 'link'
     },
   }),
-  KeyboardSensor,
 ]
 
 /** Gets the full manually ordered link sequence for a category so visible drop positions can map to real indexes. */

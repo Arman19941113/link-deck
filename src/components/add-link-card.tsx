@@ -20,6 +20,7 @@ export function AddLinkCard({ interfaceSize, categoryName, onAddLink }: AddLinkC
     <button
       type="button"
       aria-label={`Add link to ${categoryName}`}
+      tabIndex={-1}
       className={cn(
         'group flex h-full w-full cursor-pointer items-center rounded-md border border-dashed border-border/70 bg-transparent text-left text-muted-foreground outline-none transition-[background-color,border-color,box-shadow,color,translate] duration-300 ease-app-hover hover:-translate-y-px hover:border-accent/35 hover:bg-card/35 hover:text-foreground hover:shadow-[0_10px_22px_-20px_rgb(17_17_17/0.35)] focus-visible:border-ring/40 focus-visible:ring-[3px] focus-visible:ring-ring/35 motion-reduce:hover:translate-y-0 motion-reduce:transition-none dark:hover:shadow-[0_10px_24px_-20px_rgb(0_0_0/0.65)]',
         cardConfig.paddingClassName,

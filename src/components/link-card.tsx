@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { Copy, Edit3, MoreHorizontal, Trash2 } from 'lucide-react'
 
 import { LinkIcon } from '@/components/link-icon'
+import { focusSiblingLinkCard, focusVerticalLinkCard } from '@/components/link-card-keyboard'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -40,20 +41,9 @@ type LinkCardProps = {
   isDragging?: boolean
 }
 
-const LINK_CARD_ACTION_SELECTOR = "[data-link-card-action='true']"
-
-/** Moves focus between visible link cards with arrow keys. */
-function focusSiblingLinkCard(currentTarget: HTMLElement, direction: 1 | -1): void {
-  const cards = Array.from(document.querySelectorAll<HTMLElement>(LINK_CARD_ACTION_SELECTOR))
-  const currentIndex = cards.indexOf(currentTarget)
-
-  if (currentIndex < 0) {
-    return
-  }
-
-  const nextIndex = Math.min(Math.max(currentIndex + direction, 0), cards.length - 1)
-
-  cards[nextIndex]?.focus()
+/** Checks the platform shortcut that opens the focused card in a new window. */
+function isNewWindowShortcut(event: KeyboardEvent<HTMLElement>): boolean {
+  return event.key === 'Enter' && (event.metaKey || event.ctrlKey)
 }
 
 /** Shows one saved link and provides open and menu actions. */
@@ -98,23 +88,55 @@ export function LinkCard({
     onOpenLink(link, { newWindow: event.metaKey })
   }
 
-  /** Supports moving selection focus between link cards with arrow keys. */
+  /** Handles Command/Ctrl+Enter before drag sensors or nested controls can consume it. */
+  function handleOpenKeyDownCapture(event: KeyboardEvent<HTMLElement>): void {
+    if (!isNewWindowShortcut(event)) {
+      return
+    }
+
+    event.preventDefault()
+    event.stopPropagation()
+    onOpenLink(link, { newWindow: true })
+  }
+
+  /** Supports keyboard-only card navigation and opening. */
   function handleOpenKeyDown(event: KeyboardEvent<HTMLElement>): void {
-    if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+    if (event.defaultPrevented) {
+      return
+    }
+
+    if (event.key === 'Tab') {
+      event.preventDefault()
+      focusSiblingLinkCard(event.currentTarget, event.shiftKey ? -1 : 1, true)
+      return
+    }
+
+    if (event.key === 'ArrowRight') {
       event.preventDefault()
       focusSiblingLinkCard(event.currentTarget, 1)
       return
     }
 
-    if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+    if (event.key === 'ArrowLeft') {
       event.preventDefault()
       focusSiblingLinkCard(event.currentTarget, -1)
       return
     }
 
-    if (event.key === 'Enter' && event.metaKey) {
+    if (event.key === 'ArrowDown') {
       event.preventDefault()
-      onOpenLink(link, { newWindow: true })
+      focusVerticalLinkCard(event.currentTarget, 1)
+      return
+    }
+
+    if (event.key === 'ArrowUp') {
+      event.preventDefault()
+      focusVerticalLinkCard(event.currentTarget, -1)
+      return
+    }
+
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
     }
   }
 
@@ -133,7 +155,9 @@ export function LinkCard({
       tabIndex={0}
       data-link-card-action="true"
       aria-label={`Open ${link.name}`}
+      aria-keyshortcuts="Meta+Enter Control+Enter"
       onClick={handleOpenClick}
+      onKeyDownCapture={handleOpenKeyDownCapture}
       onKeyDown={handleOpenKeyDown}
       className={cn(
         'group flex h-full w-full cursor-pointer rounded-md border bg-card text-card-foreground outline-none transition-[background-color,border-color,box-shadow,translate] duration-300 ease-app-hover hover:-translate-y-px hover:border-accent/35 hover:bg-card/95 hover:shadow-[0_12px_26px_-20px_rgb(17_17_17/0.45)] focus-visible:border-ring/50 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-within:border-ring/50 focus-within:shadow-sm motion-reduce:hover:translate-y-0 motion-reduce:transition-none dark:hover:shadow-[0_12px_28px_-22px_rgb(0_0_0/0.75)]',
@@ -173,6 +197,7 @@ export function LinkCard({
               variant="ghost"
               size={interfaceSizeConfig.control.iconButtonSize}
               aria-label={`More actions for ${link.name}`}
+              tabIndex={-1}
               onClick={stopMenuEvent}
               onKeyDown={stopMenuEvent}
               onPointerDown={stopMenuEvent}
