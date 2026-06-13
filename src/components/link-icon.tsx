@@ -9,6 +9,9 @@ import { getFaviconUrl } from '@/domain/url'
 import { cn } from '@/lib/utils'
 
 const AUTO_ICON_TIMEOUT_MS = 3000
+const ICON_TILE_CLASS =
+  'flex shrink-0 items-center justify-center border bg-secondary dark:border-[#6a625a] dark:bg-[#e8e1d8]'
+const ICON_FALLBACK_CLASS = 'font-medium text-secondary-foreground dark:text-[#161513]'
 
 type LinkIconProps = {
   link: Link
@@ -84,12 +87,7 @@ export function LinkIcon({ link, getIconFile, imageClassName, wrapperClassName }
   if (icon.type === 'builtin') {
     if (isGenericLinkBuiltinIcon(icon.slug)) {
       return (
-        <span
-          className={cn(
-            'flex shrink-0 items-center justify-center border bg-secondary',
-            wrapperClassName ?? 'size-11 rounded-md text-sm',
-          )}
-        >
+        <span className={cn(ICON_TILE_CLASS, wrapperClassName ?? 'size-11 rounded-md text-sm')}>
           <LinkIconGlyph
             role="img"
             aria-label={icon.title}
@@ -105,10 +103,7 @@ export function LinkIcon({ link, getIconFile, imageClassName, wrapperClassName }
     if (!loadedBuiltinIcon) {
       return (
         <span
-          className={cn(
-            'flex shrink-0 items-center justify-center border bg-secondary font-medium text-secondary-foreground',
-            wrapperClassName ?? 'size-11 rounded-md text-sm',
-          )}
+          className={cn(ICON_TILE_CLASS, ICON_FALLBACK_CLASS, wrapperClassName ?? 'size-11 rounded-md text-sm')}
           aria-hidden="true"
         >
           {getFallbackLetter(link.name)}
@@ -117,12 +112,7 @@ export function LinkIcon({ link, getIconFile, imageClassName, wrapperClassName }
     }
 
     return (
-      <span
-        className={cn(
-          'flex shrink-0 items-center justify-center border bg-secondary',
-          wrapperClassName ?? 'size-11 rounded-md text-sm',
-        )}
-      >
+      <span className={cn(ICON_TILE_CLASS, wrapperClassName ?? 'size-11 rounded-md text-sm')}>
         <svg
           viewBox={`0 0 ${loadedBuiltinIcon.width} ${loadedBuiltinIcon.height}`}
           role="img"
@@ -140,10 +130,7 @@ export function LinkIcon({ link, getIconFile, imageClassName, wrapperClassName }
   if (!imageUrl || imageFailed) {
     return (
       <span
-        className={cn(
-          'flex shrink-0 items-center justify-center border bg-secondary font-medium text-secondary-foreground',
-          wrapperClassName ?? 'size-11 rounded-md text-sm',
-        )}
+        className={cn(ICON_TILE_CLASS, ICON_FALLBACK_CLASS, wrapperClassName ?? 'size-11 rounded-md text-sm')}
         aria-hidden="true"
       >
         {getFallbackLetter(link.name)}
@@ -152,12 +139,7 @@ export function LinkIcon({ link, getIconFile, imageClassName, wrapperClassName }
   }
 
   return (
-    <span
-      className={cn(
-        'flex shrink-0 items-center justify-center border bg-secondary',
-        wrapperClassName ?? 'size-11 rounded-md text-sm',
-      )}
-    >
+    <span className={cn(ICON_TILE_CLASS, wrapperClassName ?? 'size-11 rounded-md text-sm')}>
       <img
         src={imageUrl}
         alt=""

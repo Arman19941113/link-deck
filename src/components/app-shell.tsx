@@ -26,9 +26,15 @@ import {
 } from '@/components/ui/alert-dialog'
 import { getInterfaceSizeConfig } from '@/domain/interface-size'
 import { preloadPinyinSearchModule } from '@/domain/pinyin-search-loader'
-import type { Category, CategorySection as CategorySectionData, Link } from '@/domain/types'
+import type { Category, CategorySection as CategorySectionData, Link, ThemePreference } from '@/domain/types'
 import { useDeckStore } from '@/hooks/use-deck-store'
 import { cn } from '@/lib/utils'
+import {
+  applyThemePreference,
+  getInitialThemePreference,
+  saveThemePreference,
+  subscribeThemePreference,
+} from '@/services'
 
 type LinkIdGroups = Record<string, string[]>
 
@@ -142,6 +148,7 @@ export function AppShell() {
   const [addingLinkCategoryId, setAddingLinkCategoryId] = useState<string | null>(null)
   const [preferencesOpen, setPreferencesOpen] = useState(false)
   const [preferencesInitialTab, setPreferencesInitialTab] = useState<PreferencesTab>('general')
+  const [themePreference, setThemePreferenceState] = useState<ThemePreference>(getInitialThemePreference)
   const [shortcutDeleteLink, setShortcutDeleteLink] = useState<Link | null>(null)
   const [isShortcutDeleting, setIsShortcutDeleting] = useState(false)
   const [dragLinkIdGroups, setDragLinkIdGroups] = useState<LinkIdGroups | null>(null)
@@ -215,6 +222,14 @@ export function AppShell() {
       globalThis.clearTimeout(timeoutId)
     }
   }, [])
+
+  useEffect(() => {
+    applyThemePreference(themePreference)
+
+    return subscribeThemePreference(themePreference, () => {
+      applyThemePreference(themePreference)
+    })
+  }, [themePreference])
 
   useEffect(() => {
     if (shortcutDeleteLink && !links.some(link => link.id === shortcutDeleteLink.id)) {
@@ -292,6 +307,13 @@ export function AppShell() {
   function openPreferences(tab: PreferencesTab = 'general'): void {
     setPreferencesInitialTab(tab)
     setPreferencesOpen(true)
+  }
+
+  /** Persists the app appearance preference and applies it to the document root. */
+  function handleThemePreferenceChange(nextThemePreference: ThemePreference): void {
+    setThemePreferenceState(nextThemePreference)
+    saveThemePreference(nextThemePreference)
+    applyThemePreference(nextThemePreference)
   }
 
   /** Opens a blank form for adding a link. */
@@ -509,9 +531,11 @@ export function AppShell() {
         links={links}
         interfaceSize={interfaceSize}
         sortMode={sortMode}
+        themePreference={themePreference}
         onOpenChange={setPreferencesOpen}
         onInterfaceSizeChange={setInterfaceSize}
         onSortModeChange={setSortMode}
+        onThemePreferenceChange={handleThemePreferenceChange}
         saveCategoryDraft={saveCategoryDraft}
         exportDeck={exportDeck}
         importDeck={importDeck}

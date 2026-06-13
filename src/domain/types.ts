@@ -2,6 +2,7 @@
 
 export type SortMode = 'manual' | 'mostVisited' | 'recentVisited' | 'name'
 export type InterfaceSize = 'compact' | 'comfortable' | 'spacious'
+export type ThemePreference = 'auto' | 'light' | 'dark'
 
 export type LinkIcon =
   | { type: 'auto' }

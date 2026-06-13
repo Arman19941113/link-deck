@@ -27,6 +27,7 @@ import { Check, Download, Eraser, GripVertical, Pencil, RotateCcw, Trash2, Uploa
 import { toast } from 'sonner'
 
 import { InterfaceSizePicker } from '@/components/interface-size-picker'
+import { ThemePicker } from '@/components/theme-picker'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -45,7 +46,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { isDefaultCategory } from '@/domain/categories'
 import { getInterfaceSizeConfig, type InterfaceSizeConfig } from '@/domain/interface-size'
 import { getKeyboardShortcutKeys, KEYBOARD_SHORTCUTS } from '@/domain/keyboard-shortcuts'
-import type { Category, InterfaceSize, Link, SortMode } from '@/domain/types'
+import type { Category, InterfaceSize, Link, SortMode, ThemePreference } from '@/domain/types'
 import type { CategoryDraftDeletePlan, CategoryDraft } from '@/hooks/use-deck-store'
 import { cn } from '@/lib/utils'
 
@@ -58,9 +59,11 @@ type PreferencesDialogProps = {
   links: Link[]
   interfaceSize: InterfaceSize
   sortMode: SortMode
+  themePreference: ThemePreference
   onOpenChange: (open: boolean) => void
   onInterfaceSizeChange: (interfaceSize: InterfaceSize) => void
   onSortModeChange: (sortMode: SortMode) => void
+  onThemePreferenceChange: (themePreference: ThemePreference) => void
   saveCategoryDraft: (draft: CategoryDraft) => Promise<void>
   exportDeck: () => Promise<unknown>
   importDeck: (json: string) => Promise<void>
@@ -283,9 +286,11 @@ export function PreferencesDialog({
   links,
   interfaceSize,
   sortMode,
+  themePreference,
   onOpenChange,
   onInterfaceSizeChange,
   onSortModeChange,
+  onThemePreferenceChange,
   saveCategoryDraft,
   exportDeck,
   importDeck,
@@ -308,9 +313,11 @@ export function PreferencesDialog({
         links={links}
         interfaceSize={interfaceSize}
         sortMode={sortMode}
+        themePreference={themePreference}
         onOpenChange={onOpenChange}
         onInterfaceSizeChange={onInterfaceSizeChange}
         onSortModeChange={onSortModeChange}
+        onThemePreferenceChange={onThemePreferenceChange}
         saveCategoryDraft={saveCategoryDraft}
         exportDeck={exportDeck}
         importDeck={importDeck}
@@ -328,9 +335,11 @@ function PreferencesDialogContent({
   links,
   interfaceSize,
   sortMode,
+  themePreference,
   onOpenChange,
   onInterfaceSizeChange,
   onSortModeChange,
+  onThemePreferenceChange,
   saveCategoryDraft,
   exportDeck,
   importDeck,
@@ -368,6 +377,7 @@ function PreferencesDialogContent({
   const [activeTab, setActiveTab] = useState<PreferencesTab>(initialTab)
   const [localInterfaceSize, setLocalInterfaceSize] = useState<InterfaceSize>(interfaceSize)
   const [localSortMode, setLocalSortMode] = useState<SortMode>(sortMode)
+  const [localThemePreference, setLocalThemePreference] = useState<ThemePreference>(themePreference)
   const [displayLanguage, setDisplayLanguage] = useState<DisplayLanguage>('en')
   const interfaceSizeConfig = getInterfaceSizeConfig(interfaceSize)
   const sortedCategories = useMemo(
@@ -803,6 +813,14 @@ function PreferencesDialogContent({
     })
   }
 
+  /** Updates theme preference locally before scheduling the document-wide appearance change. */
+  function handleThemePreferenceChange(nextThemePreference: ThemePreference): void {
+    setLocalThemePreference(nextThemePreference)
+    startTransition(() => {
+      onThemePreferenceChange(nextThemePreference)
+    })
+  }
+
   /** Updates sort selection locally before scheduling the visible section recalculation. */
   function handleSortModeChange(nextSortMode: SortMode): void {
     setLocalSortMode(nextSortMode)
@@ -925,6 +943,10 @@ function PreferencesDialogContent({
               <div className={cn('max-w-none', interfaceSizeConfig.dialog.formClassName)}>
                 <div className={interfaceSizeConfig.dialog.fieldClassName}>
                   <InterfaceSizePicker value={localInterfaceSize} onChange={handleInterfaceSizeChange} />
+                </div>
+
+                <div className={interfaceSizeConfig.dialog.fieldClassName}>
+                  <ThemePicker value={localThemePreference} onChange={handleThemePreferenceChange} />
                 </div>
 
                 <div className={interfaceSizeConfig.dialog.fieldClassName}>
