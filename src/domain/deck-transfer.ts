@@ -1,6 +1,6 @@
 // Converts Link Deck snapshots to and from a portable JSON backup format.
 
-import type { Category, IconFile, InterfaceSize, Link, SortMode } from '@/domain/types'
+import type { Category, IconFile, DisplaySize, Link, SortMode } from '@/domain/types'
 import type { StoredDeckSnapshot } from '@/services/db'
 
 type ExportedIconFile = Omit<IconFile, 'blob'> & {
@@ -17,7 +17,7 @@ export type DeckExportFile = {
     categories: Category[]
     links: Link[]
     iconFiles: ExportedIconFile[]
-    interfaceSize: InterfaceSize
+    interfaceSize: DisplaySize
     sortMode: SortMode
     createdAt: string
     updatedAt: string
@@ -25,7 +25,7 @@ export type DeckExportFile = {
 }
 
 const VALID_SORT_MODES = new Set<SortMode>(['manual', 'mostVisited', 'recentVisited', 'name'])
-const VALID_INTERFACE_SIZES = new Set<InterfaceSize>(['compact', 'comfortable', 'spacious'])
+const VALID_DISPLAY_SIZES = new Set<DisplaySize>(['compact', 'comfortable', 'spacious'])
 
 /** Reads a Blob as a data URL so local icons can be included in JSON exports. */
 function readBlobAsDataUrl(blob: Blob): Promise<string> {
@@ -179,7 +179,7 @@ export async function createDeckExportFile(deck: StoredDeckSnapshot): Promise<De
       categories: deck.categories,
       links: deck.links,
       iconFiles,
-      interfaceSize: deck.interfaceSize,
+      interfaceSize: deck.displaySize,
       sortMode: deck.sortMode,
       createdAt: deck.createdAt,
       updatedAt: deck.updatedAt,
@@ -202,6 +202,7 @@ export async function parseDeckExportFile(json: string): Promise<StoredDeckSnaps
   }
 
   const deck = parsed.deck
+  const importedDisplaySize = deck.displaySize ?? deck.interfaceSize
 
   if (!Array.isArray(deck.links) && Array.isArray(deck.sites)) {
     throw new Error('Unsupported backup format.')
@@ -213,7 +214,7 @@ export async function parseDeckExportFile(json: string): Promise<StoredDeckSnaps
     !Array.isArray(deck.categories) ||
     !Array.isArray(deck.links) ||
     !Array.isArray(deck.iconFiles) ||
-    !VALID_INTERFACE_SIZES.has(deck.interfaceSize as InterfaceSize) ||
+    !VALID_DISPLAY_SIZES.has(importedDisplaySize as DisplaySize) ||
     !VALID_SORT_MODES.has(deck.sortMode as SortMode) ||
     !isTimestamp(deck.createdAt) ||
     !isTimestamp(deck.updatedAt)
@@ -277,7 +278,7 @@ export async function parseDeckExportFile(json: string): Promise<StoredDeckSnaps
     categories,
     links,
     iconFiles,
-    interfaceSize: deck.interfaceSize as InterfaceSize,
+    displaySize: importedDisplaySize as DisplaySize,
     legacyLinksDetected: false,
     sortMode: deck.sortMode as SortMode,
     createdAt: deck.createdAt,

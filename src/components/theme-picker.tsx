@@ -24,7 +24,7 @@ const THEME_OPTION_INDEX = {
   dark: 2,
 } satisfies Record<ThemePreference, number>
 
-/** Lets users choose the app theme with the same segmented interaction as interface size. */
+/** Lets users choose the app theme with the same segmented interaction as display size. */
 export function ThemePicker({ value, onChange }: ThemePickerProps) {
   const selectedIndex = THEME_OPTION_INDEX[value]
 

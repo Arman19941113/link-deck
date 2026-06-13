@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import type { InterfaceSizeConfig } from '@/domain/interface-size'
+import type { DisplaySizeConfig } from '@/domain/display-size'
 import {
   createBuiltinIconRef,
   getBuiltinIconMetadata,
@@ -32,7 +32,7 @@ type BuiltinIconValue = Extract<LinkIcon, { type: 'builtin' }>
 type BrandIconPickerProps = {
   value: BuiltinIconValue | null
   disabled?: boolean
-  interfaceSizeConfig: InterfaceSizeConfig
+  displaySizeConfig: DisplaySizeConfig
   onChange: (icon: BuiltinIconValue) => void
   onConfirm?: (icon: BuiltinIconValue) => void
 }
@@ -46,7 +46,7 @@ type BrandIconPreviewProps = {
 }
 
 /** Returns field button spacing that keeps top, bottom, and right inset balanced. */
-function getBuiltinIconActionInsetClassName(buttonSize: InterfaceSizeConfig['control']['buttonSize']) {
+function getBuiltinIconActionInsetClassName(buttonSize: DisplaySizeConfig['control']['buttonSize']) {
   return buttonSize === 'default' ? 'py-1 pr-[3px] pl-3' : 'py-0.5 pr-px pl-3'
 }
 
@@ -94,7 +94,7 @@ function BrandIconPreview({ icon, className, decorative = false }: BrandIconPrev
 }
 
 /** Shows the current built-in icon and opens the secondary chooser dialog. */
-export function BuiltinIconField({ value, disabled = false, interfaceSizeConfig, onChange }: BuiltinIconFieldProps) {
+export function BuiltinIconField({ value, disabled = false, displaySizeConfig, onChange }: BuiltinIconFieldProps) {
   const [chooserOpen, setChooserOpen] = useState(false)
   const [draftIcon, setDraftIcon] = useState<BuiltinIconValue | null>(value)
   const selectedIcon = useMemo(() => (value ? getBuiltinIconMetadata(value) : null), [value])
@@ -126,13 +126,13 @@ export function BuiltinIconField({ value, disabled = false, interfaceSizeConfig,
 
   return (
     <>
-      <div className={interfaceSizeConfig.dialog.fieldClassName}>
-        <Label className={interfaceSizeConfig.control.labelClassName}>Built-in icon</Label>
+      <div className={displaySizeConfig.dialog.fieldClassName}>
+        <Label className={displaySizeConfig.control.labelClassName}>Built-in icon</Label>
         <div
           className={cn(
-            interfaceSizeConfig.control.inputClassName,
+            displaySizeConfig.control.inputClassName,
             'flex items-center gap-3 border border-input bg-card shadow-xs',
-            getBuiltinIconActionInsetClassName(interfaceSizeConfig.control.buttonSize),
+            getBuiltinIconActionInsetClassName(displaySizeConfig.control.buttonSize),
           )}
         >
           <span className="flex min-w-0 flex-1 items-center gap-3">
@@ -149,7 +149,7 @@ export function BuiltinIconField({ value, disabled = false, interfaceSizeConfig,
             <Button
               type="button"
               variant="outline"
-              size={interfaceSizeConfig.control.iconButtonSize}
+              size={displaySizeConfig.control.iconButtonSize}
               disabled={disabled}
               className="bg-background"
               aria-label="Random built-in icon"
@@ -160,7 +160,7 @@ export function BuiltinIconField({ value, disabled = false, interfaceSizeConfig,
             <Button
               type="button"
               variant="outline"
-              size={interfaceSizeConfig.control.buttonSize}
+              size={displaySizeConfig.control.buttonSize}
               disabled={disabled}
               className="bg-background"
               onClick={handleOpenChooser}
@@ -175,12 +175,12 @@ export function BuiltinIconField({ value, disabled = false, interfaceSizeConfig,
         <DialogContent
           className={cn(
             'grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden',
-            interfaceSizeConfig.dialog.surfaceClassName,
+            displaySizeConfig.dialog.surfaceClassName,
           )}
         >
-          <DialogHeader className={interfaceSizeConfig.dialog.headerClassName}>
-            <DialogTitle className={interfaceSizeConfig.dialog.titleClassName}>Choose built-in icon</DialogTitle>
-            <DialogDescription className={interfaceSizeConfig.dialog.descriptionClassName}>
+          <DialogHeader className={displaySizeConfig.dialog.headerClassName}>
+            <DialogTitle className={displaySizeConfig.dialog.titleClassName}>Choose built-in icon</DialogTitle>
+            <DialogDescription className={displaySizeConfig.dialog.descriptionClassName}>
               Search built-in brand icons and confirm the icon for this link.
             </DialogDescription>
           </DialogHeader>
@@ -189,24 +189,24 @@ export function BuiltinIconField({ value, disabled = false, interfaceSizeConfig,
             <BrandIconPicker
               value={draftIcon}
               disabled={disabled}
-              interfaceSizeConfig={interfaceSizeConfig}
+              displaySizeConfig={displaySizeConfig}
               onChange={setDraftIcon}
               onConfirm={handleUseIcon}
             />
           </div>
 
-          <DialogFooter className={interfaceSizeConfig.dialog.footerClassName}>
+          <DialogFooter className={displaySizeConfig.dialog.footerClassName}>
             <Button
               type="button"
               variant="outline"
-              size={interfaceSizeConfig.control.buttonSize}
+              size={displaySizeConfig.control.buttonSize}
               onClick={() => setChooserOpen(false)}
             >
               Cancel
             </Button>
             <Button
               type="button"
-              size={interfaceSizeConfig.control.buttonSize}
+              size={displaySizeConfig.control.buttonSize}
               disabled={!draftIcon}
               onClick={() => handleUseIcon()}
             >
@@ -223,7 +223,7 @@ export function BuiltinIconField({ value, disabled = false, interfaceSizeConfig,
 export function BrandIconPicker({
   value,
   disabled = false,
-  interfaceSizeConfig,
+  displaySizeConfig,
   onChange,
   onConfirm,
 }: BrandIconPickerProps) {
@@ -318,13 +318,13 @@ export function BrandIconPicker({
         </div>
       ) : null}
 
-      <div className={interfaceSizeConfig.dialog.fieldClassName}>
-        <Label htmlFor="link-dialog-builtin-icon-search" className={interfaceSizeConfig.control.labelClassName}>
+      <div className={displaySizeConfig.dialog.fieldClassName}>
+        <Label htmlFor="link-dialog-builtin-icon-search" className={displaySizeConfig.control.labelClassName}>
           Search built-in icons
         </Label>
         <Input
           id="link-dialog-builtin-icon-search"
-          className={interfaceSizeConfig.control.inputClassName}
+          className={displaySizeConfig.control.inputClassName}
           value={query}
           placeholder="Search brands, for example GitHub"
           disabled={disabled}

@@ -3,38 +3,38 @@
 import { Plus, Settings2 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
-import type { InterfaceSizeConfig } from '@/domain/interface-size'
+import type { DisplaySizeConfig } from '@/domain/display-size'
 
 type AppTopBarProps = {
-  interfaceSizeConfig: InterfaceSizeConfig
+  displaySizeConfig: DisplaySizeConfig
   onAddLink: () => void
-  onOpenPreferences: () => void
+  onOpenSettings: () => void
 }
 
 /** Shows the app brand and global action area. */
-export function AppTopBar({ interfaceSizeConfig, onAddLink, onOpenPreferences }: AppTopBarProps) {
+export function AppTopBar({ displaySizeConfig, onAddLink, onOpenSettings }: AppTopBarProps) {
   return (
-    <header className={interfaceSizeConfig.topBar.className}>
+    <header className={displaySizeConfig.topBar.className}>
       <div className="flex min-w-0 flex-col">
-        <h1 className={interfaceSizeConfig.topBar.titleClassName}>Link Deck</h1>
+        <h1 className={displaySizeConfig.topBar.titleClassName}>Link Deck</h1>
       </div>
 
-      <div className={interfaceSizeConfig.topBar.actionsClassName}>
+      <div className={displaySizeConfig.topBar.actionsClassName}>
         <Button
           type="button"
           variant="outline"
-          size={interfaceSizeConfig.control.buttonSize}
-          aria-label="Open preferences"
+          size={displaySizeConfig.control.buttonSize}
+          aria-label="Open settings"
           onClick={() => {
-            onOpenPreferences()
+            onOpenSettings()
           }}
         >
           <Settings2 data-icon="inline-start" aria-hidden="true" />
-          Preferences
+          Settings
         </Button>
         <Button
           type="button"
-          size={interfaceSizeConfig.control.buttonSize}
+          size={displaySizeConfig.control.buttonSize}
           aria-label="Add link"
           onClick={() => {
             onAddLink()

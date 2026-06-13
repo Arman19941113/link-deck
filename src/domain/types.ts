@@ -1,7 +1,7 @@
 // Defines navigation domain models shared by storage and UI layers.
 
 export type SortMode = 'manual' | 'mostVisited' | 'recentVisited' | 'name'
-export type InterfaceSize = 'compact' | 'comfortable' | 'spacious'
+export type DisplaySize = 'compact' | 'comfortable' | 'spacious'
 export type ThemePreference = 'auto' | 'light' | 'dark'
 
 export type LinkIcon =

@@ -6,7 +6,7 @@ import { useDragDropMonitor } from '@dnd-kit/react'
 import { useSortable } from '@dnd-kit/react/sortable'
 
 import { LinkCard } from '@/components/link-card'
-import type { IconFile, InterfaceSize, Link } from '@/domain/types'
+import type { IconFile, DisplaySize, Link } from '@/domain/types'
 
 type SortableLinkCardProps = {
   link: Link
@@ -16,7 +16,7 @@ type SortableLinkCardProps = {
   onEditLink: (link: Link) => void
   onDeleteLink: (link: Link) => Promise<void>
   getIconFile: (id: string) => Promise<IconFile | undefined>
-  interfaceSize: InterfaceSize
+  displaySize: DisplaySize
 }
 
 /** Lets a link card open on click and participate in sorting while dragged. */
@@ -28,7 +28,7 @@ export function SortableLinkCard({
   onEditLink,
   onDeleteLink,
   getIconFile,
-  interfaceSize,
+  displaySize,
 }: SortableLinkCardProps) {
   const { handleRef, isDragging, ref } = useSortable({
     id: link.id,
@@ -81,7 +81,7 @@ export function SortableLinkCard({
         onEditLink={onEditLink}
         onDeleteLink={onDeleteLink}
         getIconFile={getIconFile}
-        interfaceSize={interfaceSize}
+        displaySize={displaySize}
         isDragging={isDragging}
         cardDragProps={{
           ref: setCardRef,

@@ -2,19 +2,19 @@
 
 import { Plus } from 'lucide-react'
 
-import { getInterfaceSizeConfig } from '@/domain/interface-size'
-import type { InterfaceSize } from '@/domain/types'
+import { getDisplaySizeConfig } from '@/domain/display-size'
+import type { DisplaySize } from '@/domain/types'
 import { cn } from '@/lib/utils'
 
 type AddLinkCardProps = {
-  interfaceSize: InterfaceSize
+  displaySize: DisplaySize
   categoryName: string
   onAddLink: () => void
 }
 
 /** Shows a fixed-size card that starts a new link in the current category. */
-export function AddLinkCard({ interfaceSize, categoryName, onAddLink }: AddLinkCardProps) {
-  const cardConfig = getInterfaceSizeConfig(interfaceSize).card
+export function AddLinkCard({ displaySize, categoryName, onAddLink }: AddLinkCardProps) {
+  const cardConfig = getDisplaySizeConfig(displaySize).card
 
   return (
     <button

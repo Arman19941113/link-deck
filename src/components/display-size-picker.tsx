@@ -1,32 +1,32 @@
-// Segmented picker with compact previews for the global interface size.
+// Segmented picker with compact previews for the global display size.
 
-import { INTERFACE_SIZE_OPTIONS } from '@/domain/interface-size'
+import { DISPLAY_SIZE_OPTIONS } from '@/domain/display-size'
 import { Label } from '@/components/ui/label'
-import type { InterfaceSize } from '@/domain/types'
+import type { DisplaySize } from '@/domain/types'
 import { cn } from '@/lib/utils'
 
-type InterfaceSizePickerProps = {
-  value: InterfaceSize
-  onChange: (value: InterfaceSize) => void
+type DisplaySizePickerProps = {
+  value: DisplaySize
+  onChange: (value: DisplaySize) => void
 }
 
-const PREVIEW_BLOCKS: Record<InterfaceSize, number> = {
+const PREVIEW_BLOCKS: Record<DisplaySize, number> = {
   compact: 4,
   comfortable: 3,
   spacious: 2,
 }
 
-/** Lets users pick the global interface size from visible layout previews. */
-export function InterfaceSizePicker({ value, onChange }: InterfaceSizePickerProps) {
+/** Lets users pick the global display size from visible layout previews. */
+export function DisplaySizePicker({ value, onChange }: DisplaySizePickerProps) {
   return (
     <div className="flex flex-col gap-2">
-      <Label id="settings-interface-size-label">Interface size</Label>
+      <Label id="settings-display-size-label">Display size</Label>
       <div
         className="grid h-9 grid-cols-3 rounded-md border border-input bg-card p-0.5 shadow-xs"
         role="radiogroup"
-        aria-labelledby="settings-interface-size-label"
+        aria-labelledby="settings-display-size-label"
       >
-        {INTERFACE_SIZE_OPTIONS.map(option => {
+        {DISPLAY_SIZE_OPTIONS.map(option => {
           const isSelected = option.value === value
 
           return (
@@ -40,7 +40,7 @@ export function InterfaceSizePicker({ value, onChange }: InterfaceSizePickerProp
             >
               <input
                 type="radio"
-                name="interface-size"
+                name="display-size"
                 value={option.value}
                 checked={isSelected}
                 className="peer sr-only"

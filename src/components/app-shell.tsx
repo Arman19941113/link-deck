@@ -12,7 +12,7 @@ import { AppTopBar } from '@/components/app-top-bar'
 import { DeckEmptyState } from '@/components/deck-empty-state'
 import { getFocusedLinkCardId } from '@/components/link-card-keyboard'
 import { LinkSearchBox } from '@/components/link-search-box'
-import { PreferencesDialog, type PreferencesTab } from '@/components/preferences-dialog'
+import { SettingsDialog, type SettingsTab } from '@/components/settings-dialog'
 import { LinkDialog } from '@/components/link-dialog'
 import {
   AlertDialog,
@@ -24,7 +24,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { getInterfaceSizeConfig } from '@/domain/interface-size'
+import { getDisplaySizeConfig } from '@/domain/display-size'
 import { preloadPinyinSearchModule } from '@/domain/pinyin-search-loader'
 import type { Category, CategorySection as CategorySectionData, Link, ThemePreference } from '@/domain/types'
 import { useDeckStore } from '@/hooks/use-deck-store'
@@ -141,8 +141,8 @@ export function AppShell() {
   const [linkDialogOpen, setLinkDialogOpen] = useState(false)
   const [editingLink, setEditingLink] = useState<Link | null>(null)
   const [addingLinkCategoryId, setAddingLinkCategoryId] = useState<string | null>(null)
-  const [preferencesOpen, setPreferencesOpen] = useState(false)
-  const [preferencesInitialTab, setPreferencesInitialTab] = useState<PreferencesTab>('general')
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const [settingsInitialTab, setSettingsInitialTab] = useState<SettingsTab>('general')
   const [themePreference, setThemePreferenceState] = useState<ThemePreference>(storageService.getTheme)
   const [shortcutDeleteLink, setShortcutDeleteLink] = useState<Link | null>(null)
   const [isShortcutDeleting, setIsShortcutDeleting] = useState(false)
@@ -153,13 +153,13 @@ export function AppShell() {
   const {
     categories,
     links,
-    interfaceSize,
+    displaySize,
     sortMode,
     query,
     initialized,
     error,
     sections,
-    setInterfaceSize,
+    setDisplaySize,
     setQuery,
     setSortMode,
     upsertLink,
@@ -173,7 +173,7 @@ export function AppShell() {
     resetDeckToDefaults,
     clearDeckData,
   } = useDeckStore()
-  const interfaceSizeConfig = getInterfaceSizeConfig(interfaceSize)
+  const displaySizeConfig = getDisplaySizeConfig(displaySize)
   const isManualSort = sortMode === 'manual'
   const hasQuery = query.trim().length > 0
   const isLinkDragEnabled = isManualSort && !hasQuery
@@ -263,7 +263,7 @@ export function AppShell() {
 
       if (!event.shiftKey && event.key === '/') {
         event.preventDefault()
-        openPreferences('shortcuts')
+        openSettings('shortcuts')
         return
       }
 
@@ -304,10 +304,10 @@ export function AppShell() {
     setLinkDialogOpen(true)
   }
 
-  /** Opens preferences to a specific tab. */
-  function openPreferences(tab: PreferencesTab = 'general'): void {
-    setPreferencesInitialTab(tab)
-    setPreferencesOpen(true)
+  /** Opens settings to a specific tab. */
+  function openSettings(tab: SettingsTab = 'general'): void {
+    setSettingsInitialTab(tab)
+    setSettingsOpen(true)
   }
 
   /** Persists the app appearance preference and applies it to the document root. */
@@ -447,12 +447,12 @@ export function AppShell() {
   }
 
   const sectionList = (
-    <div className={interfaceSizeConfig.page.stackClassName}>
+    <div className={displaySizeConfig.page.stackClassName}>
       {visibleSections.map((section, categoryIndex) => (
         <CategorySection
           key={section.category.id}
           section={section}
-          interfaceSize={interfaceSize}
+          displaySize={displaySize}
           categoryIndex={categoryIndex}
           isDragEnabled={isLinkDragEnabled}
           showAddLinkCard={!hasQuery && section.links.length === 0}
@@ -469,11 +469,11 @@ export function AppShell() {
   return (
     <main className="min-h-svh bg-background text-foreground">
       <div className="sticky top-0 z-20 border-b border-border/60 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/85">
-        <div className={cn(interfaceSizeConfig.page.className, interfaceSizeConfig.page.stackClassName, 'min-h-0')}>
+        <div className={cn(displaySizeConfig.page.className, displaySizeConfig.page.stackClassName, 'min-h-0')}>
           <AppTopBar
-            interfaceSizeConfig={interfaceSizeConfig}
+            displaySizeConfig={displaySizeConfig}
             onAddLink={handleCreateLink}
-            onOpenPreferences={() => openPreferences()}
+            onOpenSettings={() => openSettings()}
           />
 
           <LinkSearchBox
@@ -481,12 +481,12 @@ export function AppShell() {
             value={query}
             onChange={setQuery}
             onFocus={preloadPinyinSearchModule}
-            interfaceSizeConfig={interfaceSizeConfig}
+            displaySizeConfig={displaySizeConfig}
           />
         </div>
       </div>
 
-      <div className={cn(interfaceSizeConfig.page.className, interfaceSizeConfig.page.stackClassName, 'min-h-0')}>
+      <div className={cn(displaySizeConfig.page.className, displaySizeConfig.page.stackClassName, 'min-h-0')}>
         {visibleSections.length > 0 ? (
           isLinkDragEnabled ? (
             <DragDropProvider
@@ -510,21 +510,21 @@ export function AppShell() {
         link={editingLink}
         initialCategoryId={addingLinkCategoryId}
         categories={categories}
-        interfaceSizeConfig={interfaceSizeConfig}
+        displaySizeConfig={displaySizeConfig}
         getIconFile={getIconFile}
         onOpenChange={handleLinkDialogOpenChange}
         upsertLink={upsertLink}
       />
-      <PreferencesDialog
-        open={preferencesOpen}
-        initialTab={preferencesInitialTab}
+      <SettingsDialog
+        open={settingsOpen}
+        initialTab={settingsInitialTab}
         categories={categories}
         links={links}
-        interfaceSize={interfaceSize}
+        displaySize={displaySize}
         sortMode={sortMode}
         themePreference={themePreference}
-        onOpenChange={setPreferencesOpen}
-        onInterfaceSizeChange={setInterfaceSize}
+        onOpenChange={setSettingsOpen}
+        onDisplaySizeChange={setDisplaySize}
         onSortModeChange={setSortMode}
         onThemePreferenceChange={handleThemePreferenceChange}
         saveCategoryDraft={saveCategoryDraft}
@@ -543,26 +543,26 @@ export function AppShell() {
       >
         <AlertDialogContent
           size="default"
-          className={interfaceSizeConfig.dialog.contentClassName}
+          className={displaySizeConfig.dialog.contentClassName}
           onOpenAutoFocus={event => {
             event.preventDefault()
             shortcutDeleteActionRef.current?.focus({ preventScroll: true })
           }}
         >
-          <AlertDialogHeader className={interfaceSizeConfig.dialog.headerClassName}>
-            <AlertDialogTitle className={interfaceSizeConfig.dialog.titleClassName}>Delete link</AlertDialogTitle>
-            <AlertDialogDescription className={cn('wrap-break-word', interfaceSizeConfig.dialog.descriptionClassName)}>
+          <AlertDialogHeader className={displaySizeConfig.dialog.headerClassName}>
+            <AlertDialogTitle className={displaySizeConfig.dialog.titleClassName}>Delete link</AlertDialogTitle>
+            <AlertDialogDescription className={cn('wrap-break-word', displaySizeConfig.dialog.descriptionClassName)}>
               Delete "{shortcutDeleteLink?.name}"? This removes the link from your deck.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className={interfaceSizeConfig.dialog.footerClassName}>
-            <AlertDialogCancel size={interfaceSizeConfig.control.buttonSize} disabled={isShortcutDeleting}>
+          <AlertDialogFooter className={displaySizeConfig.dialog.footerClassName}>
+            <AlertDialogCancel size={displaySizeConfig.control.buttonSize} disabled={isShortcutDeleting}>
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
               ref={shortcutDeleteActionRef}
               variant="destructive"
-              size={interfaceSizeConfig.control.buttonSize}
+              size={displaySizeConfig.control.buttonSize}
               disabled={isShortcutDeleting}
               onClick={event => {
                 event.preventDefault()

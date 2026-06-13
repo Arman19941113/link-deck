@@ -1,14 +1,14 @@
-// Defines global interface-size options and semantic sizing tokens.
+// Defines global display-size options and semantic sizing tokens.
 
-import type { InterfaceSize } from '@/domain/types'
+import type { DisplaySize } from '@/domain/types'
 
-export type InterfaceSizeOption = {
+export type DisplaySizeOption = {
   description: string
-  value: InterfaceSize
+  value: DisplaySize
   label: string
 }
 
-export type InterfaceSizeConfig = {
+export type DisplaySizeConfig = {
   page: {
     className: string
     stackClassName: string
@@ -63,22 +63,22 @@ export type InterfaceSizeConfig = {
   }
 }
 
-export const INTERFACE_SIZE_OPTIONS: InterfaceSizeOption[] = [
+export const DISPLAY_SIZE_OPTIONS: DisplaySizeOption[] = [
   { value: 'compact', label: 'Compact', description: 'Dense layout across the app' },
   { value: 'comfortable', label: 'Comfortable', description: 'Balanced spacing and reading' },
   { value: 'spacious', label: 'Spacious', description: 'Larger controls and more reading room' },
 ]
 
-export const DEFAULT_INTERFACE_SIZE: InterfaceSize = 'comfortable'
+export const DEFAULT_DISPLAY_SIZE: DisplaySize = 'comfortable'
 
-const INTERFACE_SIZE_VALUES = new Set<InterfaceSize>(INTERFACE_SIZE_OPTIONS.map(option => option.value))
+const DISPLAY_SIZE_VALUES = new Set<DisplaySize>(DISPLAY_SIZE_OPTIONS.map(option => option.value))
 
-/** Checks unknown stored settings before using them as interface-size state. */
-export function isInterfaceSize(value: unknown): value is InterfaceSize {
-  return typeof value === 'string' && INTERFACE_SIZE_VALUES.has(value as InterfaceSize)
+/** Checks unknown stored settings before using them as display-size state. */
+export function isDisplaySize(value: unknown): value is DisplaySize {
+  return typeof value === 'string' && DISPLAY_SIZE_VALUES.has(value as DisplaySize)
 }
 
-export const INTERFACE_SIZE_CONFIG: Record<InterfaceSize, InterfaceSizeConfig> = {
+export const DISPLAY_SIZE_CONFIG: Record<DisplaySize, DisplaySizeConfig> = {
   compact: {
     page: {
       className: 'mx-auto flex w-full max-w-7xl flex-col px-3 py-3 sm:px-4 sm:py-4',
@@ -243,7 +243,7 @@ export const INTERFACE_SIZE_CONFIG: Record<InterfaceSize, InterfaceSizeConfig> =
   },
 }
 
-/** Returns the display configuration for the selected global interface size. */
-export function getInterfaceSizeConfig(interfaceSize: InterfaceSize): InterfaceSizeConfig {
-  return INTERFACE_SIZE_CONFIG[interfaceSize]
+/** Returns the display configuration for the selected global display size. */
+export function getDisplaySizeConfig(displaySize: DisplaySize): DisplaySizeConfig {
+  return DISPLAY_SIZE_CONFIG[displaySize]
 }

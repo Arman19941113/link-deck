@@ -1,10 +1,11 @@
-import { DEFAULT_INTERFACE_SIZE, isInterfaceSize } from '@/domain/interface-size'
+import { DEFAULT_DISPLAY_SIZE, isDisplaySize } from '@/domain/display-size'
 import { DEFAULT_THEME_PREFERENCE, isThemePreference } from '@/domain/theme'
-import type { Category, InterfaceSize, Link, SortMode, ThemePreference } from '@/domain/types'
+import type { Category, DisplaySize, Link, SortMode, ThemePreference } from '@/domain/types'
 import { getLocalStorage, setLocalStorage } from '@/lib/storage'
 
 const NAME_THEME = 'link-deck.theme'
-const NAME_INTERFACE_SIZE = 'link-deck.interface-size'
+const NAME_DISPLAY_SIZE = 'link-deck.display-size'
+const LEGACY_NAME_DISPLAY_SIZE = 'link-deck.interface-size'
 const NAME_DECK_SNAPSHOT = 'link-deck.deck-snapshot'
 const DECK_SNAPSHOT_MIRROR_VERSION = 1
 const SORT_MODE_VALUES = new Set<SortMode>(['manual', 'mostVisited', 'recentVisited', 'name'])
@@ -14,23 +15,28 @@ export type DeckSnapshotMirror = {
   version: typeof DECK_SNAPSHOT_MIRROR_VERSION
   categories: Category[]
   links: Link[]
-  interfaceSize: InterfaceSize
+  displaySize: DisplaySize
   sortMode: SortMode
+}
+
+type StoredDeckSnapshotMirror = Omit<DeckSnapshotMirror, 'displaySize'> & {
+  displaySize?: DisplaySize
+  interfaceSize?: DisplaySize
 }
 
 /** Public localStorage operations; IndexedDB data belongs in dbService. */
 export const storageService = {
   getDeckSnapshotMirror,
-  getInterfaceSize,
+  getDisplaySize,
   getTheme,
   setDeckSnapshotMirror,
-  setInterfaceSize,
+  setDisplaySize,
   setTheme,
 }
 
-/** Returns the best synchronous initial interface size before IndexedDB has opened. */
-function getInterfaceSize(): InterfaceSize {
-  return getInterfaceSizeMirror() ?? DEFAULT_INTERFACE_SIZE
+/** Returns the best synchronous initial display size before IndexedDB has opened. */
+function getDisplaySize(): DisplaySize {
+  return getDisplaySizeMirror() ?? DEFAULT_DISPLAY_SIZE
 }
 
 /** Reads the saved theme preference from localStorage. */
@@ -49,7 +55,20 @@ function setTheme(themePreference: ThemePreference): void {
 function getDeckSnapshotMirror(): DeckSnapshotMirror | null {
   const storedDeckSnapshot = getLocalStorage<unknown>(NAME_DECK_SNAPSHOT)
 
-  return isDeckSnapshotMirror(storedDeckSnapshot) ? storedDeckSnapshot : null
+  if (!isDeckSnapshotMirror(storedDeckSnapshot)) {
+    return null
+  }
+
+  const displaySize = storedDeckSnapshot.displaySize ?? storedDeckSnapshot.interfaceSize
+
+  if (!displaySize) {
+    return null
+  }
+
+  return {
+    ...storedDeckSnapshot,
+    displaySize,
+  }
 }
 
 /** Keeps a lightweight deck mirror outside IndexedDB so refresh can paint existing content immediately. */
@@ -58,14 +77,14 @@ function setDeckSnapshotMirror(snapshot: Omit<DeckSnapshotMirror, 'version'>): v
     version: DECK_SNAPSHOT_MIRROR_VERSION,
     categories: snapshot.categories,
     links: snapshot.links,
-    interfaceSize: snapshot.interfaceSize,
+    displaySize: snapshot.displaySize,
     sortMode: snapshot.sortMode,
   })
 }
 
-/** Saves the current global interface size mirror. */
-function setInterfaceSize(interfaceSize: InterfaceSize): void {
-  setInterfaceSizeMirror(interfaceSize)
+/** Saves the current global display size mirror. */
+function setDisplaySize(displaySize: DisplaySize): void {
+  setDisplaySizeMirror(displaySize)
 }
 
 /** Checks whether a parsed JSON value can be inspected as an object. */
@@ -134,7 +153,9 @@ function isLink(value: unknown): value is Link {
 }
 
 /** Checks a parsed first-paint mirror before using it as initial UI data. */
-function isDeckSnapshotMirror(value: unknown): value is DeckSnapshotMirror {
+function isDeckSnapshotMirror(value: unknown): value is StoredDeckSnapshotMirror {
+  const displaySize = isRecord(value) ? (value.displaySize ?? value.interfaceSize) : undefined
+
   return (
     isRecord(value) &&
     value.version === DECK_SNAPSHOT_MIRROR_VERSION &&
@@ -142,19 +163,25 @@ function isDeckSnapshotMirror(value: unknown): value is DeckSnapshotMirror {
     value.categories.every(isCategory) &&
     Array.isArray(value.links) &&
     value.links.every(isLink) &&
-    isInterfaceSize(value.interfaceSize) &&
+    isDisplaySize(displaySize) &&
     isSortMode(value.sortMode)
   )
 }
 
-/** Reads the synchronous interface-size mirror used to avoid first-paint layout jumps. */
-function getInterfaceSizeMirror(): InterfaceSize | null {
-  const storedInterfaceSize = getLocalStorage<unknown>(NAME_INTERFACE_SIZE)
+/** Reads the synchronous display-size mirror used to avoid first-paint layout jumps. */
+function getDisplaySizeMirror(): DisplaySize | null {
+  const storedDisplaySize = getLocalStorage<unknown>(NAME_DISPLAY_SIZE)
+  const legacyStoredDisplaySize = getLocalStorage<unknown>(LEGACY_NAME_DISPLAY_SIZE)
 
-  return isInterfaceSize(storedInterfaceSize) ? storedInterfaceSize : null
+  if (isDisplaySize(storedDisplaySize)) {
+    return storedDisplaySize
+  }
+
+  return isDisplaySize(legacyStoredDisplaySize) ? legacyStoredDisplaySize : null
 }
 
 /** Keeps a small settings mirror outside IndexedDB so initial React state can match the last choice. */
-function setInterfaceSizeMirror(interfaceSize: InterfaceSize): void {
-  setLocalStorage(NAME_INTERFACE_SIZE, interfaceSize)
+function setDisplaySizeMirror(displaySize: DisplaySize): void {
+  setLocalStorage(NAME_DISPLAY_SIZE, displaySize)
+  setLocalStorage(LEGACY_NAME_DISPLAY_SIZE, displaySize)
 }

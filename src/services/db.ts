@@ -2,12 +2,13 @@ import { openDB, type DBSchema, type IDBPDatabase } from 'idb'
 
 import { createDefaultCategory, DEFAULT_CATEGORY_ID } from '@/domain/categories'
 import { createDefaultDeck } from '@/domain/default-data'
-import { DEFAULT_INTERFACE_SIZE } from '@/domain/interface-size'
-import type { Category, DeckSnapshot, IconFile, InterfaceSize, Link, SortMode } from '@/domain/types'
+import { DEFAULT_DISPLAY_SIZE } from '@/domain/display-size'
+import type { Category, DeckSnapshot, IconFile, DisplaySize, Link, SortMode } from '@/domain/types'
 
 type SettingsRecord = {
   id: 'settings'
-  interfaceSize: InterfaceSize
+  displaySize?: DisplaySize
+  interfaceSize?: DisplaySize
   sortMode: SortMode
   updatedAt: string
 }
@@ -42,7 +43,7 @@ interface LegacyLinkDeckDb extends LinkDeckDb {
 
 /** Snapshot loaded into the app, plus the sort mode from the separate settings store. */
 export type StoredDeckSnapshot = DeckSnapshot & {
-  interfaceSize: InterfaceSize
+  displaySize: DisplaySize
   legacyLinksDetected: boolean
   sortMode: SortMode
 }
@@ -76,7 +77,7 @@ export const dbService = {
   saveCategory,
   saveCategoryDraftChanges,
   saveIconFile,
-  saveInterfaceSize,
+  saveDisplaySize,
   saveLink,
   saveLinks,
   saveSortMode,
@@ -161,7 +162,8 @@ async function seedIfEmpty(): Promise<void> {
 
   settingsStore.put({
     id: SETTINGS_ID,
-    interfaceSize: DEFAULT_INTERFACE_SIZE,
+    displaySize: DEFAULT_DISPLAY_SIZE,
+    interfaceSize: DEFAULT_DISPLAY_SIZE,
     sortMode: DEFAULT_SORT_MODE,
     updatedAt: deck.updatedAt,
   })
@@ -203,7 +205,7 @@ async function loadDeck(): Promise<StoredDeckSnapshot> {
   ])
   const legacyLinksDetected = await hasLegacySiteRecords(db, links.length)
   const records = [...categories, ...links, ...iconFiles]
-  const interfaceSize = settings?.interfaceSize ?? DEFAULT_INTERFACE_SIZE
+  const displaySize = settings?.displaySize ?? settings?.interfaceSize ?? DEFAULT_DISPLAY_SIZE
 
   const snapshot: StoredDeckSnapshot = {
     id: 'local',
@@ -211,7 +213,7 @@ async function loadDeck(): Promise<StoredDeckSnapshot> {
     categories,
     links,
     iconFiles,
-    interfaceSize,
+    displaySize,
     legacyLinksDetected,
     sortMode: settings?.sortMode ?? DEFAULT_SORT_MODE,
     createdAt: getDeckTimestamp(records, 'createdAt'),
@@ -249,7 +251,8 @@ async function replaceDeck(deck: StoredDeckSnapshot): Promise<StoredDeckSnapshot
 
   settingsStore.put({
     id: SETTINGS_ID,
-    interfaceSize: deck.interfaceSize,
+    displaySize: deck.displaySize,
+    interfaceSize: deck.displaySize,
     sortMode: deck.sortMode,
     updatedAt: deck.updatedAt,
   })
@@ -264,7 +267,7 @@ async function resetDeckToDefaults(): Promise<StoredDeckSnapshot> {
   const deck = createDefaultDeck()
   const storedDeck: StoredDeckSnapshot = {
     ...deck,
-    interfaceSize: DEFAULT_INTERFACE_SIZE,
+    displaySize: DEFAULT_DISPLAY_SIZE,
     legacyLinksDetected: false,
     sortMode: DEFAULT_SORT_MODE,
   }
@@ -281,7 +284,7 @@ async function clearDeckData(): Promise<StoredDeckSnapshot> {
     categories: [createDefaultCategory(now)],
     links: [],
     iconFiles: [],
-    interfaceSize: DEFAULT_INTERFACE_SIZE,
+    displaySize: DEFAULT_DISPLAY_SIZE,
     legacyLinksDetected: false,
     sortMode: DEFAULT_SORT_MODE,
     createdAt: now,
@@ -424,14 +427,18 @@ async function deleteCategory(categoryId: string): Promise<void> {
 }
 
 /** Applies a partial settings update without overwriting concurrently changed fields. */
-async function saveSettingsPatch(patch: Partial<Pick<SettingsRecord, 'interfaceSize' | 'sortMode'>>): Promise<void> {
+async function saveSettingsPatch(patch: Partial<Pick<SettingsRecord, 'displaySize' | 'sortMode'>>): Promise<void> {
   const db = await dbPromise
   const tx = db.transaction('settings', 'readwrite')
   const previousSettings = await tx.store.get(SETTINGS_ID)
 
+  const displaySize =
+    patch.displaySize ?? previousSettings?.displaySize ?? previousSettings?.interfaceSize ?? DEFAULT_DISPLAY_SIZE
+
   tx.store.put({
     id: SETTINGS_ID,
-    interfaceSize: patch.interfaceSize ?? previousSettings?.interfaceSize ?? DEFAULT_INTERFACE_SIZE,
+    displaySize,
+    interfaceSize: displaySize,
     sortMode: patch.sortMode ?? previousSettings?.sortMode ?? DEFAULT_SORT_MODE,
     updatedAt: new Date().toISOString(),
   })
@@ -439,9 +446,9 @@ async function saveSettingsPatch(patch: Partial<Pick<SettingsRecord, 'interfaceS
   await tx.done
 }
 
-/** Saves the current global interface size. */
-async function saveInterfaceSize(interfaceSize: InterfaceSize): Promise<void> {
-  return saveSettingsPatch({ interfaceSize })
+/** Saves the current global display size. */
+async function saveDisplaySize(displaySize: DisplaySize): Promise<void> {
+  return saveSettingsPatch({ displaySize })
 }
 
 /** Saves the current link sort mode. */

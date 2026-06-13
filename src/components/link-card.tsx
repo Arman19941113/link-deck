@@ -24,8 +24,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { getInterfaceSizeConfig } from '@/domain/interface-size'
-import type { IconFile, InterfaceSize, Link } from '@/domain/types'
+import { getDisplaySizeConfig } from '@/domain/display-size'
+import type { IconFile, DisplaySize, Link } from '@/domain/types'
 import { cn } from '@/lib/utils'
 
 type LinkCardProps = {
@@ -34,7 +34,7 @@ type LinkCardProps = {
   onEditLink: (link: Link) => void
   onDeleteLink: (link: Link) => Promise<void>
   getIconFile: (id: string) => Promise<IconFile | undefined>
-  interfaceSize: InterfaceSize
+  displaySize: DisplaySize
   cardDragProps?: HTMLAttributes<HTMLDivElement> & {
     ref?: Ref<HTMLDivElement>
   }
@@ -53,15 +53,15 @@ export function LinkCard({
   onEditLink,
   onDeleteLink,
   getIconFile,
-  interfaceSize,
+  displaySize,
   cardDragProps,
   isDragging = false,
 }: LinkCardProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const deleteActionRef = useRef<HTMLButtonElement>(null)
-  const interfaceSizeConfig = getInterfaceSizeConfig(interfaceSize)
-  const cardConfig = interfaceSizeConfig.card
+  const displaySizeConfig = getDisplaySizeConfig(displaySize)
+  const cardConfig = displaySizeConfig.card
   const { ref: cardDragRef, onKeyDown: keyboardDragListener, ...cardDragAttributes } = cardDragProps ?? {}
 
   void keyboardDragListener
@@ -197,7 +197,7 @@ export function LinkCard({
             <Button
               type="button"
               variant="ghost"
-              size={interfaceSizeConfig.control.iconButtonSize}
+              size={displaySizeConfig.control.iconButtonSize}
               aria-label={`More actions for ${link.name}`}
               tabIndex={-1}
               onClick={stopMenuEvent}
@@ -252,26 +252,26 @@ export function LinkCard({
       >
         <AlertDialogContent
           size="default"
-          className={interfaceSizeConfig.dialog.contentClassName}
+          className={displaySizeConfig.dialog.contentClassName}
           onOpenAutoFocus={event => {
             event.preventDefault()
             deleteActionRef.current?.focus({ preventScroll: true })
           }}
         >
-          <AlertDialogHeader className={interfaceSizeConfig.dialog.headerClassName}>
-            <AlertDialogTitle className={interfaceSizeConfig.dialog.titleClassName}>Delete link</AlertDialogTitle>
-            <AlertDialogDescription className={cn('wrap-break-word', interfaceSizeConfig.dialog.descriptionClassName)}>
+          <AlertDialogHeader className={displaySizeConfig.dialog.headerClassName}>
+            <AlertDialogTitle className={displaySizeConfig.dialog.titleClassName}>Delete link</AlertDialogTitle>
+            <AlertDialogDescription className={cn('wrap-break-word', displaySizeConfig.dialog.descriptionClassName)}>
               Delete "{link.name}"? This removes the link from your deck.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className={interfaceSizeConfig.dialog.footerClassName}>
-            <AlertDialogCancel size={interfaceSizeConfig.control.buttonSize} disabled={isDeleting}>
+          <AlertDialogFooter className={displaySizeConfig.dialog.footerClassName}>
+            <AlertDialogCancel size={displaySizeConfig.control.buttonSize} disabled={isDeleting}>
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
               ref={deleteActionRef}
               variant="destructive"
-              size={interfaceSizeConfig.control.buttonSize}
+              size={displaySizeConfig.control.buttonSize}
               disabled={isDeleting}
               onClick={event => {
                 event.preventDefault()

@@ -20,7 +20,7 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { DEFAULT_CATEGORY_ID } from '@/domain/categories'
-import type { InterfaceSizeConfig } from '@/domain/interface-size'
+import type { DisplaySizeConfig } from '@/domain/display-size'
 import { DEFAULT_BUILTIN_ICON } from '@/domain/brand-icons'
 import type { Category, IconFile, Link, LinkIcon } from '@/domain/types'
 import type { LinkInput } from '@/hooks/use-deck-store'
@@ -34,7 +34,7 @@ type LinkDialogProps = {
   link?: Link | null
   initialCategoryId?: string | null
   categories: Category[]
-  interfaceSizeConfig: InterfaceSizeConfig
+  displaySizeConfig: DisplaySizeConfig
   getIconFile: (id: string) => Promise<IconFile | undefined>
   onOpenChange: (open: boolean) => void
   upsertLink: (input: LinkInput) => Promise<Link>
@@ -96,7 +96,7 @@ export function LinkDialog({
   link,
   initialCategoryId,
   categories,
-  interfaceSizeConfig,
+  displaySizeConfig,
   getIconFile,
   onOpenChange,
   upsertLink,
@@ -110,7 +110,7 @@ export function LinkDialog({
         link={link}
         initialCategoryId={initialCategoryId}
         categories={categories}
-        interfaceSizeConfig={interfaceSizeConfig}
+        displaySizeConfig={displaySizeConfig}
         getIconFile={getIconFile}
         onOpenChange={onOpenChange}
         upsertLink={upsertLink}
@@ -124,7 +124,7 @@ function LinkDialogForm({
   link,
   initialCategoryId,
   categories,
-  interfaceSizeConfig,
+  displaySizeConfig,
   getIconFile,
   onOpenChange,
   upsertLink,
@@ -345,25 +345,25 @@ function LinkDialogForm({
     <DialogContent
       className={cn(
         'grid-rows-[auto_auto] overflow-y-auto',
-        interfaceSizeConfig.dialog.surfaceClassName,
+        displaySizeConfig.dialog.surfaceClassName,
         'h-auto! max-h-[calc(100svh-2rem)]!',
       )}
     >
-      <DialogHeader className={interfaceSizeConfig.dialog.headerClassName}>
-        <DialogTitle className={interfaceSizeConfig.dialog.titleClassName}>{dialogTitle}</DialogTitle>
-        <DialogDescription className={interfaceSizeConfig.dialog.descriptionClassName}>
+      <DialogHeader className={displaySizeConfig.dialog.headerClassName}>
+        <DialogTitle className={displaySizeConfig.dialog.titleClassName}>{dialogTitle}</DialogTitle>
+        <DialogDescription className={displaySizeConfig.dialog.descriptionClassName}>
           Save the link details and choose how its icon should appear.
         </DialogDescription>
       </DialogHeader>
 
-      <form className={interfaceSizeConfig.dialog.formClassName} onSubmit={event => void handleSubmit(event)}>
-        <div className={interfaceSizeConfig.dialog.fieldClassName}>
-          <Label htmlFor="link-dialog-url" className={interfaceSizeConfig.control.labelClassName}>
+      <form className={displaySizeConfig.dialog.formClassName} onSubmit={event => void handleSubmit(event)}>
+        <div className={displaySizeConfig.dialog.fieldClassName}>
+          <Label htmlFor="link-dialog-url" className={displaySizeConfig.control.labelClassName}>
             Link URL
           </Label>
           <Input
             id="link-dialog-url"
-            className={interfaceSizeConfig.control.inputClassName}
+            className={displaySizeConfig.control.inputClassName}
             value={url}
             required
             type="url"
@@ -376,18 +376,16 @@ function LinkDialogForm({
 
         <div
           className={
-            shouldShowCategorySelect
-              ? interfaceSizeConfig.dialog.gridClassName
-              : interfaceSizeConfig.dialog.fieldClassName
+            shouldShowCategorySelect ? displaySizeConfig.dialog.gridClassName : displaySizeConfig.dialog.fieldClassName
           }
         >
-          <div className={interfaceSizeConfig.dialog.fieldClassName}>
-            <Label htmlFor="link-dialog-name" className={interfaceSizeConfig.control.labelClassName}>
+          <div className={displaySizeConfig.dialog.fieldClassName}>
+            <Label htmlFor="link-dialog-name" className={displaySizeConfig.control.labelClassName}>
               Title
             </Label>
             <Input
               id="link-dialog-name"
-              className={interfaceSizeConfig.control.inputClassName}
+              className={displaySizeConfig.control.inputClassName}
               value={name}
               placeholder="Use link address if empty"
               disabled={isSaving}
@@ -396,14 +394,14 @@ function LinkDialogForm({
           </div>
 
           {shouldShowCategorySelect ? (
-            <div className={interfaceSizeConfig.dialog.fieldClassName}>
-              <Label htmlFor="link-dialog-category" className={interfaceSizeConfig.control.labelClassName}>
+            <div className={displaySizeConfig.dialog.fieldClassName}>
+              <Label htmlFor="link-dialog-category" className={displaySizeConfig.control.labelClassName}>
                 Category
               </Label>
               <Select value={selectedCategoryId} disabled={isSaving || !hasCategories} onValueChange={setCategoryId}>
                 <SelectTrigger
                   id="link-dialog-category"
-                  className={cn('w-full', interfaceSizeConfig.control.inputClassName)}
+                  className={cn('w-full', displaySizeConfig.control.inputClassName)}
                   aria-invalid={!selectedCategoryId && Boolean(error)}
                 >
                   <SelectValue placeholder="Select a category" />
@@ -422,13 +420,13 @@ function LinkDialogForm({
           ) : null}
         </div>
 
-        <div className={interfaceSizeConfig.dialog.fieldClassName}>
-          <Label htmlFor="link-dialog-note" className={interfaceSizeConfig.control.labelClassName}>
+        <div className={displaySizeConfig.dialog.fieldClassName}>
+          <Label htmlFor="link-dialog-note" className={displaySizeConfig.control.labelClassName}>
             Notes
           </Label>
           <Textarea
             id="link-dialog-note"
-            className={cn(interfaceSizeConfig.control.textareaClassName, 'h-auto min-h-0 resize-none')}
+            className={cn(displaySizeConfig.control.textareaClassName, 'h-auto min-h-0 resize-none')}
             value={note}
             rows={2}
             disabled={isSaving}
@@ -436,9 +434,9 @@ function LinkDialogForm({
           />
         </div>
 
-        <div className={interfaceSizeConfig.dialog.gridClassName}>
-          <div className={interfaceSizeConfig.dialog.fieldClassName}>
-            <Label htmlFor="link-dialog-icon-mode" className={interfaceSizeConfig.control.labelClassName}>
+        <div className={displaySizeConfig.dialog.gridClassName}>
+          <div className={displaySizeConfig.dialog.fieldClassName}>
+            <Label htmlFor="link-dialog-icon-mode" className={displaySizeConfig.control.labelClassName}>
               Icon source
             </Label>
             <Select
@@ -457,7 +455,7 @@ function LinkDialogForm({
             >
               <SelectTrigger
                 id="link-dialog-icon-mode"
-                className={cn('w-full', interfaceSizeConfig.control.inputClassName)}
+                className={cn('w-full', displaySizeConfig.control.inputClassName)}
               >
                 <SelectValue />
               </SelectTrigger>
@@ -482,7 +480,7 @@ function LinkDialogForm({
             <BuiltinIconField
               value={builtinIcon}
               disabled={isSaving}
-              interfaceSizeConfig={interfaceSizeConfig}
+              displaySizeConfig={displaySizeConfig}
               onChange={icon => {
                 setBuiltinIcon(icon)
                 setError(null)
@@ -491,13 +489,13 @@ function LinkDialogForm({
           ) : null}
 
           {iconMode === 'url' ? (
-            <div className={interfaceSizeConfig.dialog.fieldClassName}>
-              <Label htmlFor="link-dialog-icon-url" className={interfaceSizeConfig.control.labelClassName}>
+            <div className={displaySizeConfig.dialog.fieldClassName}>
+              <Label htmlFor="link-dialog-icon-url" className={displaySizeConfig.control.labelClassName}>
                 Icon URL
               </Label>
               <Input
                 id="link-dialog-icon-url"
-                className={interfaceSizeConfig.control.inputClassName}
+                className={displaySizeConfig.control.inputClassName}
                 value={iconUrl}
                 type="url"
                 placeholder="https://example.com/icon.png"
@@ -509,8 +507,8 @@ function LinkDialogForm({
           ) : null}
 
           {iconMode === 'file' ? (
-            <div className={interfaceSizeConfig.dialog.fieldClassName}>
-              <Label htmlFor="link-dialog-icon-file" className={interfaceSizeConfig.control.labelClassName}>
+            <div className={displaySizeConfig.dialog.fieldClassName}>
+              <Label htmlFor="link-dialog-icon-file" className={displaySizeConfig.control.labelClassName}>
                 Local file
               </Label>
               <Input
@@ -525,7 +523,7 @@ function LinkDialogForm({
               <Label
                 htmlFor="link-dialog-icon-file"
                 className={cn(
-                  interfaceSizeConfig.control.inputClassName,
+                  displaySizeConfig.control.inputClassName,
                   'flex cursor-pointer items-center gap-3 border border-input bg-card shadow-xs transition-[border-color,box-shadow,opacity]',
                   'peer-focus-visible:border-ring peer-focus-visible:ring-[3px] peer-focus-visible:ring-ring/50',
                   isSaving && 'cursor-not-allowed opacity-50',
@@ -554,17 +552,17 @@ function LinkDialogForm({
           ) : null}
         </div>
 
-        <DialogFooter className={cn('mt-3', interfaceSizeConfig.dialog.footerClassName)}>
+        <DialogFooter className={cn('mt-3', displaySizeConfig.dialog.footerClassName)}>
           <Button
             type="button"
             variant="outline"
-            size={interfaceSizeConfig.control.buttonSize}
+            size={displaySizeConfig.control.buttonSize}
             disabled={isSaving}
             onClick={() => onOpenChange(false)}
           >
             Cancel
           </Button>
-          <Button type="submit" size={interfaceSizeConfig.control.buttonSize} disabled={isSaving || !hasCategories}>
+          <Button type="submit" size={displaySizeConfig.control.buttonSize} disabled={isSaving || !hasCategories}>
             {isSaving ? 'Saving...' : 'Save link'}
           </Button>
         </DialogFooter>

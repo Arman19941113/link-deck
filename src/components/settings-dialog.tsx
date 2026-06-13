@@ -1,4 +1,4 @@
-// Preferences dialog for display options and category draft editing.
+// Settings dialog for display options and category draft editing.
 
 import { startTransition, type ChangeEvent, type FormEvent, type KeyboardEvent, type ReactNode } from 'react'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -26,7 +26,7 @@ import { CSS } from '@dnd-kit/utilities'
 import { Check, Download, Eraser, GripVertical, Pencil, RotateCcw, Trash2, Upload, X } from 'lucide-react'
 import { toast } from 'sonner'
 
-import { InterfaceSizePicker } from '@/components/interface-size-picker'
+import { DisplaySizePicker } from '@/components/display-size-picker'
 import { ThemePicker } from '@/components/theme-picker'
 import {
   AlertDialog,
@@ -44,24 +44,24 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { isDefaultCategory } from '@/domain/categories'
-import { getInterfaceSizeConfig, type InterfaceSizeConfig } from '@/domain/interface-size'
+import { getDisplaySizeConfig, type DisplaySizeConfig } from '@/domain/display-size'
 import { getKeyboardShortcutKeys, KEYBOARD_SHORTCUTS } from '@/domain/keyboard-shortcuts'
-import type { Category, InterfaceSize, Link, SortMode, ThemePreference } from '@/domain/types'
+import type { Category, DisplaySize, Link, SortMode, ThemePreference } from '@/domain/types'
 import type { CategoryDraftDeletePlan, CategoryDraft } from '@/hooks/use-deck-store'
 import { cn } from '@/lib/utils'
 
 type DeleteMode = CategoryDraftDeletePlan['mode']
 
-type PreferencesDialogProps = {
+type SettingsDialogProps = {
   open: boolean
-  initialTab?: PreferencesTab
+  initialTab?: SettingsTab
   categories: Category[]
   links: Link[]
-  interfaceSize: InterfaceSize
+  displaySize: DisplaySize
   sortMode: SortMode
   themePreference: ThemePreference
   onOpenChange: (open: boolean) => void
-  onInterfaceSizeChange: (interfaceSize: InterfaceSize) => void
+  onDisplaySizeChange: (displaySize: DisplaySize) => void
   onSortModeChange: (sortMode: SortMode) => void
   onThemePreferenceChange: (themePreference: ThemePreference) => void
   saveCategoryDraft: (draft: CategoryDraft) => Promise<void>
@@ -71,31 +71,32 @@ type PreferencesDialogProps = {
   clearDeckData: () => Promise<void>
 }
 
-type PreferencesDialogContentProps = Omit<PreferencesDialogProps, 'open'>
-export type PreferencesTab = 'general' | 'categories' | 'data' | 'shortcuts'
-type DisplayLanguage = 'en'
+type SettingsDialogContentProps = Omit<SettingsDialogProps, 'open'>
+export type SettingsTab = 'general' | 'data' | 'categories' | 'links' | 'shortcuts'
+type Language = 'en'
 type ConfirmDataAction = 'reset' | 'clear'
 
 const SORT_LABELS: Record<SortMode, string> = {
   manual: 'Manual order',
   mostVisited: 'Most opened',
   recentVisited: 'Recently opened',
-  name: 'Title',
+  name: 'Title (A-Z)',
 }
 
-const DISPLAY_LANGUAGE_LABELS: Record<DisplayLanguage, string> = {
+const LANGUAGE_LABELS: Record<Language, string> = {
   en: 'English',
 }
 
-const PREFERENCES_TABS: Array<{ value: PreferencesTab; label: string }> = [
+const SETTINGS_TABS: Array<{ value: SettingsTab; label: string }> = [
   { value: 'general', label: 'General' },
-  { value: 'categories', label: 'Categories' },
   { value: 'data', label: 'Data' },
+  { value: 'categories', label: 'Categories' },
+  { value: 'links', label: 'Links' },
   { value: 'shortcuts', label: 'Shortcuts' },
 ]
 const CATEGORY_PANEL_CONTROL_TAB_INDEX = -1
 
-/** Converts unknown errors into preference dialog messages. */
+/** Converts unknown errors into settings dialog messages. */
 function getDialogErrorMessage(error: unknown): string {
   return error instanceof Error ? error.message : 'Action failed. Please try again later.'
 }
@@ -178,7 +179,7 @@ type SortableCategoryRowProps = {
   category: Category
   disabled: boolean
   dragContent: ReactNode
-  interfaceSizeConfig: InterfaceSizeConfig
+  displaySizeConfig: DisplaySizeConfig
 }
 
 /** Adds a full-row drag area to category rows while keeping right-side action buttons independent. */
@@ -187,7 +188,7 @@ function SortableCategoryRow({
   category,
   disabled,
   dragContent,
-  interfaceSizeConfig,
+  displaySizeConfig,
 }: SortableCategoryRowProps) {
   const { attributes, isDragging, listeners, setActivatorNodeRef, setNodeRef, transform, transition } = useSortable({
     id: category.id,
@@ -213,7 +214,7 @@ function SortableCategoryRow({
     <div
       ref={setNodeRef}
       style={style}
-      className={cn(interfaceSizeConfig.dialog.rowClassName, isDragging && 'invisible')}
+      className={cn(displaySizeConfig.dialog.rowClassName, isDragging && 'invisible')}
     >
       <div
         ref={setActivatorNodeRef}
@@ -227,22 +228,22 @@ function SortableCategoryRow({
         {dragContent}
       </div>
 
-      <div className={interfaceSizeConfig.dialog.rowActionsClassName}>{actions}</div>
+      <div className={displaySizeConfig.dialog.rowActionsClassName}>{actions}</div>
     </div>
   )
 }
 
 type CategoryDragOverlayRowProps = {
   category: Category
-  interfaceSizeConfig: InterfaceSizeConfig
+  displaySizeConfig: DisplaySizeConfig
 }
 
 /** Renders a top-level category row snapshot while dragging so dialog content does not clip it. */
-function CategoryDragOverlayRow({ category, interfaceSizeConfig }: CategoryDragOverlayRowProps) {
+function CategoryDragOverlayRow({ category, displaySizeConfig }: CategoryDragOverlayRowProps) {
   const isBuiltInDefault = isDefaultCategory(category.id)
 
   return (
-    <div className={cn(interfaceSizeConfig.dialog.rowClassName, 'border-accent shadow-lg')}>
+    <div className={cn(displaySizeConfig.dialog.rowClassName, 'border-accent shadow-lg')}>
       <div className="flex min-w-0 flex-1 items-center gap-2 p-2">
         <GripVertical className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
         <div className="min-w-0 flex-1">
@@ -252,12 +253,12 @@ function CategoryDragOverlayRow({ category, interfaceSizeConfig }: CategoryDragO
         </div>
       </div>
 
-      <div className={interfaceSizeConfig.dialog.rowActionsClassName}>
+      <div className={displaySizeConfig.dialog.rowActionsClassName}>
         {isBuiltInDefault ? null : (
           <Button
             type="button"
             variant="ghost"
-            size={interfaceSizeConfig.control.iconButtonSize}
+            size={displaySizeConfig.control.iconButtonSize}
             aria-hidden="true"
             tabIndex={-1}
           >
@@ -267,7 +268,7 @@ function CategoryDragOverlayRow({ category, interfaceSizeConfig }: CategoryDragO
         <Button
           type="button"
           variant="ghost"
-          size={interfaceSizeConfig.control.iconButtonSize}
+          size={displaySizeConfig.control.iconButtonSize}
           aria-hidden="true"
           tabIndex={-1}
         >
@@ -278,17 +279,17 @@ function CategoryDragOverlayRow({ category, interfaceSizeConfig }: CategoryDragO
   )
 }
 
-/** Preferences dialog shell that resets internal edit state with a key. */
-export function PreferencesDialog({
+/** Settings dialog shell that resets internal edit state with a key. */
+export function SettingsDialog({
   open,
   initialTab = 'general',
   categories,
   links,
-  interfaceSize,
+  displaySize,
   sortMode,
   themePreference,
   onOpenChange,
-  onInterfaceSizeChange,
+  onDisplaySizeChange,
   onSortModeChange,
   onThemePreferenceChange,
   saveCategoryDraft,
@@ -296,7 +297,7 @@ export function PreferencesDialog({
   importDeck,
   resetDeckToDefaults,
   clearDeckData,
-}: PreferencesDialogProps) {
+}: SettingsDialogProps) {
   return (
     <Dialog
       open={open}
@@ -306,16 +307,16 @@ export function PreferencesDialog({
         }
       }}
     >
-      <PreferencesDialogContent
+      <SettingsDialogContent
         key={`${open ? 'open' : 'closed'}-${initialTab}-${categories.map(category => category.id).join('-')}`}
         initialTab={initialTab}
         categories={categories}
         links={links}
-        interfaceSize={interfaceSize}
+        displaySize={displaySize}
         sortMode={sortMode}
         themePreference={themePreference}
         onOpenChange={onOpenChange}
-        onInterfaceSizeChange={onInterfaceSizeChange}
+        onDisplaySizeChange={onDisplaySizeChange}
         onSortModeChange={onSortModeChange}
         onThemePreferenceChange={onThemePreferenceChange}
         saveCategoryDraft={saveCategoryDraft}
@@ -328,16 +329,16 @@ export function PreferencesDialog({
   )
 }
 
-/** Preferences dialog content; all changes go to a local draft before the footer save commits them. */
-function PreferencesDialogContent({
+/** Settings dialog content; all changes go to a local draft before the footer save commits them. */
+function SettingsDialogContent({
   initialTab = 'general',
   categories,
   links,
-  interfaceSize,
+  displaySize,
   sortMode,
   themePreference,
   onOpenChange,
-  onInterfaceSizeChange,
+  onDisplaySizeChange,
   onSortModeChange,
   onThemePreferenceChange,
   saveCategoryDraft,
@@ -345,12 +346,12 @@ function PreferencesDialogContent({
   importDeck,
   resetDeckToDefaults,
   clearDeckData,
-}: PreferencesDialogContentProps) {
+}: SettingsDialogContentProps) {
   const newNameInputRef = useRef<HTMLInputElement>(null)
   const editingNameInputRef = useRef<HTMLInputElement>(null)
   const categoryListRef = useRef<HTMLDivElement>(null)
   const importFileInputRef = useRef<HTMLInputElement>(null)
-  const preferencesTabRefs = useRef(new Map<PreferencesTab, HTMLButtonElement>())
+  const settingsTabRefs = useRef(new Map<SettingsTab, HTMLButtonElement>())
   const [initialSnapshot] = useState(() => {
     const initialDraftCategories = normalizeDraftOrder(sortCategories(categories))
 
@@ -374,12 +375,12 @@ function PreferencesDialogContent({
   const [activeCategoryWidth, setActiveCategoryWidth] = useState<number | null>(null)
   const [discardDialogOpen, setDiscardDialogOpen] = useState(false)
   const [confirmDataAction, setConfirmDataAction] = useState<ConfirmDataAction | null>(null)
-  const [activeTab, setActiveTab] = useState<PreferencesTab>(initialTab)
-  const [localInterfaceSize, setLocalInterfaceSize] = useState<InterfaceSize>(interfaceSize)
+  const [activeTab, setActiveTab] = useState<SettingsTab>(initialTab)
+  const [localDisplaySize, setLocalDisplaySize] = useState<DisplaySize>(displaySize)
   const [localSortMode, setLocalSortMode] = useState<SortMode>(sortMode)
   const [localThemePreference, setLocalThemePreference] = useState<ThemePreference>(themePreference)
-  const [displayLanguage, setDisplayLanguage] = useState<DisplayLanguage>('en')
-  const interfaceSizeConfig = getInterfaceSizeConfig(interfaceSize)
+  const [language, setLanguage] = useState<Language>('en')
+  const displaySizeConfig = getDisplaySizeConfig(displaySize)
   const sortedCategories = useMemo(
     () => normalizeDraftOrder(applyEditingName(draftCategories, editingCategoryId, editingName)),
     [draftCategories, editingCategoryId, editingName],
@@ -452,7 +453,7 @@ function PreferencesDialogContent({
   /** Keeps invalid field state locally while rendering the message through the global toaster. */
   function showError(message: string): void {
     setError(message)
-    toast.error(message, { id: 'preferences-dialog-error' })
+    toast.error(message, { id: 'settings-dialog-error' })
   }
 
   /** Clears the input after adding a category and keeps the dialog open for more edits. */
@@ -586,7 +587,7 @@ function PreferencesDialogContent({
     const isMoveTarget = deletePlans.some(plan => plan.mode === 'move-links' && plan.targetCategoryId === category.id)
 
     if (isMoveTarget) {
-      showError('This category is already a link move target. Save or cancel the current changes first.')
+      showError('Links are already being moved to this category. Save or cancel the current changes first.')
       return
     }
 
@@ -802,11 +803,11 @@ function PreferencesDialogContent({
     setError(null)
   }
 
-  /** Updates interface size locally before scheduling the page-wide recalculation. */
-  function handleInterfaceSizeChange(nextInterfaceSize: InterfaceSize): void {
-    setLocalInterfaceSize(nextInterfaceSize)
+  /** Updates display size locally before scheduling the page-wide recalculation. */
+  function handleDisplaySizeChange(nextDisplaySize: DisplaySize): void {
+    setLocalDisplaySize(nextDisplaySize)
     startTransition(() => {
-      onInterfaceSizeChange(nextInterfaceSize)
+      onDisplaySizeChange(nextDisplaySize)
     })
   }
 
@@ -867,30 +868,30 @@ function PreferencesDialogContent({
     onOpenChange(false)
   }
 
-  /** Keeps dialog auto-focus aligned with the active preferences tab. */
-  function focusActivePreferencesTab(): void {
-    preferencesTabRefs.current.get(activeTab)?.focus({ preventScroll: true })
+  /** Keeps dialog auto-focus aligned with the active settings tab. */
+  function focusActiveSettingsTab(): void {
+    settingsTabRefs.current.get(activeTab)?.focus({ preventScroll: true })
   }
 
-  /** Moves between preference panels from the settings navigation. */
-  function handlePreferencesTabKeyDown(event: KeyboardEvent<HTMLButtonElement>, tab: PreferencesTab): void {
+  /** Moves between settings panels from the settings navigation. */
+  function handleSettingsTabKeyDown(event: KeyboardEvent<HTMLButtonElement>, tab: SettingsTab): void {
     if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') {
       return
     }
 
     event.preventDefault()
 
-    const currentIndex = PREFERENCES_TABS.findIndex(preferencesTab => preferencesTab.value === tab)
+    const currentIndex = SETTINGS_TABS.findIndex(settingsTab => settingsTab.value === tab)
     const direction = event.key === 'ArrowDown' ? 1 : -1
-    const nextIndex = (currentIndex + direction + PREFERENCES_TABS.length) % PREFERENCES_TABS.length
-    const nextTab = PREFERENCES_TABS[nextIndex]?.value
+    const nextIndex = (currentIndex + direction + SETTINGS_TABS.length) % SETTINGS_TABS.length
+    const nextTab = SETTINGS_TABS[nextIndex]?.value
 
     if (!nextTab) {
       return
     }
 
     setActiveTab(nextTab)
-    preferencesTabRefs.current.get(nextTab)?.focus({ preventScroll: true })
+    settingsTabRefs.current.get(nextTab)?.focus({ preventScroll: true })
   }
 
   return (
@@ -898,13 +899,13 @@ function PreferencesDialogContent({
       <DialogContent
         aria-describedby={undefined}
         className={cn(
-          interfaceSizeConfig.dialog.surfaceClassName,
+          displaySizeConfig.dialog.surfaceClassName,
           'grid grid-rows-[auto_minmax(0,1fr)_auto] gap-0 overflow-hidden p-0',
         )}
         showCloseButton={false}
         onOpenAutoFocus={event => {
           event.preventDefault()
-          focusActivePreferencesTab()
+          focusActiveSettingsTab()
         }}
         onEscapeKeyDown={event => {
           event.preventDefault()
@@ -925,32 +926,32 @@ function PreferencesDialogContent({
           requestClose()
         }}
       >
-        <DialogHeader className={cn('border-b px-4 py-4 sm:px-6', interfaceSizeConfig.dialog.headerClassName)}>
-          <DialogTitle className={interfaceSizeConfig.dialog.titleClassName}>Preferences</DialogTitle>
+        <DialogHeader className={cn('border-b px-4 py-4 sm:px-6', displaySizeConfig.dialog.headerClassName)}>
+          <DialogTitle className={displaySizeConfig.dialog.titleClassName}>Settings</DialogTitle>
         </DialogHeader>
 
         <div className="grid min-h-0 grid-cols-1 grid-rows-[auto_minmax(0,1fr)] sm:grid-cols-[10rem_minmax(0,1fr)] sm:grid-rows-[minmax(0,1fr)]">
           <nav
             className="flex gap-1 overflow-x-auto border-b bg-muted/40 p-2 sm:flex-col sm:border-r sm:border-b-0"
-            aria-label="Preferences navigation"
+            aria-label="Settings navigation"
           >
-            {PREFERENCES_TABS.map(tab => (
+            {SETTINGS_TABS.map(tab => (
               <Button
                 key={tab.value}
                 ref={node => {
                   if (node) {
-                    preferencesTabRefs.current.set(tab.value, node)
+                    settingsTabRefs.current.set(tab.value, node)
                   } else {
-                    preferencesTabRefs.current.delete(tab.value)
+                    settingsTabRefs.current.delete(tab.value)
                   }
                 }}
                 type="button"
                 variant={activeTab === tab.value ? 'secondary' : 'ghost'}
-                size={interfaceSizeConfig.control.buttonSize}
+                size={displaySizeConfig.control.buttonSize}
                 className="justify-start"
                 aria-current={activeTab === tab.value ? 'page' : undefined}
                 onClick={() => setActiveTab(tab.value)}
-                onKeyDown={event => handlePreferencesTabKeyDown(event, tab.value)}
+                onKeyDown={event => handleSettingsTabKeyDown(event, tab.value)}
               >
                 {tab.label}
               </Button>
@@ -959,18 +960,46 @@ function PreferencesDialogContent({
 
           <section className="min-h-0 overflow-y-auto px-4 py-4 sm:px-6">
             {activeTab === 'general' ? (
-              <div className={cn('max-w-none', interfaceSizeConfig.dialog.formClassName)}>
-                <div className={interfaceSizeConfig.dialog.fieldClassName}>
-                  <InterfaceSizePicker value={localInterfaceSize} onChange={handleInterfaceSizeChange} />
+              <div className={cn('max-w-none', displaySizeConfig.dialog.formClassName)}>
+                <div className={displaySizeConfig.dialog.fieldClassName}>
+                  <DisplaySizePicker value={localDisplaySize} onChange={handleDisplaySizeChange} />
                 </div>
 
-                <div className={interfaceSizeConfig.dialog.fieldClassName}>
+                <div className={displaySizeConfig.dialog.fieldClassName}>
                   <ThemePicker value={localThemePreference} onChange={handleThemePreferenceChange} />
                 </div>
 
-                <div className={interfaceSizeConfig.dialog.fieldClassName}>
-                  <Label htmlFor="settings-sort-mode" className={interfaceSizeConfig.control.labelClassName}>
-                    Sort order
+                <div className={displaySizeConfig.dialog.fieldClassName}>
+                  <Label htmlFor="settings-language" className={displaySizeConfig.control.labelClassName}>
+                    Language
+                  </Label>
+                  <Select value={language} disabled onValueChange={value => setLanguage(value as Language)}>
+                    <SelectTrigger
+                      id="settings-language"
+                      className={cn('w-full bg-card', displaySizeConfig.control.inputClassName)}
+                    >
+                      <SelectValue placeholder="Select a language">{LANGUAGE_LABELS[language]}</SelectValue>
+                    </SelectTrigger>
+                    <SelectContent align="start">
+                      <SelectGroup>
+                        {Object.entries(LANGUAGE_LABELS).map(([value, label]) => (
+                          <SelectItem key={value} value={value}>
+                            {label}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs leading-5 text-muted-foreground">
+                    English is currently the only display language.
+                  </p>
+                </div>
+              </div>
+            ) : activeTab === 'links' ? (
+              <div className={cn('max-w-xl', displaySizeConfig.dialog.formClassName)}>
+                <div className={displaySizeConfig.dialog.fieldClassName}>
+                  <Label htmlFor="settings-link-order" className={displaySizeConfig.control.labelClassName}>
+                    Link order
                   </Label>
                   <Select
                     value={localSortMode}
@@ -979,10 +1008,10 @@ function PreferencesDialogContent({
                     }}
                   >
                     <SelectTrigger
-                      id="settings-sort-mode"
-                      className={cn('w-full bg-card', interfaceSizeConfig.control.inputClassName)}
+                      id="settings-link-order"
+                      className={cn('w-full bg-card', displaySizeConfig.control.inputClassName)}
                     >
-                      <SelectValue placeholder="Select a sort order">{SORT_LABELS[localSortMode]}</SelectValue>
+                      <SelectValue placeholder="Select a link order">{SORT_LABELS[localSortMode]}</SelectValue>
                     </SelectTrigger>
                     <SelectContent align="start">
                       <SelectGroup>
@@ -995,41 +1024,9 @@ function PreferencesDialogContent({
                     </SelectContent>
                   </Select>
                 </div>
-
-                <div className={interfaceSizeConfig.dialog.fieldClassName}>
-                  <Label htmlFor="settings-language" className={interfaceSizeConfig.control.labelClassName}>
-                    Display language
-                  </Label>
-                  <Select
-                    value={displayLanguage}
-                    disabled
-                    onValueChange={value => setDisplayLanguage(value as DisplayLanguage)}
-                  >
-                    <SelectTrigger
-                      id="settings-language"
-                      className={cn('w-full bg-card', interfaceSizeConfig.control.inputClassName)}
-                    >
-                      <SelectValue placeholder="Select a language">
-                        {DISPLAY_LANGUAGE_LABELS[displayLanguage]}
-                      </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent align="start">
-                      <SelectGroup>
-                        {Object.entries(DISPLAY_LANGUAGE_LABELS).map(([value, label]) => (
-                          <SelectItem key={value} value={value}>
-                            {label}
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                  <p className="text-xs leading-5 text-muted-foreground">
-                    Link Deck currently ships with English interface copy.
-                  </p>
-                </div>
               </div>
             ) : activeTab === 'shortcuts' ? (
-              <div className={cn('max-w-xl', interfaceSizeConfig.dialog.formClassName)}>
+              <div className={cn('max-w-xl', displaySizeConfig.dialog.formClassName)}>
                 <div className="flex flex-col gap-2">
                   {KEYBOARD_SHORTCUTS.map(shortcut => (
                     <div
@@ -1047,7 +1044,7 @@ function PreferencesDialogContent({
                 </div>
               </div>
             ) : activeTab === 'data' ? (
-              <div className={cn('max-w-xl', interfaceSizeConfig.dialog.formClassName)}>
+              <div className={cn('max-w-xl', displaySizeConfig.dialog.formClassName)}>
                 <input
                   ref={importFileInputRef}
                   type="file"
@@ -1067,13 +1064,13 @@ function PreferencesDialogContent({
                   <Button
                     type="button"
                     variant="outline"
-                    size={interfaceSizeConfig.control.buttonSize}
+                    size={displaySizeConfig.control.buttonSize}
                     className="w-full sm:w-32"
                     disabled={!canUseDataControls}
                     onClick={requestImportDeck}
                   >
                     <Download data-icon="inline-start" aria-hidden="true" />
-                    {busyAction === 'import' ? 'Importing...' : 'Import'}
+                    {busyAction === 'import' ? 'Importing…' : 'Import'}
                   </Button>
                 </div>
 
@@ -1082,7 +1079,7 @@ function PreferencesDialogContent({
                   <Button
                     type="button"
                     variant="outline"
-                    size={interfaceSizeConfig.control.buttonSize}
+                    size={displaySizeConfig.control.buttonSize}
                     className="w-full sm:w-32"
                     aria-busy={busyAction === 'export'}
                     disabled={!canUseDataControls}
@@ -1098,7 +1095,7 @@ function PreferencesDialogContent({
                   <Button
                     type="button"
                     variant="outline"
-                    size={interfaceSizeConfig.control.buttonSize}
+                    size={displaySizeConfig.control.buttonSize}
                     className="w-full sm:w-32"
                     disabled={!canUseDataControls}
                     onClick={() => requestDataAction('reset')}
@@ -1113,7 +1110,7 @@ function PreferencesDialogContent({
                   <Button
                     type="button"
                     variant="outline"
-                    size={interfaceSizeConfig.control.buttonSize}
+                    size={displaySizeConfig.control.buttonSize}
                     className="w-full sm:w-32"
                     disabled={!canUseDataControls}
                     onClick={() => requestDataAction('clear')}
@@ -1124,19 +1121,19 @@ function PreferencesDialogContent({
                 </div>
               </div>
             ) : (
-              <div className={interfaceSizeConfig.dialog.formClassName}>
+              <div className={displaySizeConfig.dialog.formClassName}>
                 <form onSubmit={handleAddCategory}>
                   <div className="min-w-0 flex-1">
                     <Label
-                      className={cn('sr-only', interfaceSizeConfig.control.labelClassName)}
-                      htmlFor="preferences-category-new-name"
+                      className={cn('sr-only', displaySizeConfig.control.labelClassName)}
+                      htmlFor="settings-category-new-name"
                     >
                       New category name
                     </Label>
                     <Input
                       ref={newNameInputRef}
-                      id="preferences-category-new-name"
-                      className={interfaceSizeConfig.control.inputClassName}
+                      id="settings-category-new-name"
+                      className={displaySizeConfig.control.inputClassName}
                       value={newName}
                       disabled={isBusy}
                       placeholder="New category name, press Enter to add"
@@ -1169,13 +1166,13 @@ function PreferencesDialogContent({
                               key={category.id}
                               category={category}
                               disabled={isBusy || isEditing}
-                              interfaceSizeConfig={interfaceSizeConfig}
+                              displaySizeConfig={displaySizeConfig}
                               dragContent={
                                 <div className="min-w-0 flex-1">
                                   {isEditing ? (
                                     <Label
-                                      className={cn('sr-only', interfaceSizeConfig.control.labelClassName)}
-                                      htmlFor={`preferences-category-edit-${category.id}`}
+                                      className={cn('sr-only', displaySizeConfig.control.labelClassName)}
+                                      htmlFor={`settings-category-edit-${category.id}`}
                                     >
                                       Category name
                                     </Label>
@@ -1183,10 +1180,10 @@ function PreferencesDialogContent({
                                   {isEditing ? (
                                     <Input
                                       ref={editingNameInputRef}
-                                      id={`preferences-category-edit-${category.id}`}
+                                      id={`settings-category-edit-${category.id}`}
                                       value={editingName}
                                       disabled={isBusy}
-                                      className={interfaceSizeConfig.control.inputClassName}
+                                      className={displaySizeConfig.control.inputClassName}
                                       onChange={event => setEditingName(event.target.value)}
                                       onKeyDown={event => handleEditCategoryKeyDown(event, category.id)}
                                     />
@@ -1203,7 +1200,7 @@ function PreferencesDialogContent({
                                     <Button
                                       type="button"
                                       variant="ghost"
-                                      size={interfaceSizeConfig.control.iconButtonSize}
+                                      size={displaySizeConfig.control.iconButtonSize}
                                       disabled={isBusy}
                                       tabIndex={CATEGORY_PANEL_CONTROL_TAB_INDEX}
                                       aria-label="Cancel rename"
@@ -1214,7 +1211,7 @@ function PreferencesDialogContent({
                                     <Button
                                       type="button"
                                       variant="ghost"
-                                      size={interfaceSizeConfig.control.iconButtonSize}
+                                      size={displaySizeConfig.control.iconButtonSize}
                                       disabled={isBusy}
                                       tabIndex={CATEGORY_PANEL_CONTROL_TAB_INDEX}
                                       aria-label={`Save ${category.name}`}
@@ -1229,7 +1226,7 @@ function PreferencesDialogContent({
                                       <Button
                                         type="button"
                                         variant="ghost"
-                                        size={interfaceSizeConfig.control.iconButtonSize}
+                                        size={displaySizeConfig.control.iconButtonSize}
                                         disabled={isBusy || !canDeleteCategory}
                                         tabIndex={CATEGORY_PANEL_CONTROL_TAB_INDEX}
                                         aria-label={
@@ -1245,7 +1242,7 @@ function PreferencesDialogContent({
                                     <Button
                                       type="button"
                                       variant="ghost"
-                                      size={interfaceSizeConfig.control.iconButtonSize}
+                                      size={displaySizeConfig.control.iconButtonSize}
                                       disabled={isBusy}
                                       tabIndex={CATEGORY_PANEL_CONTROL_TAB_INDEX}
                                       aria-label={`Rename ${category.name}`}
@@ -1270,10 +1267,7 @@ function PreferencesDialogContent({
                               width: activeCategoryWidth ?? undefined,
                             }}
                           >
-                            <CategoryDragOverlayRow
-                              category={activeCategory}
-                              interfaceSizeConfig={interfaceSizeConfig}
-                            />
+                            <CategoryDragOverlayRow category={activeCategory} displaySizeConfig={displaySizeConfig} />
                           </div>
                         ) : null}
                       </DragOverlay>,
@@ -1293,11 +1287,11 @@ function PreferencesDialogContent({
                       </p>
                     </div>
 
-                    <div className={interfaceSizeConfig.dialog.gridClassName}>
-                      <div className={interfaceSizeConfig.dialog.fieldClassName}>
+                    <div className={displaySizeConfig.dialog.gridClassName}>
+                      <div className={displaySizeConfig.dialog.fieldClassName}>
                         <Label
-                          htmlFor="preferences-category-delete-mode"
-                          className={interfaceSizeConfig.control.labelClassName}
+                          htmlFor="settings-category-delete-mode"
+                          className={displaySizeConfig.control.labelClassName}
                         >
                           Action
                         </Label>
@@ -1307,8 +1301,8 @@ function PreferencesDialogContent({
                           onValueChange={value => setDeleteMode(value as DeleteMode)}
                         >
                           <SelectTrigger
-                            id="preferences-category-delete-mode"
-                            className={cn('w-full', interfaceSizeConfig.control.inputClassName)}
+                            id="settings-category-delete-mode"
+                            className={cn('w-full', displaySizeConfig.control.inputClassName)}
                             tabIndex={CATEGORY_PANEL_CONTROL_TAB_INDEX}
                           >
                             <SelectValue />
@@ -1323,12 +1317,12 @@ function PreferencesDialogContent({
                       </div>
 
                       {deleteMode === 'move-links' ? (
-                        <div className={interfaceSizeConfig.dialog.fieldClassName}>
+                        <div className={displaySizeConfig.dialog.fieldClassName}>
                           <Label
-                            htmlFor="preferences-category-delete-target"
-                            className={interfaceSizeConfig.control.labelClassName}
+                            htmlFor="settings-category-delete-target"
+                            className={displaySizeConfig.control.labelClassName}
                           >
-                            Target category
+                            Move links to
                           </Label>
                           <Select
                             value={effectiveTargetCategoryId}
@@ -1336,8 +1330,8 @@ function PreferencesDialogContent({
                             onValueChange={setTargetCategoryId}
                           >
                             <SelectTrigger
-                              id="preferences-category-delete-target"
-                              className={cn('w-full', interfaceSizeConfig.control.inputClassName)}
+                              id="settings-category-delete-target"
+                              className={cn('w-full', displaySizeConfig.control.inputClassName)}
                               aria-invalid={!targetCategoryId && Boolean(error)}
                               tabIndex={CATEGORY_PANEL_CONTROL_TAB_INDEX}
                             >
@@ -1361,7 +1355,7 @@ function PreferencesDialogContent({
                       <Button
                         type="button"
                         variant="outline"
-                        size={interfaceSizeConfig.control.buttonSize}
+                        size={displaySizeConfig.control.buttonSize}
                         disabled={isBusy}
                         tabIndex={CATEGORY_PANEL_CONTROL_TAB_INDEX}
                         onClick={() => {
@@ -1374,7 +1368,7 @@ function PreferencesDialogContent({
                       <Button
                         type="button"
                         variant="destructive"
-                        size={interfaceSizeConfig.control.buttonSize}
+                        size={displaySizeConfig.control.buttonSize}
                         disabled={isBusy}
                         tabIndex={CATEGORY_PANEL_CONTROL_TAB_INDEX}
                         onClick={confirmPendingDelete}
@@ -1389,13 +1383,13 @@ function PreferencesDialogContent({
           </section>
         </div>
 
-        <DialogFooter className={cn('border-t px-4 py-2 sm:px-6', interfaceSizeConfig.dialog.footerClassName)}>
+        <DialogFooter className={cn('border-t px-4 py-2 sm:px-6', displaySizeConfig.dialog.footerClassName)}>
           {activeTab === 'categories' ? (
             <>
               <Button
                 type="button"
                 variant="outline"
-                size={interfaceSizeConfig.control.buttonSize}
+                size={displaySizeConfig.control.buttonSize}
                 disabled={isBusy}
                 tabIndex={CATEGORY_PANEL_CONTROL_TAB_INDEX}
                 onClick={requestClose}
@@ -1404,7 +1398,7 @@ function PreferencesDialogContent({
               </Button>
               <Button
                 type="button"
-                size={interfaceSizeConfig.control.buttonSize}
+                size={displaySizeConfig.control.buttonSize}
                 disabled={isBusy || !isDirty}
                 tabIndex={CATEGORY_PANEL_CONTROL_TAB_INDEX}
                 onClick={() => void handleSaveDraft()}
@@ -1416,7 +1410,7 @@ function PreferencesDialogContent({
             <Button
               type="button"
               variant="outline"
-              size={interfaceSizeConfig.control.buttonSize}
+              size={displaySizeConfig.control.buttonSize}
               disabled={isBusy}
               onClick={requestClose}
             >
@@ -1434,31 +1428,31 @@ function PreferencesDialogContent({
           }
         }}
       >
-        <AlertDialogContent size="default" className={interfaceSizeConfig.dialog.contentClassName}>
-          <AlertDialogHeader className={interfaceSizeConfig.dialog.headerClassName}>
-            <AlertDialogTitle className={interfaceSizeConfig.dialog.titleClassName}>
+        <AlertDialogContent size="default" className={displaySizeConfig.dialog.contentClassName}>
+          <AlertDialogHeader className={displaySizeConfig.dialog.headerClassName}>
+            <AlertDialogTitle className={displaySizeConfig.dialog.titleClassName}>
               {confirmDataAction === 'reset' ? 'Reset to default data?' : 'Clear all data?'}
             </AlertDialogTitle>
-            <AlertDialogDescription className={interfaceSizeConfig.dialog.descriptionClassName}>
+            <AlertDialogDescription className={displaySizeConfig.dialog.descriptionClassName}>
               {confirmDataAction === 'reset'
-                ? 'This will replace all current links, categories, local icons, and settings with the bundled default data.'
+                ? 'This will replace all current links, categories, local icons, and settings with the built-in default data.'
                 : 'This will delete all links, local icons, and custom categories. One default category will remain.'}
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className={interfaceSizeConfig.dialog.footerClassName}>
-            <AlertDialogCancel size={interfaceSizeConfig.control.buttonSize} disabled={isBusy}>
+          <AlertDialogFooter className={displaySizeConfig.dialog.footerClassName}>
+            <AlertDialogCancel size={displaySizeConfig.control.buttonSize} disabled={isBusy}>
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
               variant="destructive"
-              size={interfaceSizeConfig.control.buttonSize}
+              size={displaySizeConfig.control.buttonSize}
               disabled={isBusy}
               onClick={() => void handleConfirmDataAction()}
             >
               {busyAction === 'reset'
-                ? 'Resetting...'
+                ? 'Resetting…'
                 : busyAction === 'clear'
-                  ? 'Clearing...'
+                  ? 'Clearing…'
                   : confirmDataAction === 'reset'
                     ? 'Reset'
                     : 'Clear data'}
@@ -1468,22 +1462,22 @@ function PreferencesDialogContent({
       </AlertDialog>
 
       <AlertDialog open={discardDialogOpen} onOpenChange={setDiscardDialogOpen}>
-        <AlertDialogContent size="default" className={interfaceSizeConfig.dialog.contentClassName}>
-          <AlertDialogHeader className={interfaceSizeConfig.dialog.headerClassName}>
-            <AlertDialogTitle className={interfaceSizeConfig.dialog.titleClassName}>
+        <AlertDialogContent size="default" className={displaySizeConfig.dialog.contentClassName}>
+          <AlertDialogHeader className={displaySizeConfig.dialog.headerClassName}>
+            <AlertDialogTitle className={displaySizeConfig.dialog.titleClassName}>
               Discard unsaved changes?
             </AlertDialogTitle>
-            <AlertDialogDescription className={interfaceSizeConfig.dialog.descriptionClassName}>
+            <AlertDialogDescription className={displaySizeConfig.dialog.descriptionClassName}>
               Closing will discard category additions, renames, deletions, and ordering changes.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className={interfaceSizeConfig.dialog.footerClassName}>
-            <AlertDialogCancel size={interfaceSizeConfig.control.buttonSize} disabled={isBusy}>
+          <AlertDialogFooter className={displaySizeConfig.dialog.footerClassName}>
+            <AlertDialogCancel size={displaySizeConfig.control.buttonSize} disabled={isBusy}>
               Keep editing
             </AlertDialogCancel>
             <AlertDialogAction
               variant="destructive"
-              size={interfaceSizeConfig.control.buttonSize}
+              size={displaySizeConfig.control.buttonSize}
               disabled={isBusy}
               onClick={() => onOpenChange(false)}
             >

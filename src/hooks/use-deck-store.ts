@@ -8,7 +8,7 @@ import { loadPinyinSearchModule } from '@/domain/pinyin-search-loader'
 import { moveLink, reorderCategories } from '@/domain/reorder'
 import { selectCategorySections } from '@/domain/selectors'
 import { createDeckExportFile, parseDeckExportFile, type DeckExportFile } from '@/domain/deck-transfer'
-import type { Category, CategorySection, IconFile, InterfaceSize, Link, LinkIcon, SortMode } from '@/domain/types'
+import type { Category, CategorySection, IconFile, DisplaySize, Link, LinkIcon, SortMode } from '@/domain/types'
 import { normalizeUrl } from '@/domain/url'
 import { dbService, storageService } from '@/services'
 
@@ -61,13 +61,13 @@ type PinyinSectionsState = {
 export type DeckStore = {
   categories: Category[]
   links: Link[]
-  interfaceSize: InterfaceSize
+  displaySize: DisplaySize
   sortMode: SortMode
   query: string
   initialized: boolean
   error: string | null
   sections: CategorySection[]
-  setInterfaceSize: (interfaceSize: InterfaceSize) => void
+  setDisplaySize: (displaySize: DisplaySize) => void
   setQuery: (query: string) => void
   setSortMode: (sortMode: SortMode) => void
   upsertLink: (input: LinkInput) => Promise<Link>
@@ -244,8 +244,8 @@ export function useDeckStore(): DeckStore {
   const [initialDeckMirror] = useState(storageService.getDeckSnapshotMirror)
   const [categories, setCategories] = useState<Category[]>(() => initialDeckMirror?.categories ?? [])
   const [links, setLinks] = useState<Link[]>(() => initialDeckMirror?.links ?? [])
-  const [interfaceSize, setInterfaceSizeState] = useState<InterfaceSize>(
-    () => initialDeckMirror?.interfaceSize ?? storageService.getInterfaceSize(),
+  const [displaySize, setDisplaySizeState] = useState<DisplaySize>(
+    () => initialDeckMirror?.displaySize ?? storageService.getDisplaySize(),
   )
   const [sortMode, setSortModeState] = useState<SortMode>(() => initialDeckMirror?.sortMode ?? 'manual')
   const [query, setQuery] = useState('')
@@ -254,7 +254,7 @@ export function useDeckStore(): DeckStore {
   const [pinyinSectionsState, setPinyinSectionsState] = useState<PinyinSectionsState | null>(null)
   const categoriesRef = useRef<Category[]>(initialDeckMirror?.categories ?? [])
   const linksRef = useRef<Link[]>(initialDeckMirror?.links ?? [])
-  const interfaceSizeRef = useRef<InterfaceSize>(initialDeckMirror?.interfaceSize ?? storageService.getInterfaceSize())
+  const displaySizeRef = useRef<DisplaySize>(initialDeckMirror?.displaySize ?? storageService.getDisplaySize())
   const sortModeRef = useRef<SortMode>(initialDeckMirror?.sortMode ?? 'manual')
 
   const saveCurrentDeckMirror = useCallback(() => {
@@ -265,7 +265,7 @@ export function useDeckStore(): DeckStore {
     storageService.setDeckSnapshotMirror({
       categories: categoriesRef.current,
       links: linksRef.current,
-      interfaceSize: interfaceSizeRef.current,
+      displaySize: displaySizeRef.current,
       sortMode: sortModeRef.current,
     })
   }, [])
@@ -288,10 +288,10 @@ export function useDeckStore(): DeckStore {
     [saveCurrentDeckMirror],
   )
 
-  const updateInterfaceSizeState = useCallback(
-    (nextInterfaceSize: InterfaceSize) => {
-      interfaceSizeRef.current = nextInterfaceSize
-      setInterfaceSizeState(nextInterfaceSize)
+  const updateDisplaySizeState = useCallback(
+    (nextDisplaySize: DisplaySize) => {
+      displaySizeRef.current = nextDisplaySize
+      setDisplaySizeState(nextDisplaySize)
       saveCurrentDeckMirror()
     },
     [saveCurrentDeckMirror],
@@ -307,15 +307,15 @@ export function useDeckStore(): DeckStore {
   )
 
   const applyStoredDeckState = useCallback(
-    (deck: { interfaceSize: InterfaceSize; categories: Category[]; links: Link[]; sortMode: SortMode }) => {
+    (deck: { displaySize: DisplaySize; categories: Category[]; links: Link[]; sortMode: SortMode }) => {
       updateCategoriesState(deck.categories)
       updateLinksState(deck.links)
-      updateInterfaceSizeState(deck.interfaceSize)
+      updateDisplaySizeState(deck.displaySize)
       updateSortModeState(deck.sortMode)
-      storageService.setInterfaceSize(deck.interfaceSize)
+      storageService.setDisplaySize(deck.displaySize)
       setQuery('')
     },
-    [updateCategoriesState, updateInterfaceSizeState, updateLinksState, updateSortModeState],
+    [updateCategoriesState, updateDisplaySizeState, updateLinksState, updateSortModeState],
   )
 
   const cleanupIconIfUnused = useCallback(async (iconId: string, nextLinks: Link[]) => {
@@ -458,13 +458,13 @@ export function useDeckStore(): DeckStore {
     }
   }, [applyStoredDeckState])
 
-  const setInterfaceSize = useCallback(
-    (nextInterfaceSize: InterfaceSize): void => {
-      updateInterfaceSizeState(nextInterfaceSize)
-      storageService.setInterfaceSize(nextInterfaceSize)
-      void dbService.saveInterfaceSize(nextInterfaceSize).catch(() => undefined)
+  const setDisplaySize = useCallback(
+    (nextDisplaySize: DisplaySize): void => {
+      updateDisplaySizeState(nextDisplaySize)
+      storageService.setDisplaySize(nextDisplaySize)
+      void dbService.saveDisplaySize(nextDisplaySize).catch(() => undefined)
     },
-    [updateInterfaceSizeState],
+    [updateDisplaySizeState],
   )
 
   const setSortMode = useCallback(
@@ -768,11 +768,11 @@ export function useDeckStore(): DeckStore {
 
         if (options?.mode === 'move-links') {
           if (options.targetCategoryId === categoryId) {
-            throw createDisplayError('Select another category as the move target')
+            throw createDisplayError('Choose another category to move links to')
           }
 
           if (!nextCategories.some(nextCategory => nextCategory.id === options.targetCategoryId)) {
-            throw createDisplayError('Target category not found')
+            throw createDisplayError('Choose an existing category to move links to')
           }
 
           let order = getNextLinkOrder(latestLinks, options.targetCategoryId)
@@ -868,11 +868,11 @@ export function useDeckStore(): DeckStore {
 
         if (plan.mode === 'move-links') {
           if (plan.targetCategoryId === plan.categoryId) {
-            throwDraftError('Select another category as the move target')
+            throwDraftError('Choose another category to move links to')
           }
 
           if (!draftCategoryIds.has(plan.targetCategoryId)) {
-            throwDraftError('Target category not found')
+            throwDraftError('Choose an existing category to move links to')
           }
         }
 
@@ -1014,7 +1014,7 @@ export function useDeckStore(): DeckStore {
       const latestLinks = linksRef.current
 
       if (!latestCategories.some(category => category.id === categoryId)) {
-        const missingCategoryError = createDisplayError('Target category not found')
+        const missingCategoryError = createDisplayError('Choose an existing category to move links to')
 
         setError(missingCategoryError.message)
         throw missingCategoryError
@@ -1055,13 +1055,13 @@ export function useDeckStore(): DeckStore {
   return {
     categories,
     links,
-    interfaceSize,
+    displaySize,
     sortMode,
     query,
     initialized,
     error,
     sections,
-    setInterfaceSize,
+    setDisplaySize,
     setQuery,
     setSortMode,
     upsertLink,

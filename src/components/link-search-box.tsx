@@ -6,7 +6,7 @@ import { Search, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { focusFirstLinkCard } from '@/components/link-card-keyboard'
-import type { InterfaceSizeConfig } from '@/domain/interface-size'
+import type { DisplaySizeConfig } from '@/domain/display-size'
 import { cn } from '@/lib/utils'
 
 type LinkSearchBoxProps = {
@@ -14,11 +14,11 @@ type LinkSearchBoxProps = {
   inputRef?: Ref<HTMLInputElement>
   onChange: (value: string) => void
   onFocus?: () => void
-  interfaceSizeConfig: InterfaceSizeConfig
+  displaySizeConfig: DisplaySizeConfig
 }
 
 /** Provides link search input with an icon and clear action. */
-export function LinkSearchBox({ value, inputRef, onChange, onFocus, interfaceSizeConfig }: LinkSearchBoxProps) {
+export function LinkSearchBox({ value, inputRef, onChange, onFocus, displaySizeConfig }: LinkSearchBoxProps) {
   /** Sends Tab from search directly into the link-card list. */
   function handleSearchKeyDown(event: KeyboardEvent<HTMLInputElement>): void {
     if (event.key !== 'Tab' || event.shiftKey) {
@@ -36,7 +36,7 @@ export function LinkSearchBox({ value, inputRef, onChange, onFocus, interfaceSiz
         Search links
       </label>
       <div className="relative">
-        <Search className={interfaceSizeConfig.control.searchIconClassName} aria-hidden="true" />
+        <Search className={displaySizeConfig.control.searchIconClassName} aria-hidden="true" />
         <Input
           ref={inputRef}
           id="link-search"
@@ -50,16 +50,16 @@ export function LinkSearchBox({ value, inputRef, onChange, onFocus, interfaceSiz
           placeholder="Search links, notes, or URLs..."
           className={cn(
             'bg-card shadow-none',
-            interfaceSizeConfig.control.inputClassName,
-            interfaceSizeConfig.control.searchInputClassName,
+            displaySizeConfig.control.inputClassName,
+            displaySizeConfig.control.searchInputClassName,
           )}
         />
         {value ? (
           <Button
             type="button"
             variant="ghost"
-            size={interfaceSizeConfig.control.iconButtonSize}
-            className={interfaceSizeConfig.control.searchClearButtonClassName}
+            size={displaySizeConfig.control.iconButtonSize}
+            className={displaySizeConfig.control.searchClearButtonClassName}
             tabIndex={-1}
             aria-label="Clear search"
             onClick={() => onChange('')}

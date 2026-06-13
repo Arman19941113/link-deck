@@ -1,4 +1,4 @@
-// Keyboard shortcut definitions shared by global handlers and preferences copy.
+// Keyboard shortcut definitions shared by global handlers and settings copy.
 
 export type KeyboardShortcutId = 'search' | 'createLink' | 'openLink' | 'deleteLink' | 'keyboardShortcuts'
 
@@ -37,7 +37,7 @@ export const KEYBOARD_SHORTCUTS: KeyboardShortcut[] = [
   },
   {
     id: 'openLink',
-    label: 'Open selected website card',
+    label: 'Open selected link',
     keys: {
       apple: 'Cmd + Enter',
       default: 'Ctrl + Enter',
@@ -46,7 +46,7 @@ export const KEYBOARD_SHORTCUTS: KeyboardShortcut[] = [
   },
   {
     id: 'createLink',
-    label: 'New website card',
+    label: 'New link',
     keys: {
       apple: 'Cmd + Shift + O',
       default: 'Ctrl + Shift + O',
@@ -55,7 +55,7 @@ export const KEYBOARD_SHORTCUTS: KeyboardShortcut[] = [
   },
   {
     id: 'deleteLink',
-    label: 'Delete website card',
+    label: 'Delete selected link',
     keys: {
       apple: 'Cmd + Shift + Backspace',
       default: 'Ctrl + Shift + Backspace',
@@ -64,7 +64,7 @@ export const KEYBOARD_SHORTCUTS: KeyboardShortcut[] = [
   },
   {
     id: 'keyboardShortcuts',
-    label: 'Shortcuts panel',
+    label: 'Show shortcuts',
     keys: {
       apple: 'Cmd + /',
       default: 'Ctrl + /',

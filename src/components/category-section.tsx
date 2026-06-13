@@ -7,12 +7,12 @@ import { useSortable } from '@dnd-kit/react/sortable'
 import { AddLinkCard } from '@/components/add-link-card'
 import { LinkCard } from '@/components/link-card'
 import { SortableLinkCard } from '@/components/sortable-link-card'
-import { getInterfaceSizeConfig } from '@/domain/interface-size'
-import type { CategorySection as CategorySectionData, IconFile, InterfaceSize, Link } from '@/domain/types'
+import { getDisplaySizeConfig } from '@/domain/display-size'
+import type { CategorySection as CategorySectionData, IconFile, DisplaySize, Link } from '@/domain/types'
 
 type CategorySectionProps = {
   section: CategorySectionData
-  interfaceSize: InterfaceSize
+  displaySize: DisplaySize
   categoryIndex?: number
   isDragEnabled?: boolean
   showAddLinkCard?: boolean
@@ -26,7 +26,7 @@ type CategorySectionProps = {
 /** Renders a category title and responsive card grid. */
 export function CategorySection({
   section,
-  interfaceSize,
+  displaySize,
   categoryIndex = 0,
   isDragEnabled = false,
   showAddLinkCard = false,
@@ -37,7 +37,7 @@ export function CategorySection({
   getIconFile,
 }: CategorySectionProps) {
   const links = section.links ?? []
-  const interfaceSizeConfig = getInterfaceSizeConfig(interfaceSize)
+  const displaySizeConfig = getDisplaySizeConfig(displaySize)
   const { ref: categoryRef } = useSortable({
     id: section.category.id,
     accept: ['link'],
@@ -51,12 +51,12 @@ export function CategorySection({
     type: 'category',
   })
   const linkGridStyle: CSSProperties = {
-    gridTemplateColumns: `repeat(auto-fit, minmax(min(100%, ${interfaceSizeConfig.card.minColumnWidth}), 1fr))`,
-    gridAutoRows: interfaceSizeConfig.card.height,
+    gridTemplateColumns: `repeat(auto-fit, minmax(min(100%, ${displaySizeConfig.card.minColumnWidth}), 1fr))`,
+    gridAutoRows: displaySizeConfig.card.height,
   }
   const addLinkCard = (
     <AddLinkCard
-      interfaceSize={interfaceSize}
+      displaySize={displaySize}
       categoryName={section.category.name}
       onAddLink={() => onAddLink(section.category.id)}
     />
@@ -65,13 +65,13 @@ export function CategorySection({
   return (
     <section
       ref={categoryRef}
-      className={interfaceSizeConfig.section.className}
+      className={displaySizeConfig.section.className}
       aria-labelledby={`category-${section.category.id}`}
     >
       <div className="flex items-end">
         <h2
           id={`category-${section.category.id}`}
-          className={interfaceSizeConfig.section.titleClassName}
+          className={displaySizeConfig.section.titleClassName}
           title={section.category.name}
         >
           {section.category.name}
@@ -79,7 +79,7 @@ export function CategorySection({
       </div>
 
       {isDragEnabled ? (
-        <div className={interfaceSizeConfig.card.gridClassName} style={linkGridStyle}>
+        <div className={displaySizeConfig.card.gridClassName} style={linkGridStyle}>
           {links.map((link, index) => (
             <SortableLinkCard
               key={link.id}
@@ -90,13 +90,13 @@ export function CategorySection({
               onEditLink={onEditLink}
               onDeleteLink={onDeleteLink}
               getIconFile={getIconFile}
-              interfaceSize={interfaceSize}
+              displaySize={displaySize}
             />
           ))}
           {showAddLinkCard ? <div className="h-full">{addLinkCard}</div> : null}
         </div>
       ) : (
-        <div className={interfaceSizeConfig.card.gridClassName} style={linkGridStyle}>
+        <div className={displaySizeConfig.card.gridClassName} style={linkGridStyle}>
           {links.map(link => (
             <LinkCard
               key={link.id}
@@ -105,7 +105,7 @@ export function CategorySection({
               onEditLink={onEditLink}
               onDeleteLink={onDeleteLink}
               getIconFile={getIconFile}
-              interfaceSize={interfaceSize}
+              displaySize={displaySize}
             />
           ))}
           {showAddLinkCard ? addLinkCard : null}
