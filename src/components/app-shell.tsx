@@ -10,9 +10,20 @@ import { AlertCircle } from 'lucide-react'
 import { CategorySection } from '@/components/category-section'
 import { AppTopBar } from '@/components/app-top-bar'
 import { DeckEmptyState } from '@/components/deck-empty-state'
+import { getFocusedLinkCardId } from '@/components/link-card-keyboard'
 import { LinkSearchBox } from '@/components/link-search-box'
-import { PreferencesDialog } from '@/components/preferences-dialog'
+import { PreferencesDialog, type PreferencesTab } from '@/components/preferences-dialog'
 import { LinkDialog } from '@/components/link-dialog'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { getInterfaceSizeConfig } from '@/domain/interface-size'
 import { preloadPinyinSearchModule } from '@/domain/pinyin-search-loader'
 import type { Category, CategorySection as CategorySectionData, Link } from '@/domain/types'
@@ -114,13 +125,28 @@ function getLinkDragData(entity: Draggable<Data> | Droppable<Data> | null | unde
   return null
 }
 
+/** Checks whether a global shortcut should avoid hijacking editable text input. */
+function isEditableShortcutTarget(target: EventTarget | null): boolean {
+  return target instanceof HTMLElement && Boolean(target.closest('input, textarea, select, [contenteditable="true"]'))
+}
+
+/** Checks whether a global shortcut should wait for the active modal interaction to finish. */
+function isModalOpen(): boolean {
+  return Boolean(document.querySelector('[data-slot="dialog-content"], [data-slot="alert-dialog-content"]'))
+}
+
 /** Composes start page data, status messages, and navigation display regions. */
 export function AppShell() {
   const [linkDialogOpen, setLinkDialogOpen] = useState(false)
   const [editingLink, setEditingLink] = useState<Link | null>(null)
   const [addingLinkCategoryId, setAddingLinkCategoryId] = useState<string | null>(null)
   const [preferencesOpen, setPreferencesOpen] = useState(false)
+  const [preferencesInitialTab, setPreferencesInitialTab] = useState<PreferencesTab>('general')
+  const [shortcutDeleteLink, setShortcutDeleteLink] = useState<Link | null>(null)
+  const [isShortcutDeleting, setIsShortcutDeleting] = useState(false)
   const [dragLinkIdGroups, setDragLinkIdGroups] = useState<LinkIdGroups | null>(null)
+  const searchInputRef = useRef<HTMLInputElement>(null)
+  const shortcutDeleteActionRef = useRef<HTMLButtonElement>(null)
   const dragLinkIdGroupsRef = useRef<LinkIdGroups | null>(null)
   const {
     categories,
@@ -190,11 +216,82 @@ export function AppShell() {
     }
   }, [])
 
+  useEffect(() => {
+    if (shortcutDeleteLink && !links.some(link => link.id === shortcutDeleteLink.id)) {
+      setShortcutDeleteLink(null)
+    }
+  }, [links, shortcutDeleteLink])
+
+  useEffect(() => {
+    /** Handles supported app-wide shortcuts before browser defaults can take over. */
+    function handleGlobalKeyDown(event: KeyboardEvent): void {
+      const hasPlatformModifier = event.metaKey || event.ctrlKey
+
+      if (!hasPlatformModifier || event.altKey || event.isComposing) {
+        return
+      }
+
+      const key = event.key.toLowerCase()
+
+      if (isModalOpen()) {
+        return
+      }
+
+      if (!event.shiftKey && key === 'k') {
+        event.preventDefault()
+        searchInputRef.current?.focus({ preventScroll: true })
+        searchInputRef.current?.select()
+        preloadPinyinSearchModule()
+        return
+      }
+
+      if (!event.shiftKey && event.key === '/') {
+        event.preventDefault()
+        openPreferences('shortcuts')
+        return
+      }
+
+      if (isEditableShortcutTarget(event.target)) {
+        return
+      }
+
+      if (event.shiftKey && key === 'o') {
+        event.preventDefault()
+        handleCreateLink()
+        return
+      }
+
+      if (event.shiftKey && event.key === 'Backspace') {
+        const focusedLinkId = getFocusedLinkCardId()
+        const focusedLink = focusedLinkId ? links.find(link => link.id === focusedLinkId) : null
+
+        if (!focusedLink) {
+          return
+        }
+
+        event.preventDefault()
+        setShortcutDeleteLink(focusedLink)
+      }
+    }
+
+    window.addEventListener('keydown', handleGlobalKeyDown)
+
+    return () => {
+      window.removeEventListener('keydown', handleGlobalKeyDown)
+    }
+  }, [links])
+
   /** Opens a blank form for adding a link from the global action. */
   function handleCreateLink(): void {
     setEditingLink(null)
     setAddingLinkCategoryId(null)
     setLinkDialogOpen(true)
+  }
+
+  /** Opens preferences to a specific tab. */
+  function openPreferences(tab: PreferencesTab = 'general'): void {
+    setPreferencesInitialTab(tab)
+    setPreferencesOpen(true)
   }
 
   /** Opens a blank form for adding a link. */
@@ -218,6 +315,24 @@ export function AppShell() {
     if (!open) {
       setEditingLink(null)
       setAddingLinkCategoryId(null)
+    }
+  }
+
+  /** Deletes the card selected by the global delete shortcut after confirmation. */
+  async function handleShortcutDeleteLink(): Promise<void> {
+    if (!shortcutDeleteLink || isShortcutDeleting) {
+      return
+    }
+
+    setIsShortcutDeleting(true)
+
+    try {
+      await deleteLink(shortcutDeleteLink)
+      setShortcutDeleteLink(null)
+    } catch (deleteError) {
+      console.error('Failed to delete link from keyboard shortcut', deleteError)
+    } finally {
+      setIsShortcutDeleting(false)
     }
   }
 
@@ -335,7 +450,7 @@ export function AppShell() {
           <AppTopBar
             interfaceSizeConfig={interfaceSizeConfig}
             onAddLink={handleCreateLink}
-            onOpenPreferences={() => setPreferencesOpen(true)}
+            onOpenPreferences={() => openPreferences()}
           />
 
           {error ? (
@@ -349,6 +464,7 @@ export function AppShell() {
           ) : null}
 
           <LinkSearchBox
+            inputRef={searchInputRef}
             value={query}
             onChange={setQuery}
             onFocus={preloadPinyinSearchModule}
@@ -388,6 +504,7 @@ export function AppShell() {
       />
       <PreferencesDialog
         open={preferencesOpen}
+        initialTab={preferencesInitialTab}
         categories={categories}
         links={links}
         interfaceSize={interfaceSize}
@@ -401,6 +518,47 @@ export function AppShell() {
         resetDeckToDefaults={resetDeckToDefaults}
         clearDeckData={clearDeckData}
       />
+      <AlertDialog
+        open={shortcutDeleteLink !== null}
+        onOpenChange={open => {
+          if (!open && !isShortcutDeleting) {
+            setShortcutDeleteLink(null)
+          }
+        }}
+      >
+        <AlertDialogContent
+          size="default"
+          className={interfaceSizeConfig.dialog.contentClassName}
+          onOpenAutoFocus={event => {
+            event.preventDefault()
+            shortcutDeleteActionRef.current?.focus({ preventScroll: true })
+          }}
+        >
+          <AlertDialogHeader className={interfaceSizeConfig.dialog.headerClassName}>
+            <AlertDialogTitle className={interfaceSizeConfig.dialog.titleClassName}>Delete link</AlertDialogTitle>
+            <AlertDialogDescription className={cn('wrap-break-word', interfaceSizeConfig.dialog.descriptionClassName)}>
+              Delete "{shortcutDeleteLink?.name}"? This removes the link from your deck.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className={interfaceSizeConfig.dialog.footerClassName}>
+            <AlertDialogCancel size={interfaceSizeConfig.control.buttonSize} disabled={isShortcutDeleting}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              ref={shortcutDeleteActionRef}
+              variant="destructive"
+              size={interfaceSizeConfig.control.buttonSize}
+              disabled={isShortcutDeleting}
+              onClick={event => {
+                event.preventDefault()
+                void handleShortcutDeleteLink()
+              }}
+            >
+              {isShortcutDeleting ? 'Deleting...' : 'Delete'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </main>
   )
 }

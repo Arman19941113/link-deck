@@ -1,11 +1,11 @@
 // Link card showing a saved link summary with open and menu actions.
 
 import type { HTMLAttributes, KeyboardEvent, MouseEvent, PointerEvent, Ref } from 'react'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Copy, Edit3, MoreHorizontal, Trash2 } from 'lucide-react'
 
 import { LinkIcon } from '@/components/link-icon'
-import { focusSiblingLinkCard, focusVerticalLinkCard } from '@/components/link-card-keyboard'
+import { focusSiblingLinkCard, focusVerticalLinkCard, LINK_CARD_ID_ATTRIBUTE } from '@/components/link-card-keyboard'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -59,6 +59,7 @@ export function LinkCard({
 }: LinkCardProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const deleteActionRef = useRef<HTMLButtonElement>(null)
   const interfaceSizeConfig = getInterfaceSizeConfig(interfaceSize)
   const cardConfig = interfaceSizeConfig.card
   const { ref: cardDragRef, onKeyDown: keyboardDragListener, ...cardDragAttributes } = cardDragProps ?? {}
@@ -154,8 +155,9 @@ export function LinkCard({
       role="button"
       tabIndex={0}
       data-link-card-action="true"
+      {...{ [LINK_CARD_ID_ATTRIBUTE]: link.id }}
       aria-label={`Open ${link.name}`}
-      aria-keyshortcuts="Meta+Enter Control+Enter"
+      aria-keyshortcuts="Meta+Enter Control+Enter Meta+Shift+Backspace Control+Shift+Backspace"
       onClick={handleOpenClick}
       onKeyDownCapture={handleOpenKeyDownCapture}
       onKeyDown={handleOpenKeyDown}
@@ -248,7 +250,14 @@ export function LinkCard({
           }
         }}
       >
-        <AlertDialogContent size="default" className={interfaceSizeConfig.dialog.contentClassName}>
+        <AlertDialogContent
+          size="default"
+          className={interfaceSizeConfig.dialog.contentClassName}
+          onOpenAutoFocus={event => {
+            event.preventDefault()
+            deleteActionRef.current?.focus({ preventScroll: true })
+          }}
+        >
           <AlertDialogHeader className={interfaceSizeConfig.dialog.headerClassName}>
             <AlertDialogTitle className={interfaceSizeConfig.dialog.titleClassName}>Delete link</AlertDialogTitle>
             <AlertDialogDescription className={cn('wrap-break-word', interfaceSizeConfig.dialog.descriptionClassName)}>
@@ -260,6 +269,7 @@ export function LinkCard({
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
+              ref={deleteActionRef}
               variant="destructive"
               size={interfaceSizeConfig.control.buttonSize}
               disabled={isDeleting}

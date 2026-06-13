@@ -1,6 +1,7 @@
 // Shared DOM helpers for link-card keyboard focus management.
 
 export const LINK_CARD_ACTION_SELECTOR = "[data-link-card-action='true']"
+export const LINK_CARD_ID_ATTRIBUTE = 'data-link-card-id'
 
 type LinkCardGeometry = {
   element: HTMLElement
@@ -17,6 +18,19 @@ export function getFocusableLinkCards(): HTMLElement[] {
 /** Focuses the first visible link card. */
 export function focusFirstLinkCard(): boolean {
   return focusLinkCardAtIndex(0)
+}
+
+/** Returns the link id for the card that currently owns focus. */
+export function getFocusedLinkCardId(): string | null {
+  const activeElement = document.activeElement
+
+  if (!(activeElement instanceof HTMLElement)) {
+    return null
+  }
+
+  const focusedCard = activeElement.closest<HTMLElement>(LINK_CARD_ACTION_SELECTOR)
+
+  return focusedCard?.getAttribute(LINK_CARD_ID_ATTRIBUTE) ?? null
 }
 
 /** Moves focus between visible link cards, optionally wrapping at the ends. */

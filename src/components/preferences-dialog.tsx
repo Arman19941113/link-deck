@@ -44,6 +44,7 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { isDefaultCategory } from '@/domain/categories'
 import { getInterfaceSizeConfig, type InterfaceSizeConfig } from '@/domain/interface-size'
+import { getKeyboardShortcutKeys, KEYBOARD_SHORTCUTS } from '@/domain/keyboard-shortcuts'
 import type { Category, InterfaceSize, Link, SortMode } from '@/domain/types'
 import type { CategoryDraftDeletePlan, CategoryDraft } from '@/hooks/use-deck-store'
 import { cn } from '@/lib/utils'
@@ -52,6 +53,7 @@ type DeleteMode = CategoryDraftDeletePlan['mode']
 
 type PreferencesDialogProps = {
   open: boolean
+  initialTab?: PreferencesTab
   categories: Category[]
   links: Link[]
   interfaceSize: InterfaceSize
@@ -67,7 +69,7 @@ type PreferencesDialogProps = {
 }
 
 type PreferencesDialogContentProps = Omit<PreferencesDialogProps, 'open'>
-type PreferencesTab = 'general' | 'categories' | 'data'
+export type PreferencesTab = 'general' | 'categories' | 'data' | 'shortcuts'
 type DisplayLanguage = 'en'
 type ConfirmDataAction = 'reset' | 'clear'
 
@@ -86,6 +88,7 @@ const PREFERENCES_TABS: Array<{ value: PreferencesTab; label: string }> = [
   { value: 'general', label: 'General' },
   { value: 'categories', label: 'Categories' },
   { value: 'data', label: 'Data' },
+  { value: 'shortcuts', label: 'Shortcuts' },
 ]
 
 /** Converts unknown errors into preference dialog messages. */
@@ -273,6 +276,7 @@ function CategoryDragOverlayRow({ category, interfaceSizeConfig }: CategoryDragO
 /** Preferences dialog shell that resets internal edit state with a key. */
 export function PreferencesDialog({
   open,
+  initialTab = 'general',
   categories,
   links,
   interfaceSize,
@@ -296,7 +300,8 @@ export function PreferencesDialog({
       }}
     >
       <PreferencesDialogContent
-        key={`${open ? 'open' : 'closed'}-${categories.map(category => category.id).join('-')}`}
+        key={`${open ? 'open' : 'closed'}-${initialTab}-${categories.map(category => category.id).join('-')}`}
+        initialTab={initialTab}
         categories={categories}
         links={links}
         interfaceSize={interfaceSize}
@@ -316,6 +321,7 @@ export function PreferencesDialog({
 
 /** Preferences dialog content; all changes go to a local draft before the footer save commits them. */
 function PreferencesDialogContent({
+  initialTab = 'general',
   categories,
   links,
   interfaceSize,
@@ -333,6 +339,7 @@ function PreferencesDialogContent({
   const editingNameInputRef = useRef<HTMLInputElement>(null)
   const categoryListRef = useRef<HTMLDivElement>(null)
   const importFileInputRef = useRef<HTMLInputElement>(null)
+  const preferencesTabRefs = useRef(new Map<PreferencesTab, HTMLButtonElement>())
   const [initialSnapshot] = useState(() => {
     const initialDraftCategories = normalizeDraftOrder(sortCategories(categories))
 
@@ -356,7 +363,7 @@ function PreferencesDialogContent({
   const [activeCategoryWidth, setActiveCategoryWidth] = useState<number | null>(null)
   const [discardDialogOpen, setDiscardDialogOpen] = useState(false)
   const [confirmDataAction, setConfirmDataAction] = useState<ConfirmDataAction | null>(null)
-  const [activeTab, setActiveTab] = useState<PreferencesTab>('general')
+  const [activeTab, setActiveTab] = useState<PreferencesTab>(initialTab)
   const [localInterfaceSize, setLocalInterfaceSize] = useState<InterfaceSize>(interfaceSize)
   const [localSortMode, setLocalSortMode] = useState<SortMode>(sortMode)
   const [displayLanguage, setDisplayLanguage] = useState<DisplayLanguage>('en')
@@ -843,6 +850,11 @@ function PreferencesDialogContent({
     onOpenChange(false)
   }
 
+  /** Keeps dialog auto-focus aligned with the active preferences tab. */
+  function focusActivePreferencesTab(): void {
+    preferencesTabRefs.current.get(activeTab)?.focus({ preventScroll: true })
+  }
+
   return (
     <>
       <DialogContent
@@ -852,6 +864,10 @@ function PreferencesDialogContent({
           'grid grid-rows-[auto_minmax(0,1fr)_auto] gap-0 overflow-hidden p-0',
         )}
         showCloseButton={false}
+        onOpenAutoFocus={event => {
+          event.preventDefault()
+          focusActivePreferencesTab()
+        }}
         onEscapeKeyDown={event => {
           event.preventDefault()
 
@@ -875,7 +891,7 @@ function PreferencesDialogContent({
           <DialogTitle className={interfaceSizeConfig.dialog.titleClassName}>Preferences</DialogTitle>
         </DialogHeader>
 
-        <div className="grid min-h-0 grid-cols-1 grid-rows-[auto_minmax(0,1fr)] sm:grid-cols-[8rem_minmax(0,1fr)] sm:grid-rows-[minmax(0,1fr)]">
+        <div className="grid min-h-0 grid-cols-1 grid-rows-[auto_minmax(0,1fr)] sm:grid-cols-[10rem_minmax(0,1fr)] sm:grid-rows-[minmax(0,1fr)]">
           <nav
             className="flex gap-1 overflow-x-auto border-b bg-muted/40 p-2 sm:flex-col sm:border-r sm:border-b-0"
             aria-label="Preferences navigation"
@@ -883,6 +899,13 @@ function PreferencesDialogContent({
             {PREFERENCES_TABS.map(tab => (
               <Button
                 key={tab.value}
+                ref={node => {
+                  if (node) {
+                    preferencesTabRefs.current.set(tab.value, node)
+                  } else {
+                    preferencesTabRefs.current.delete(tab.value)
+                  }
+                }}
                 type="button"
                 variant={activeTab === tab.value ? 'secondary' : 'ghost'}
                 size={interfaceSizeConfig.control.buttonSize}
@@ -971,6 +994,24 @@ function PreferencesDialogContent({
                     {error}
                   </p>
                 ) : null}
+              </div>
+            ) : activeTab === 'shortcuts' ? (
+              <div className={cn('max-w-xl', interfaceSizeConfig.dialog.formClassName)}>
+                <div className="flex flex-col gap-2">
+                  {KEYBOARD_SHORTCUTS.map(shortcut => (
+                    <div
+                      key={shortcut.id}
+                      className="flex flex-col gap-2 rounded-md bg-muted/30 px-3 py-3 sm:flex-row sm:items-center sm:justify-between"
+                    >
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium">{shortcut.label}</p>
+                      </div>
+                      <kbd className="inline-flex w-fit shrink-0 items-center rounded-sm border bg-card px-2 py-1 font-mono text-xs text-muted-foreground">
+                        {getKeyboardShortcutKeys(shortcut)}
+                      </kbd>
+                    </div>
+                  ))}
+                </div>
               </div>
             ) : activeTab === 'data' ? (
               <div className={cn('max-w-xl', interfaceSizeConfig.dialog.formClassName)}>
