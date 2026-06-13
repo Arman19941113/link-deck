@@ -1,6 +1,6 @@
 // Keyboard shortcut definitions shared by global handlers and preferences copy.
 
-export type KeyboardShortcutId = 'search' | 'createLink' | 'deleteLink' | 'keyboardShortcuts'
+export type KeyboardShortcutId = 'search' | 'createLink' | 'openLink' | 'deleteLink' | 'keyboardShortcuts'
 
 type NavigatorWithUserAgentData = Navigator & {
   userAgentData?: {
@@ -34,6 +34,15 @@ export const KEYBOARD_SHORTCUTS: KeyboardShortcut[] = [
       default: 'Ctrl + K',
     },
     ariaKeys: 'Meta+K Control+K',
+  },
+  {
+    id: 'openLink',
+    label: 'Open selected website card',
+    keys: {
+      apple: 'Cmd + Enter',
+      default: 'Ctrl + Enter',
+    },
+    ariaKeys: 'Meta+Enter Control+Enter',
   },
   {
     id: 'createLink',
