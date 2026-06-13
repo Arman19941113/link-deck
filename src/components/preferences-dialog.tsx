@@ -409,7 +409,6 @@ function PreferencesDialogContent({
   const isReplacingData = busyAction !== null && busyAction !== 'export'
   const canUseDataControls = !isReplacingData && !isDirty
   const canDeleteCategory = sortedCategories.length > 1
-  const errorId = 'preferences-category-error'
 
   useEffect(() => {
     if (!editingCategoryId) {
@@ -450,6 +449,12 @@ function PreferencesDialogContent({
     }
   }
 
+  /** Keeps invalid field state locally while rendering the message through the global toaster. */
+  function showError(message: string): void {
+    setError(message)
+    toast.error(message, { id: 'preferences-dialog-error' })
+  }
+
   /** Clears the input after adding a category and keeps the dialog open for more edits. */
   function addCategoryFromInput(): void {
     if (isBusy) {
@@ -459,7 +464,7 @@ function PreferencesDialogContent({
     const name = newName.trim()
 
     if (!name) {
-      setError('Enter a category name')
+      showError('Enter a category name')
       newNameInputRef.current?.focus()
       return
     }
@@ -540,7 +545,7 @@ function PreferencesDialogContent({
     const name = editingName.trim()
 
     if (!name) {
-      setError('Enter a category name')
+      showError('Enter a category name')
       return
     }
 
@@ -572,7 +577,7 @@ function PreferencesDialogContent({
     }
 
     if (isDefaultCategory(category.id)) {
-      setError('The default category cannot be deleted')
+      showError('The default category cannot be deleted')
       return
     }
 
@@ -581,7 +586,7 @@ function PreferencesDialogContent({
     const isMoveTarget = deletePlans.some(plan => plan.mode === 'move-links' && plan.targetCategoryId === category.id)
 
     if (isMoveTarget) {
-      setError('This category is already a link move target. Save or cancel the current changes first.')
+      showError('This category is already a link move target. Save or cancel the current changes first.')
       return
     }
 
@@ -607,12 +612,12 @@ function PreferencesDialogContent({
     }
 
     if (sortedCategories.length <= 1) {
-      setError('Keep at least one category')
+      showError('Keep at least one category')
       return
     }
 
     if (deleteMode === 'move-links' && !effectiveTargetCategoryId) {
-      setError('Select the category to move links to')
+      showError('Select the category to move links to')
       return
     }
 
@@ -685,7 +690,7 @@ function PreferencesDialogContent({
     const nextDraftCategories = normalizeDraftOrder(applyEditingName(draftCategories, editingCategoryId, editingName))
 
     if (editingCategoryId && !editingName.trim()) {
-      setError('Enter a category name')
+      showError('Enter a category name')
       return
     }
 
@@ -702,7 +707,7 @@ function PreferencesDialogContent({
       setDraftCategories(nextDraftCategories)
       setEditingCategoryId(null)
       setEditingName('')
-      setError(getDialogErrorMessage(saveError))
+      showError(getDialogErrorMessage(saveError))
       setBusyAction(null)
     }
   }
@@ -733,7 +738,7 @@ function PreferencesDialogContent({
       setError(null)
       toast.success('Backup exported.')
     } catch (exportError) {
-      setError(getDialogErrorMessage(exportError))
+      showError(getDialogErrorMessage(exportError))
     } finally {
       setBusyAction(null)
     }
@@ -746,7 +751,7 @@ function PreferencesDialogContent({
     }
 
     if (isDirty) {
-      setError('Save or discard category changes before importing data.')
+      showError('Save or discard category changes before importing data.')
       return
     }
 
@@ -764,7 +769,7 @@ function PreferencesDialogContent({
     }
 
     if (isDirty) {
-      setError('Save or discard category changes before importing data.')
+      showError('Save or discard category changes before importing data.')
       return
     }
 
@@ -789,7 +794,7 @@ function PreferencesDialogContent({
     }
 
     if (isDirty) {
-      setError('Save or discard category changes before replacing data.')
+      showError('Save or discard category changes before replacing data.')
       return
     }
 
@@ -843,7 +848,7 @@ function PreferencesDialogContent({
       setBusyAction(null)
       onOpenChange(false)
     } catch (dataError) {
-      setError(getDialogErrorMessage(dataError))
+      showError(getDialogErrorMessage(dataError))
       setBusyAction(null)
     }
   }
@@ -1022,16 +1027,6 @@ function PreferencesDialogContent({
                     Link Deck currently ships with English interface copy.
                   </p>
                 </div>
-
-                {error ? (
-                  <p
-                    id={errorId}
-                    role="alert"
-                    className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive"
-                  >
-                    {error}
-                  </p>
-                ) : null}
               </div>
             ) : activeTab === 'shortcuts' ? (
               <div className={cn('max-w-xl', interfaceSizeConfig.dialog.formClassName)}>
@@ -1127,16 +1122,6 @@ function PreferencesDialogContent({
                     Clear data
                   </Button>
                 </div>
-
-                {error ? (
-                  <p
-                    id={errorId}
-                    role="alert"
-                    className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive"
-                  >
-                    {error}
-                  </p>
-                ) : null}
               </div>
             ) : (
               <div className={interfaceSizeConfig.dialog.formClassName}>
@@ -1398,16 +1383,6 @@ function PreferencesDialogContent({
                       </Button>
                     </div>
                   </div>
-                ) : null}
-
-                {error ? (
-                  <p
-                    id={errorId}
-                    role="alert"
-                    className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive"
-                  >
-                    {error}
-                  </p>
                 ) : null}
               </div>
             )}

@@ -3,6 +3,7 @@
 import type { ChangeEvent, FormEvent } from 'react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Upload } from 'lucide-react'
+import { toast } from 'sonner'
 
 import { BuiltinIconField } from '@/components/brand-icon-picker'
 import { Button } from '@/components/ui/button'
@@ -151,7 +152,6 @@ function LinkDialogForm({
   const [error, setError] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const dialogTitle = link ? 'Edit link' : 'Add link'
-  const errorId = 'link-dialog-error'
   const selectedCategoryId = categoryId || defaultCategoryId
   const hasCategories = categories.length > 0
   const shouldShowCategorySelect = Boolean(link) || !initialCategoryId
@@ -225,6 +225,12 @@ function LinkDialogForm({
     setSelectedIconPreviewUrl(null)
   }
 
+  /** Stores form error state for invalid fields while showing the message through the global toaster. */
+  function showError(message: string): void {
+    setError(message)
+    toast.error(message, { id: 'link-dialog-error' })
+  }
+
   /** Validates file size and stores the pending icon upload. */
   function handleIconFileChange(event: ChangeEvent<HTMLInputElement>): void {
     const file = event.target.files?.[0] ?? null
@@ -239,7 +245,7 @@ function LinkDialogForm({
     setIconFile(file)
 
     if (!ACCEPTED_ICON_MIME_TYPES.has(file.type)) {
-      setError('Choose a PNG, JPEG, WebP, or SVG icon')
+      showError('Choose a PNG, JPEG, WebP, or SVG icon')
       return
     }
 
@@ -249,7 +255,7 @@ function LinkDialogForm({
     setSelectedIconPreviewUrl(previewUrl)
 
     if (file.size > MAX_ICON_FILE_SIZE) {
-      setError('Icon files cannot exceed 1024KB')
+      showError('Icon files cannot exceed 1024KB')
       return
     }
 
@@ -269,37 +275,37 @@ function LinkDialogForm({
     const trimmedIconUrl = iconUrl.trim()
 
     if (!trimmedUrl) {
-      setError('Enter a link URL')
+      showError('Enter a link URL')
       return
     }
 
     if (!selectedCategoryId) {
-      setError('Select a category')
+      showError('Select a category')
       return
     }
 
     if (iconMode === 'builtin' && !builtinIcon) {
-      setError('Choose a built-in icon')
+      showError('Choose a built-in icon')
       return
     }
 
     if (iconMode === 'url' && !trimmedIconUrl) {
-      setError('Enter an icon URL')
+      showError('Enter an icon URL')
       return
     }
 
     if (iconMode === 'file' && iconFile && !ACCEPTED_ICON_MIME_TYPES.has(iconFile.type)) {
-      setError('Choose a PNG, JPEG, WebP, or SVG icon')
+      showError('Choose a PNG, JPEG, WebP, or SVG icon')
       return
     }
 
     if (iconMode === 'file' && iconFile && iconFile.size > MAX_ICON_FILE_SIZE) {
-      setError('Icon files cannot exceed 1024KB')
+      showError('Icon files cannot exceed 1024KB')
       return
     }
 
     if (iconMode === 'file' && !iconFile && link?.icon.type !== 'file') {
-      setError('Choose a local icon file')
+      showError('Choose a local icon file')
       return
     }
 
@@ -329,7 +335,7 @@ function LinkDialogForm({
       })
       onOpenChange(false)
     } catch (saveError) {
-      setError(getDialogErrorMessage(saveError))
+      showError(getDialogErrorMessage(saveError))
     } finally {
       setIsSaving(false)
     }
@@ -547,12 +553,6 @@ function LinkDialogForm({
             </div>
           ) : null}
         </div>
-
-        {error ? (
-          <p id={errorId} role="alert" className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
-            {error}
-          </p>
-        ) : null}
 
         <DialogFooter className={cn('mt-3', interfaceSizeConfig.dialog.footerClassName)}>
           <Button

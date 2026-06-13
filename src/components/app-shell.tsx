@@ -5,7 +5,7 @@ import type { Data, Draggable, Droppable } from '@dnd-kit/abstract'
 import { PointerActivationConstraints, PointerSensor } from '@dnd-kit/dom'
 import { move as moveSortableItems } from '@dnd-kit/helpers'
 import { DragDropProvider, type DragEndEvent, type DragOverEvent, type DragStartEvent } from '@dnd-kit/react'
-import { AlertCircle } from 'lucide-react'
+import { toast } from 'sonner'
 
 import { CategorySection } from '@/components/category-section'
 import { AppTopBar } from '@/components/app-top-bar'
@@ -225,6 +225,12 @@ export function AppShell() {
       applyThemePreference(themePreference)
     })
   }, [themePreference])
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error, { id: 'deck-error' })
+    }
+  }, [error])
 
   useEffect(() => {
     if (shortcutDeleteLink && !links.some(link => link.id === shortcutDeleteLink.id)) {
@@ -469,16 +475,6 @@ export function AppShell() {
             onAddLink={handleCreateLink}
             onOpenPreferences={() => openPreferences()}
           />
-
-          {error ? (
-            <div
-              role="alert"
-              className="flex items-start gap-2 rounded-md border border-destructive/30 bg-card px-3 py-2 text-sm text-destructive"
-            >
-              <AlertCircle className="mt-0.5 shrink-0" aria-hidden="true" />
-              <p>{error}</p>
-            </div>
-          ) : null}
 
           <LinkSearchBox
             inputRef={searchInputRef}
