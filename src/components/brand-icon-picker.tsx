@@ -1,6 +1,6 @@
 // Built-in BrandIcon picker used by the link add and edit dialog.
 
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type KeyboardEvent } from 'react'
 import { Check, Link as LinkIconGlyph, Shuffle } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -34,6 +34,7 @@ type BrandIconPickerProps = {
   disabled?: boolean
   interfaceSizeConfig: InterfaceSizeConfig
   onChange: (icon: BuiltinIconValue) => void
+  onConfirm?: (icon: BuiltinIconValue) => void
 }
 
 type BuiltinIconFieldProps = BrandIconPickerProps
@@ -114,12 +115,12 @@ export function BuiltinIconField({ value, disabled = false, interfaceSizeConfig,
   }
 
   /** Commits the icon selected inside the chooser dialog. */
-  function handleUseIcon(): void {
-    if (!draftIcon) {
+  function handleUseIcon(icon = draftIcon): void {
+    if (!icon) {
       return
     }
 
-    onChange(draftIcon)
+    onChange(icon)
     setChooserOpen(false)
   }
 
@@ -190,6 +191,7 @@ export function BuiltinIconField({ value, disabled = false, interfaceSizeConfig,
               disabled={disabled}
               interfaceSizeConfig={interfaceSizeConfig}
               onChange={setDraftIcon}
+              onConfirm={handleUseIcon}
             />
           </div>
 
@@ -206,7 +208,7 @@ export function BuiltinIconField({ value, disabled = false, interfaceSizeConfig,
               type="button"
               size={interfaceSizeConfig.control.buttonSize}
               disabled={!draftIcon}
-              onClick={handleUseIcon}
+              onClick={() => handleUseIcon()}
             >
               Use icon
             </Button>
@@ -218,10 +220,85 @@ export function BuiltinIconField({ value, disabled = false, interfaceSizeConfig,
 }
 
 /** Lets the user search and choose a serializable built-in icon reference. */
-export function BrandIconPicker({ value, disabled = false, interfaceSizeConfig, onChange }: BrandIconPickerProps) {
+export function BrandIconPicker({
+  value,
+  disabled = false,
+  interfaceSizeConfig,
+  onChange,
+  onConfirm,
+}: BrandIconPickerProps) {
   const [query, setQuery] = useState('')
   const selectedIcon = useMemo(() => (value ? getBuiltinIconMetadata(value) : null), [value])
   const results = useMemo(() => searchBuiltinIcons(query), [query])
+
+  function confirmIcon(icon: BuiltinIconValue): void {
+    onChange(icon)
+    onConfirm?.(icon)
+  }
+
+  function handleSearchKeyDown(event: KeyboardEvent<HTMLInputElement>): void {
+    if (event.key !== 'Enter' || event.nativeEvent.isComposing || !value) {
+      return
+    }
+
+    event.preventDefault()
+    onConfirm?.(value)
+  }
+
+  function getIconGridColumnCount(button: HTMLButtonElement): number {
+    const grid = button.parentElement
+
+    if (!grid) {
+      return 1
+    }
+
+    return getComputedStyle(grid).gridTemplateColumns.split(' ').filter(Boolean).length || 1
+  }
+
+  function focusIconOption(buttons: HTMLButtonElement[], currentIndex: number, offset: number): void {
+    const nextIndex = Math.min(Math.max(currentIndex + offset, 0), buttons.length - 1)
+    const nextButton = buttons[nextIndex]
+
+    nextButton?.focus()
+    nextButton?.scrollIntoView({ block: 'nearest', inline: 'nearest' })
+  }
+
+  function handleIconKeyDown(event: KeyboardEvent<HTMLButtonElement>, icon: BuiltinIconValue): void {
+    if (event.nativeEvent.isComposing) {
+      return
+    }
+
+    if (event.key === 'Enter') {
+      event.preventDefault()
+      confirmIcon(icon)
+      return
+    }
+
+    if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key)) {
+      return
+    }
+
+    event.preventDefault()
+    const list = event.currentTarget.closest('[data-result-list]')
+    const buttons = Array.from(list?.querySelectorAll<HTMLButtonElement>('[data-brand-icon-option]') ?? []).filter(
+      button => !button.disabled,
+    )
+    const currentIndex = buttons.indexOf(event.currentTarget)
+
+    if (currentIndex === -1) {
+      return
+    }
+
+    const columnCount = getIconGridColumnCount(event.currentTarget)
+    const offsetByKey: Record<string, number> = {
+      ArrowLeft: -1,
+      ArrowRight: 1,
+      ArrowUp: -columnCount,
+      ArrowDown: columnCount,
+    }
+
+    focusIconOption(buttons, currentIndex, offsetByKey[event.key] ?? 0)
+  }
 
   return (
     <div className="flex h-full min-h-0 flex-col rounded-md border bg-secondary/20 p-3">
@@ -252,18 +329,21 @@ export function BrandIconPicker({ value, disabled = false, interfaceSizeConfig, 
           placeholder="Search brands, for example GitHub"
           disabled={disabled}
           onChange={event => setQuery(event.target.value)}
+          onKeyDown={handleSearchKeyDown}
         />
       </div>
 
       {results.length ? (
-        <div data-result-list className="mt-3 min-h-0 flex-1 overflow-y-auto">
+        <div data-result-list className="mt-3 min-h-0 flex-1 overflow-y-auto p-1">
           <div className="grid gap-2 sm:grid-cols-3">
             {results.map(icon => {
               const selected = value?.slug === icon.key
+              const iconRef = createBuiltinIconRef(icon)
 
               return (
                 <Button
                   key={icon.key}
+                  data-brand-icon-option
                   type="button"
                   variant={selected ? 'secondary' : 'ghost'}
                   className={cn(
@@ -271,7 +351,9 @@ export function BrandIconPicker({ value, disabled = false, interfaceSizeConfig, 
                     selected && 'border-accent/50',
                   )}
                   disabled={disabled}
-                  onClick={() => onChange(createBuiltinIconRef(icon))}
+                  onClick={() => onChange(iconRef)}
+                  onFocus={() => onChange(iconRef)}
+                  onKeyDown={event => handleIconKeyDown(event, iconRef)}
                 >
                   <BrandIconPreview icon={icon} decorative />
                   <span className="min-w-0">
@@ -283,7 +365,7 @@ export function BrandIconPicker({ value, disabled = false, interfaceSizeConfig, 
           </div>
         </div>
       ) : (
-        <div data-result-list className="mt-3 min-h-0 flex-1 overflow-y-auto">
+        <div data-result-list className="mt-3 min-h-0 flex-1 overflow-y-auto p-1">
           <p className="rounded-md bg-background px-3 py-2 text-sm text-muted-foreground">
             No built-in icons match this search.
           </p>
