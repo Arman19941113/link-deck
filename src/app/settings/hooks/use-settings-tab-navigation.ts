@@ -6,8 +6,8 @@ import type { SettingsTab } from '../types'
 
 export const SETTINGS_TABS: Array<{ value: SettingsTab; label: string }> = [
   { value: 'general', label: 'General' },
-  { value: 'data', label: 'Data' },
   { value: 'categories', label: 'Categories' },
+  { value: 'data', label: 'Data' },
   { value: 'shortcuts', label: 'Shortcuts' },
 ]
 

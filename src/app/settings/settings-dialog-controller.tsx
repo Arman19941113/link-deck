@@ -15,12 +15,10 @@ import { ShortcutsSettingsPanel } from './shortcuts-settings-panel'
 import type { DataBusyAction, SettingsLanguage, SettingsTab } from './types'
 import { Button } from '@/components/ui/button'
 import { DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { getDisplaySizeConfig, type DisplaySizeConfig } from '@/app/display-size-config'
 import type { DeleteCategoryLinksStrategy } from '@/domain/deck/category-delete-changes'
 import type { Category, SavedLink, SortMode } from '@/domain/deck/types'
 import type { ThemePreference } from '@/domain/settings/theme'
 import type { DisplaySize } from '@/domain/settings/types'
-import { cn } from '@/lib/utils'
 
 export type SettingsDialogControllerProps = {
   initialTab?: SettingsTab
@@ -80,7 +78,6 @@ export function SettingsDialogController({
     onThemePreferenceChange,
   )
   const settingsError = useSettingsError()
-  const displaySizeConfig = getDisplaySizeConfig(displaySize)
   const isBusy = busyAction !== null
   const categorySettingsViewModel = useCategorySettingsViewModel({
     categories,
@@ -118,7 +115,6 @@ export function SettingsDialogController({
     if (activeTab === 'general') {
       return (
         <GeneralSettingsPanel
-          displaySizeConfig={displaySizeConfig}
           displaySize={localDisplaySize}
           sortMode={localSortMode}
           themePreference={localThemePreference}
@@ -131,14 +127,13 @@ export function SettingsDialogController({
       )
     }
 
-    if (activeTab === 'shortcuts') {
-      return <ShortcutsSettingsPanel displaySizeConfig={displaySizeConfig} />
+    if (activeTab === 'categories') {
+      return <CategoriesSettingsPanel viewModel={categorySettingsViewModel} />
     }
 
     if (activeTab === 'data') {
       return (
         <DataSettingsPanel
-          displaySizeConfig={displaySizeConfig}
           importFileInputRef={backupActions.importFileInputRef}
           canUseDataControls={backupActions.canUseDataControls}
           busyAction={busyAction}
@@ -150,17 +145,14 @@ export function SettingsDialogController({
       )
     }
 
-    return <CategoriesSettingsPanel displaySizeConfig={displaySizeConfig} viewModel={categorySettingsViewModel} />
+    return <ShortcutsSettingsPanel />
   }
 
   return (
     <>
       <DialogContent
         aria-describedby={undefined}
-        className={cn(
-          displaySizeConfig.dialog.surfaceClassName,
-          'grid grid-rows-[auto_minmax(0,1fr)_auto] gap-0 overflow-hidden p-0',
-        )}
+        className="grid h-[592px] w-[672px] max-w-none grid-rows-[auto_minmax(0,1fr)_auto] gap-0 overflow-hidden p-0 sm:max-w-none"
         showCloseButton={false}
         onOpenAutoFocus={event => {
           event.preventDefault()
@@ -185,14 +177,13 @@ export function SettingsDialogController({
           requestClose()
         }}
       >
-        <DialogHeader className={cn('border-b px-4 py-4 sm:px-6', displaySizeConfig.dialog.headerClassName)}>
-          <DialogTitle className={displaySizeConfig.dialog.titleClassName}>Settings</DialogTitle>
+        <DialogHeader className="gap-2 border-b px-4 py-4 sm:px-6">
+          <DialogTitle className="text-lg leading-none font-semibold">Settings</DialogTitle>
         </DialogHeader>
 
         <div className="grid min-h-0 grid-cols-1 grid-rows-[auto_minmax(0,1fr)] sm:grid-cols-[10rem_minmax(0,1fr)] sm:grid-rows-[minmax(0,1fr)]">
           <SettingsNavigation
             activeTab={activeTab}
-            displaySizeConfig={displaySizeConfig}
             onTabButtonRef={registerSettingsTabButton}
             onTabChange={requestSettingsTabChange}
             onTabKeyDown={handleSettingsTabKeyDown}
@@ -201,14 +192,8 @@ export function SettingsDialogController({
           <section className="min-h-0 overflow-y-auto px-4 py-4 sm:px-6">{renderActivePanel()}</section>
         </div>
 
-        <DialogFooter className={cn('border-t px-4 py-2 sm:px-6', displaySizeConfig.dialog.footerClassName)}>
-          <Button
-            type="button"
-            variant="outline"
-            size={displaySizeConfig.control.buttonSize}
-            disabled={isBusy}
-            onClick={requestClose}
-          >
+        <DialogFooter className="gap-2 border-t px-4 py-2 sm:px-6">
+          <Button type="button" variant="outline" size="default" disabled={isBusy} onClick={requestClose}>
             Close
           </Button>
         </DialogFooter>
@@ -216,7 +201,6 @@ export function SettingsDialogController({
 
       <DestructiveDataActionConfirmDialog
         busyAction={busyAction}
-        displaySizeConfig={displaySizeConfig}
         isBusy={isBusy}
         onConfirm={() => void backupActions.handleConfirmDestructiveDataAction()}
         onOpenChange={open => {
@@ -227,29 +211,19 @@ export function SettingsDialogController({
         pendingDestructiveDataAction={backupActions.pendingDestructiveDataAction}
       />
 
-      <CategoryDeleteConfirmDialog
-        categorySettingsViewModel={categorySettingsViewModel}
-        displaySizeConfig={displaySizeConfig}
-      />
+      <CategoryDeleteConfirmDialog categorySettingsViewModel={categorySettingsViewModel} />
     </>
   )
 }
 
 type SettingsNavigationProps = {
   activeTab: SettingsTab
-  displaySizeConfig: DisplaySizeConfig
   onTabButtonRef: (tab: SettingsTab, node: HTMLButtonElement | null) => void
   onTabChange: (tab: SettingsTab) => void
   onTabKeyDown: (event: KeyboardEvent<HTMLButtonElement>, tab: SettingsTab) => void
 }
 
-function SettingsNavigation({
-  activeTab,
-  displaySizeConfig,
-  onTabButtonRef,
-  onTabChange,
-  onTabKeyDown,
-}: SettingsNavigationProps) {
+function SettingsNavigation({ activeTab, onTabButtonRef, onTabChange, onTabKeyDown }: SettingsNavigationProps) {
   return (
     <nav
       className="flex gap-1 overflow-x-auto border-b bg-muted/40 p-2 sm:flex-col sm:border-r sm:border-b-0"
@@ -261,7 +235,7 @@ function SettingsNavigation({
           ref={node => onTabButtonRef(tab.value, node)}
           type="button"
           variant={activeTab === tab.value ? 'secondary' : 'ghost'}
-          size={displaySizeConfig.control.buttonSize}
+          size="default"
           className="justify-start"
           aria-current={activeTab === tab.value ? 'page' : undefined}
           onClick={() => onTabChange(tab.value)}

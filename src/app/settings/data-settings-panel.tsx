@@ -4,12 +4,9 @@ import type { ChangeEvent, ReactNode, RefObject } from 'react'
 import { Download, Eraser, RotateCcw, Upload } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
-import type { DisplaySizeConfig } from '@/app/display-size-config'
 import type { DataBusyAction, DestructiveDataAction } from './types'
-import { cn } from '@/lib/utils'
 
 type DataSettingsPanelProps = {
-  displaySizeConfig: DisplaySizeConfig
   importFileInputRef: RefObject<HTMLInputElement | null>
   canUseDataControls: boolean
   busyAction: DataBusyAction | null
@@ -21,7 +18,6 @@ type DataSettingsPanelProps = {
 
 /** Renders deck backup and replacement controls. */
 export function DataSettingsPanel({
-  displaySizeConfig,
   importFileInputRef,
   canUseDataControls,
   busyAction,
@@ -31,7 +27,7 @@ export function DataSettingsPanel({
   onDestructiveDataActionRequest,
 }: DataSettingsPanelProps) {
   return (
-    <div className={cn('max-w-xl', displaySizeConfig.dialog.formClassName)}>
+    <div className="flex max-w-xl flex-col gap-4">
       <input
         ref={importFileInputRef}
         type="file"
@@ -44,7 +40,7 @@ export function DataSettingsPanel({
         <Button
           type="button"
           variant="outline"
-          size={displaySizeConfig.control.buttonSize}
+          size="default"
           className="w-full sm:w-32"
           disabled={!canUseDataControls}
           onClick={onImportRequest}
@@ -58,7 +54,7 @@ export function DataSettingsPanel({
         <Button
           type="button"
           variant="outline"
-          size={displaySizeConfig.control.buttonSize}
+          size="default"
           className="w-full sm:w-32"
           aria-busy={busyAction === 'export'}
           disabled={!canUseDataControls}
@@ -73,7 +69,7 @@ export function DataSettingsPanel({
         <Button
           type="button"
           variant="outline"
-          size={displaySizeConfig.control.buttonSize}
+          size="default"
           className="w-full sm:w-32"
           disabled={!canUseDataControls}
           onClick={() => onDestructiveDataActionRequest('reset')}
@@ -87,7 +83,7 @@ export function DataSettingsPanel({
         <Button
           type="button"
           variant="outline"
-          size={displaySizeConfig.control.buttonSize}
+          size="default"
           className="w-full sm:w-32"
           disabled={!canUseDataControls}
           onClick={() => onDestructiveDataActionRequest('clear')}
@@ -107,7 +103,7 @@ type DataSettingsActionRowProps = {
 
 function DataSettingsActionRow({ title, children }: DataSettingsActionRowProps) {
   return (
-    <div className="flex flex-col gap-3 rounded-md bg-muted/30 px-3 py-3 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex min-h-[3.75rem] flex-col gap-3 rounded-md bg-muted/30 px-3 py-3 sm:flex-row sm:items-center sm:justify-between">
       <p className="min-w-0 text-sm font-medium">{title}</p>
       {children}
     </div>

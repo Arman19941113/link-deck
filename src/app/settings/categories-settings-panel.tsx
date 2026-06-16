@@ -21,8 +21,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { isDefaultCategory } from '@/domain/deck/categories'
-import type { DisplaySizeConfig } from '@/app/display-size-config'
-import { cn } from '@/lib/utils'
 
 type CategorySettingsPanelViewModel = Pick<
   ReturnType<typeof useCategorySettingsViewModel>,
@@ -51,12 +49,11 @@ type CategorySettingsPanelViewModel = Pick<
 >
 
 type CategoriesSettingsPanelProps = {
-  displaySizeConfig: DisplaySizeConfig
   viewModel: CategorySettingsPanelViewModel
 }
 
 /** Renders the local category editor with drag sorting and immediate deletion. */
-export function CategoriesSettingsPanel({ displaySizeConfig, viewModel }: CategoriesSettingsPanelProps) {
+export function CategoriesSettingsPanel({ viewModel }: CategoriesSettingsPanelProps) {
   const {
     categoryRows,
     canDeleteCategory,
@@ -112,19 +109,16 @@ export function CategoriesSettingsPanel({ displaySizeConfig, viewModel }: Catego
   }
 
   return (
-    <div className={displaySizeConfig.dialog.formClassName}>
+    <div className="flex flex-col gap-4">
       <form onSubmit={handleAddCategory}>
         <div className="min-w-0 flex-1">
-          <Label
-            className={cn('sr-only', displaySizeConfig.control.labelClassName)}
-            htmlFor="settings-category-new-name"
-          >
+          <Label className="sr-only text-sm" htmlFor="settings-category-new-name">
             New category name
           </Label>
           <Input
             ref={newCategoryNameInputRef}
             id="settings-category-new-name"
-            className={displaySizeConfig.control.inputClassName}
+            className="h-11 rounded-md px-3 text-base md:text-sm"
             value={newCategoryName}
             placeholder="New category name, press Enter to add"
             onChange={event => setNewCategoryName(event.target.value)}
@@ -153,14 +147,10 @@ export function CategoriesSettingsPanel({ displaySizeConfig, viewModel }: Catego
                     key={category.id}
                     category={category}
                     disabled={isEditing}
-                    displaySizeConfig={displaySizeConfig}
                     dragContent={
                       <div className="min-w-0 flex-1">
                         {isEditing ? (
-                          <Label
-                            className={cn('sr-only', displaySizeConfig.control.labelClassName)}
-                            htmlFor={`settings-category-edit-${category.id}`}
-                          >
+                          <Label className="sr-only text-sm" htmlFor={`settings-category-edit-${category.id}`}>
                             Category name
                           </Label>
                         ) : null}
@@ -169,7 +159,7 @@ export function CategoriesSettingsPanel({ displaySizeConfig, viewModel }: Catego
                             ref={editingCategoryNameInputRef}
                             id={`settings-category-edit-${category.id}`}
                             value={editingCategoryName}
-                            className={displaySizeConfig.control.inputClassName}
+                            className="h-11 rounded-md px-3 text-base md:text-sm"
                             onChange={event => setEditingCategoryName(event.target.value)}
                             onKeyDown={event => handleEditCategoryKeyDown(event, category.id)}
                           />
@@ -186,7 +176,7 @@ export function CategoriesSettingsPanel({ displaySizeConfig, viewModel }: Catego
                           <Button
                             type="button"
                             variant="ghost"
-                            size={displaySizeConfig.control.iconButtonSize}
+                            size="icon-sm"
                             tabIndex={CATEGORY_PANEL_CONTROL_TAB_INDEX}
                             aria-label="Cancel rename"
                             onClick={cancelRename}
@@ -196,7 +186,7 @@ export function CategoriesSettingsPanel({ displaySizeConfig, viewModel }: Catego
                           <Button
                             type="button"
                             variant="ghost"
-                            size={displaySizeConfig.control.iconButtonSize}
+                            size="icon-sm"
                             tabIndex={CATEGORY_PANEL_CONTROL_TAB_INDEX}
                             aria-label={`Save ${category.name}`}
                             onClick={() => handleRename(category.id)}
@@ -210,7 +200,7 @@ export function CategoriesSettingsPanel({ displaySizeConfig, viewModel }: Catego
                             <Button
                               type="button"
                               variant="ghost"
-                              size={displaySizeConfig.control.iconButtonSize}
+                              size="icon-sm"
                               disabled={!canDeleteCategory}
                               tabIndex={CATEGORY_PANEL_CONTROL_TAB_INDEX}
                               aria-label={
@@ -224,7 +214,7 @@ export function CategoriesSettingsPanel({ displaySizeConfig, viewModel }: Catego
                           <Button
                             type="button"
                             variant="ghost"
-                            size={displaySizeConfig.control.iconButtonSize}
+                            size="icon-sm"
                             tabIndex={CATEGORY_PANEL_CONTROL_TAB_INDEX}
                             aria-label={`Rename ${category.name}`}
                             onClick={() => startRename(category)}
@@ -248,7 +238,7 @@ export function CategoriesSettingsPanel({ displaySizeConfig, viewModel }: Catego
                     width: draggedCategoryWidth ?? undefined,
                   }}
                 >
-                  <CategoryDragOverlayRow category={draggedCategory} displaySizeConfig={displaySizeConfig} />
+                  <CategoryDragOverlayRow category={draggedCategory} />
                 </div>
               ) : null}
             </DragOverlay>,

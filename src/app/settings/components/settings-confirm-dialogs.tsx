@@ -12,7 +12,6 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import type { DisplaySizeConfig } from '@/app/display-size-config'
 import type { DeleteCategoryLinksStrategy } from '@/domain/deck/category-delete-changes'
 import { cn } from '@/lib/utils'
 import type { useCategorySettingsViewModel } from '../hooks/use-category-settings-view-model'
@@ -23,7 +22,6 @@ type CategorySettingsViewModel = ReturnType<typeof useCategorySettingsViewModel>
 
 type DestructiveDataActionConfirmDialogProps = {
   busyAction: DataBusyAction | null
-  displaySizeConfig: DisplaySizeConfig
   isBusy: boolean
   onConfirm: () => void
   onOpenChange: (open: boolean) => void
@@ -32,13 +30,11 @@ type DestructiveDataActionConfirmDialogProps = {
 
 type CategoryDeleteConfirmDialogProps = {
   categorySettingsViewModel: CategorySettingsViewModel
-  displaySizeConfig: DisplaySizeConfig
 }
 
 /** Renders the reset and clear-data confirmation dialog. */
 export function DestructiveDataActionConfirmDialog({
   busyAction,
-  displaySizeConfig,
   isBusy,
   onConfirm,
   onOpenChange,
@@ -46,24 +42,24 @@ export function DestructiveDataActionConfirmDialog({
 }: DestructiveDataActionConfirmDialogProps) {
   return (
     <AlertDialog open={pendingDestructiveDataAction !== null} onOpenChange={onOpenChange}>
-      <AlertDialogContent size="default" className={displaySizeConfig.dialog.contentClassName}>
-        <AlertDialogHeader className={displaySizeConfig.dialog.headerClassName}>
-          <AlertDialogTitle className={displaySizeConfig.dialog.titleClassName}>
+      <AlertDialogContent size="default" className="max-h-[calc(100svh-2rem)] gap-4 p-6 sm:max-w-xl">
+        <AlertDialogHeader className="gap-2">
+          <AlertDialogTitle className="text-lg leading-none font-semibold">
             {pendingDestructiveDataAction === 'reset' ? 'Reset to default data?' : 'Clear all data?'}
           </AlertDialogTitle>
-          <AlertDialogDescription className={displaySizeConfig.dialog.descriptionClassName}>
+          <AlertDialogDescription className="text-sm text-muted-foreground">
             {pendingDestructiveDataAction === 'reset'
               ? 'This will replace all current links, categories, local icons, and settings with the built-in default data.'
               : 'This will delete all links, local icons, and custom categories. One default category will remain.'}
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter className={displaySizeConfig.dialog.footerClassName}>
-          <AlertDialogCancel size={displaySizeConfig.control.buttonSize} disabled={isBusy}>
+        <AlertDialogFooter className="gap-2">
+          <AlertDialogCancel size="default" disabled={isBusy}>
             Cancel
           </AlertDialogCancel>
           <AlertDialogAction
             variant="destructive"
-            size={displaySizeConfig.control.buttonSize}
+            size="default"
             disabled={isBusy}
             onClick={event => {
               event.preventDefault()
@@ -85,10 +81,7 @@ export function DestructiveDataActionConfirmDialog({
 }
 
 /** Renders the category deletion dialog and optional link-handling controls. */
-export function CategoryDeleteConfirmDialog({
-  categorySettingsViewModel,
-  displaySizeConfig,
-}: CategoryDeleteConfirmDialogProps) {
+export function CategoryDeleteConfirmDialog({ categorySettingsViewModel }: CategoryDeleteConfirmDialogProps) {
   return (
     <AlertDialog
       open={categorySettingsViewModel.pendingDeleteCategory !== null}
@@ -98,12 +91,12 @@ export function CategoryDeleteConfirmDialog({
         }
       }}
     >
-      <AlertDialogContent size="default" className={displaySizeConfig.dialog.contentClassName}>
-        <AlertDialogHeader className={displaySizeConfig.dialog.headerClassName}>
-          <AlertDialogTitle className={displaySizeConfig.dialog.titleClassName}>
+      <AlertDialogContent size="default" className="max-h-[calc(100svh-2rem)] gap-4 p-6 sm:max-w-xl">
+        <AlertDialogHeader className="gap-2">
+          <AlertDialogTitle className="text-lg leading-none font-semibold">
             Delete "{categorySettingsViewModel.pendingDeleteCategory?.name}"?
           </AlertDialogTitle>
-          <AlertDialogDescription className={displaySizeConfig.dialog.descriptionClassName}>
+          <AlertDialogDescription className="text-sm text-muted-foreground">
             {categorySettingsViewModel.pendingDeleteLinkCount > 0
               ? `This category contains ${categorySettingsViewModel.pendingDeleteLinkCount} links. Choose what should happen to them before deleting.`
               : 'This category will be removed immediately.'}
@@ -111,9 +104,9 @@ export function CategoryDeleteConfirmDialog({
         </AlertDialogHeader>
 
         {categorySettingsViewModel.pendingDeleteCategory && categorySettingsViewModel.pendingDeleteLinkCount > 0 ? (
-          <div className={displaySizeConfig.dialog.gridClassName}>
-            <div className={displaySizeConfig.dialog.fieldClassName}>
-              <Label htmlFor="settings-category-delete-mode" className={displaySizeConfig.control.labelClassName}>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="settings-category-delete-mode" className="text-sm">
                 Action
               </Label>
               <Select
@@ -122,7 +115,7 @@ export function CategoryDeleteConfirmDialog({
               >
                 <SelectTrigger
                   id="settings-category-delete-mode"
-                  className={cn('w-full', displaySizeConfig.control.inputClassName)}
+                  className={cn('h-11 w-full rounded-md px-3 text-base md:text-sm')}
                 >
                   <SelectValue />
                 </SelectTrigger>
@@ -136,8 +129,8 @@ export function CategoryDeleteConfirmDialog({
             </div>
 
             {categorySettingsViewModel.deleteMode === 'move-links' ? (
-              <div className={displaySizeConfig.dialog.fieldClassName}>
-                <Label htmlFor="settings-category-delete-target" className={displaySizeConfig.control.labelClassName}>
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="settings-category-delete-target" className="text-sm">
                   Move links to
                 </Label>
                 <Select
@@ -146,7 +139,7 @@ export function CategoryDeleteConfirmDialog({
                 >
                   <SelectTrigger
                     id="settings-category-delete-target"
-                    className={cn('w-full', displaySizeConfig.control.inputClassName)}
+                    className={cn('h-11 w-full rounded-md px-3 text-base md:text-sm')}
                     aria-invalid={
                       !categorySettingsViewModel.deleteTargetCategoryId && Boolean(categorySettingsViewModel.error)
                     }
@@ -168,11 +161,11 @@ export function CategoryDeleteConfirmDialog({
           </div>
         ) : null}
 
-        <AlertDialogFooter className={displaySizeConfig.dialog.footerClassName}>
-          <AlertDialogCancel size={displaySizeConfig.control.buttonSize}>Cancel</AlertDialogCancel>
+        <AlertDialogFooter className="gap-2">
+          <AlertDialogCancel size="default">Cancel</AlertDialogCancel>
           <AlertDialogAction
             variant="destructive"
-            size={displaySizeConfig.control.buttonSize}
+            size="default"
             onClick={event => {
               event.preventDefault()
               void categorySettingsViewModel.confirmPendingDelete()

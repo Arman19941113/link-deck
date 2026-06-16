@@ -42,8 +42,6 @@ export type DisplaySizeConfig = {
     fieldClassName: string
     gridClassName: string
     footerClassName: string
-    rowClassName: string
-    rowActionsClassName: string
   }
   card: {
     minColumnWidth: string
@@ -104,8 +102,6 @@ const DISPLAY_SIZE_CONFIG: Record<DisplaySize, DisplaySizeConfig> = {
       fieldClassName: 'flex flex-col gap-1.5',
       gridClassName: 'grid gap-3 sm:grid-cols-2',
       footerClassName: 'gap-1.5',
-      rowClassName: 'flex h-10 items-center rounded-md border bg-card',
-      rowActionsClassName: 'flex w-18 shrink-0 items-center justify-end gap-1.5 p-1.5 pl-0',
     },
     card: {
       minColumnWidth: '13rem',
@@ -158,8 +154,6 @@ const DISPLAY_SIZE_CONFIG: Record<DisplaySize, DisplaySizeConfig> = {
       fieldClassName: 'flex flex-col gap-2',
       gridClassName: 'grid gap-4 sm:grid-cols-2',
       footerClassName: 'gap-2',
-      rowClassName: 'flex h-12 items-center rounded-md border bg-card',
-      rowActionsClassName: 'flex w-20 shrink-0 items-center justify-end gap-2 p-2 pl-0',
     },
     card: {
       minColumnWidth: '17.75rem',
@@ -212,8 +206,6 @@ const DISPLAY_SIZE_CONFIG: Record<DisplaySize, DisplaySizeConfig> = {
       fieldClassName: 'flex flex-col gap-2.5',
       gridClassName: 'grid gap-5 sm:grid-cols-2',
       footerClassName: 'gap-2.5',
-      rowClassName: 'flex h-14 items-center rounded-md border bg-card',
-      rowActionsClassName: 'flex w-24 shrink-0 items-center justify-end gap-2 p-2 pl-0',
     },
     card: {
       minColumnWidth: '22rem',

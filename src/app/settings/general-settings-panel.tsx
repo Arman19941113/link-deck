@@ -4,7 +4,6 @@ import { DisplaySizePicker } from './components/display-size-picker'
 import { ThemePicker } from './components/theme-picker'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import type { DisplaySizeConfig } from '@/app/display-size-config'
 import type { SortMode } from '@/domain/deck/types'
 import type { ThemePreference } from '@/domain/settings/theme'
 import type { DisplaySize } from '@/domain/settings/types'
@@ -12,7 +11,6 @@ import type { SettingsLanguage } from './types'
 import { cn } from '@/lib/utils'
 
 type GeneralSettingsPanelProps = {
-  displaySizeConfig: DisplaySizeConfig
   displaySize: DisplaySize
   sortMode: SortMode
   themePreference: ThemePreference
@@ -34,7 +32,6 @@ const LANGUAGE_LABELS: Record<SettingsLanguage, string> = {
 
 /** Renders general preferences that apply immediately. */
 export function GeneralSettingsPanel({
-  displaySizeConfig,
   displaySize,
   sortMode,
   themePreference,
@@ -45,17 +42,17 @@ export function GeneralSettingsPanel({
   onLanguageChange,
 }: GeneralSettingsPanelProps) {
   return (
-    <div className={cn('max-w-none', displaySizeConfig.dialog.formClassName)}>
-      <div className={displaySizeConfig.dialog.fieldClassName}>
+    <div className="flex max-w-none flex-col gap-4">
+      <div className="flex flex-col gap-2">
         <ThemePicker value={themePreference} onChange={onThemePreferenceChange} />
       </div>
 
-      <div className={displaySizeConfig.dialog.fieldClassName}>
+      <div className="flex flex-col gap-2">
         <DisplaySizePicker value={displaySize} onChange={onDisplaySizeChange} />
       </div>
 
-      <div className={displaySizeConfig.dialog.fieldClassName}>
-        <Label htmlFor="settings-link-order" className={displaySizeConfig.control.labelClassName}>
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="settings-link-order" className="text-sm">
           Link order
         </Label>
         <Select
@@ -66,7 +63,7 @@ export function GeneralSettingsPanel({
         >
           <SelectTrigger
             id="settings-link-order"
-            className={cn('w-full bg-card', displaySizeConfig.control.inputClassName)}
+            className={cn('h-11 w-full rounded-md bg-card px-3 text-base md:text-sm')}
           >
             <SelectValue placeholder="Select a link order">{SORT_LABELS[sortMode]}</SelectValue>
           </SelectTrigger>
@@ -82,14 +79,14 @@ export function GeneralSettingsPanel({
         </Select>
       </div>
 
-      <div className={displaySizeConfig.dialog.fieldClassName}>
-        <Label htmlFor="settings-language" className={displaySizeConfig.control.labelClassName}>
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="settings-language" className="text-sm">
           Language
         </Label>
         <Select value={language} disabled onValueChange={value => onLanguageChange(value as SettingsLanguage)}>
           <SelectTrigger
             id="settings-language"
-            className={cn('w-full bg-card', displaySizeConfig.control.inputClassName)}
+            className={cn('h-11 w-full rounded-md bg-card px-3 text-base md:text-sm')}
           >
             <SelectValue placeholder="Select a language">{LANGUAGE_LABELS[language]}</SelectValue>
           </SelectTrigger>

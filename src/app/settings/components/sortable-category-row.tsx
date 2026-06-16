@@ -6,7 +6,6 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 
 import type { Category } from '@/domain/deck/types'
-import type { DisplaySizeConfig } from '@/app/display-size-config'
 import { cn } from '@/lib/utils'
 
 export const CATEGORY_PANEL_CONTROL_TAB_INDEX = -1
@@ -16,17 +15,10 @@ type SortableCategoryRowProps = {
   category: Category
   disabled: boolean
   dragContent: ReactNode
-  displaySizeConfig: DisplaySizeConfig
 }
 
 /** Adds a full-row drag area to category rows while keeping right-side action buttons independent. */
-export function SortableCategoryRow({
-  actions,
-  category,
-  disabled,
-  dragContent,
-  displaySizeConfig,
-}: SortableCategoryRowProps) {
+export function SortableCategoryRow({ actions, category, disabled, dragContent }: SortableCategoryRowProps) {
   const { attributes, isDragging, listeners, setActivatorNodeRef, setNodeRef, transform, transition } = useSortable({
     id: category.id,
     data: {
@@ -51,7 +43,7 @@ export function SortableCategoryRow({
     <div
       ref={setNodeRef}
       style={style}
-      className={cn(displaySizeConfig.dialog.rowClassName, isDragging && 'invisible')}
+      className={cn('flex h-12 items-center rounded-md border bg-card', isDragging && 'invisible')}
     >
       <div
         ref={setActivatorNodeRef}
@@ -65,7 +57,7 @@ export function SortableCategoryRow({
         {dragContent}
       </div>
 
-      <div className={displaySizeConfig.dialog.rowActionsClassName}>{actions}</div>
+      <div className="flex w-20 shrink-0 items-center justify-end gap-2 p-2 pl-0">{actions}</div>
     </div>
   )
 }
