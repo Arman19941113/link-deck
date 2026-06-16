@@ -10,7 +10,6 @@ import { useImmediateSetting } from './hooks/use-immediate-setting'
 import { SETTINGS_TABS, useSettingsTabNavigation } from './hooks/use-settings-tab-navigation'
 import { useSettingsError } from './hooks/use-settings-error'
 import { useSettingsBackupActions } from './hooks/use-settings-backup-actions'
-import { LinksSettingsPanel } from './links-settings-panel'
 import { CategoryDeleteConfirmDialog, DestructiveDataActionConfirmDialog } from './components/settings-confirm-dialogs'
 import { ShortcutsSettingsPanel } from './shortcuts-settings-panel'
 import type { DataBusyAction, SettingsLanguage, SettingsTab } from './types'
@@ -121,21 +120,13 @@ export function SettingsDialogController({
         <GeneralSettingsPanel
           displaySizeConfig={displaySizeConfig}
           displaySize={localDisplaySize}
+          sortMode={localSortMode}
           themePreference={localThemePreference}
           language={language}
           onDisplaySizeChange={handleDisplaySizeChange}
+          onSortModeChange={handleSortModeChange}
           onThemePreferenceChange={handleThemePreferenceChange}
           onLanguageChange={setLanguage}
-        />
-      )
-    }
-
-    if (activeTab === 'links') {
-      return (
-        <LinksSettingsPanel
-          displaySizeConfig={displaySizeConfig}
-          sortMode={localSortMode}
-          onSortModeChange={handleSortModeChange}
         />
       )
     }

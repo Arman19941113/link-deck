@@ -1,7 +1,6 @@
 // Defines navigation domain models shared by storage and UI layers.
 
 import type { SavedLinkIcon } from './icon-types'
-import type { DisplaySize } from '@/domain/settings/types'
 
 export type { SavedLinkIcon } from './icon-types'
 
@@ -50,14 +49,8 @@ export interface DeckDocument {
   updatedAt: string
 }
 
-/** User preferences persisted alongside the deck document. */
-export type DeckPreferences = {
-  displaySize: DisplaySize
-  sortMode: SortMode
-}
-
 /** The full app state loaded from local persistence. */
-export type PersistedAppState = DeckDocument & DeckPreferences
+export type PersistedAppState = DeckDocument
 
 /** A selector output category with its visible saved link list. */
 export interface VisibleCategorySection {

@@ -5,6 +5,7 @@ import { useEffect } from 'react'
 import { getDeckActionErrorMessage } from './deck-action-utils'
 import type { DeckDataSnapshot } from './use-deck-runtime-state'
 import { deckPersistenceService } from '@/services/deck-persistence'
+import { localAppCacheService } from '@/services/local-app-cache'
 
 type UseDeckLifecycleParams = {
   applyLoadedDeckSnapshot: (deck: DeckDataSnapshot) => void
@@ -25,7 +26,11 @@ export function useDeckLifecycle({ applyLoadedDeckSnapshot, setError, setInitial
           return
         }
 
-        applyLoadedDeckSnapshot(deck)
+        applyLoadedDeckSnapshot({
+          ...deck,
+          displaySize: localAppCacheService.getDisplaySize(),
+          sortMode: localAppCacheService.getSortMode(),
+        })
         setError(null)
       } catch (loadError) {
         if (!canceled) {

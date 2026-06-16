@@ -8,7 +8,6 @@ export const SETTINGS_TABS: Array<{ value: SettingsTab; label: string }> = [
   { value: 'general', label: 'General' },
   { value: 'data', label: 'Data' },
   { value: 'categories', label: 'Categories' },
-  { value: 'links', label: 'Links' },
   { value: 'shortcuts', label: 'Shortcuts' },
 ]
 

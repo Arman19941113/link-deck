@@ -1,7 +1,7 @@
 // Provides best-effort browser cache operations for startup state and local preferences.
 
 import type { Category, SavedLink, SortMode } from '@/domain/deck/types'
-import { isSortMode } from '@/domain/deck/sort-mode'
+import { DEFAULT_SORT_MODE, isSortMode } from '@/domain/deck/sort-mode'
 import { DEFAULT_DISPLAY_SIZE, isDisplaySize } from '@/domain/settings/display-size'
 import type { DisplaySize } from '@/domain/settings/types'
 import { DEFAULT_THEME_PREFERENCE, isThemePreference, type ThemePreference } from '@/domain/settings/theme'
@@ -10,6 +10,7 @@ import { readLocalStorageJsonOrString, writeLocalStorageJson } from '@/lib/local
 
 const LOCAL_STORAGE_KEY_THEME = 'link-deck.theme'
 const LOCAL_STORAGE_KEY_DISPLAY_SIZE = 'link-deck.display-size'
+const LOCAL_STORAGE_KEY_SORT_MODE = 'link-deck.sort-mode'
 const LOCAL_STORAGE_KEY_STARTUP_DECK_SNAPSHOT = 'link-deck.deck-snapshot'
 const STARTUP_DECK_SNAPSHOT_VERSION = 1
 
@@ -26,15 +27,24 @@ type StartupDeckSnapshot = {
 export const localAppCacheService = {
   getStartupDeckSnapshot,
   getDisplaySize,
+  getSortMode,
   getThemePreference,
   setStartupDeckSnapshot,
   setDisplaySize,
+  setSortMode,
   setThemePreference,
 }
 
 /** Returns the best synchronous initial display size before IndexedDB has opened. */
 function getDisplaySize(): DisplaySize {
   return getDisplaySizeMirror() ?? DEFAULT_DISPLAY_SIZE
+}
+
+/** Reads the saved sort mode from localStorage. */
+function getSortMode(): SortMode {
+  const storedSortMode = readLocalStorageJsonOrString<unknown>(LOCAL_STORAGE_KEY_SORT_MODE)
+
+  return isSortMode(storedSortMode) ? storedSortMode : DEFAULT_SORT_MODE
 }
 
 /** Reads the saved theme preference from localStorage. */
@@ -70,6 +80,11 @@ function setStartupDeckSnapshot(snapshot: Omit<StartupDeckSnapshot, 'version'>):
 /** Saves the current global display size cache. */
 function setDisplaySize(displaySize: DisplaySize): void {
   setDisplaySizeMirror(displaySize)
+}
+
+/** Saves the current link sort mode preference. */
+function setSortMode(sortMode: SortMode): void {
+  writeLocalStorageJson(LOCAL_STORAGE_KEY_SORT_MODE, sortMode)
 }
 
 /** Checks a parsed startup snapshot before using it as initial UI data. */

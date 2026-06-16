@@ -20,6 +20,7 @@ export type DeckRuntimeStore = DeckDataSnapshot & {
 
 type CreateDeckRuntimeStateInput = {
   fallbackDisplaySize: DisplaySize
+  fallbackSortMode: SortMode
   startupSnapshot: DeckDataSnapshot | null
 }
 
@@ -47,13 +48,14 @@ export type DeckRuntimeAction =
 
 export function createDeckRuntimeState({
   fallbackDisplaySize,
+  fallbackSortMode,
   startupSnapshot,
 }: CreateDeckRuntimeStateInput): DeckRuntimeStore {
   return {
     categories: startupSnapshot?.categories ?? [],
     links: startupSnapshot?.links ?? [],
     displaySize: startupSnapshot?.displaySize ?? fallbackDisplaySize,
-    sortMode: startupSnapshot?.sortMode ?? 'manual',
+    sortMode: startupSnapshot?.sortMode ?? fallbackSortMode,
     query: '',
     initialized: Boolean(startupSnapshot),
     error: null,

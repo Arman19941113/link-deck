@@ -6,4 +6,4 @@ export type DataBusyAction = DestructiveDataAction | 'export' | 'import'
 
 export type SettingsLanguage = 'en'
 
-export type SettingsTab = 'general' | 'data' | 'categories' | 'links' | 'shortcuts'
+export type SettingsTab = 'general' | 'data' | 'categories' | 'shortcuts'

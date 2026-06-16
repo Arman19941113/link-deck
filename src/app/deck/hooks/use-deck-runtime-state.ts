@@ -43,6 +43,7 @@ export function useDeckRuntimeState(): DeckRuntimeStateApi {
     deckRuntimeReducer,
     {
       fallbackDisplaySize: localAppCacheService.getDisplaySize(),
+      fallbackSortMode: localAppCacheService.getSortMode(),
       startupSnapshot,
     },
     createDeckRuntimeState,
@@ -111,7 +112,6 @@ export function useDeckRuntimeState(): DeckRuntimeStateApi {
       syncDeckDataRefs(deck)
       dispatch({ type: 'apply-loaded-deck-snapshot', deck })
       saveDeckDataSnapshot(deck)
-      localAppCacheService.setDisplaySize(deck.displaySize)
     },
     [saveDeckDataSnapshot, syncDeckDataRefs],
   )

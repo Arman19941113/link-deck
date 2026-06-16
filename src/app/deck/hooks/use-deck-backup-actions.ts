@@ -8,7 +8,6 @@ import { createDefaultPersistedDeck, createEmptyPersistedDeck } from '@/domain/d
 import { parseDeckBackupPayload, type DeckBackupPayload } from '@/domain/deck/deck-transfer'
 import type { PersistedAppState } from '@/domain/deck/types'
 import { deckPersistenceService } from '@/services/deck-persistence'
-import { localAppCacheService } from '@/services/local-app-cache'
 
 type UseDeckBackupActionsParams = OptimisticDeckCommitter & {
   setError: (error: string | null) => void
@@ -18,23 +17,13 @@ type UseDeckBackupActionsParams = OptimisticDeckCommitter & {
 export function useDeckBackupActions({ commitOptimisticDeckDataPatch, setError }: UseDeckBackupActionsParams) {
   const replaceDeckOptimistically = useCallback(
     (deck: PersistedAppState): void => {
-      localAppCacheService.setDisplaySize(deck.displaySize)
       commitOptimisticDeckDataPatch(
         {
           categories: deck.categories,
           links: deck.links,
-          displaySize: deck.displaySize,
-          sortMode: deck.sortMode,
         },
         async () => {
           await deckPersistenceService.replaceDeck(deck)
-        },
-        {
-          onRollback: rollbackPatch => {
-            if (rollbackPatch.displaySize) {
-              localAppCacheService.setDisplaySize(rollbackPatch.displaySize)
-            }
-          },
         },
       )
     },

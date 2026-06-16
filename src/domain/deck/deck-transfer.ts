@@ -1,11 +1,8 @@
 // Converts Link Deck state to and from a portable JSON backup format.
 
-import { isSortMode } from './sort-mode'
 import { isCategory, isRecord, isSavedLink, isTimestamp } from './deck-guards'
-import { isDisplaySize } from '@/domain/settings/display-size'
 import { blobToDataUrl, dataUrlToBlob } from '@/lib/blob-data-url'
-import type { Category, StoredIconFile, SavedLink, SortMode, PersistedAppState } from './types'
-import type { DisplaySize } from '@/domain/settings/types'
+import type { Category, StoredIconFile, SavedLink, PersistedAppState } from './types'
 
 type ExportedIconFile = Omit<StoredIconFile, 'blob'> & {
   dataUrl: string
@@ -21,8 +18,6 @@ export type DeckBackupPayload = {
     categories: Category[]
     links: SavedLink[]
     iconFiles: ExportedIconFile[]
-    displaySize: DisplaySize
-    sortMode: SortMode
     createdAt: string
     updatedAt: string
   }
@@ -51,8 +46,6 @@ export async function createDeckBackupPayload(deck: PersistedAppState): Promise<
       categories: deck.categories,
       links: deck.links,
       iconFiles,
-      displaySize: deck.displaySize,
-      sortMode: deck.sortMode,
       createdAt: deck.createdAt,
       updatedAt: deck.updatedAt,
     },
@@ -81,8 +74,6 @@ export async function parseDeckBackupPayload(json: string): Promise<PersistedApp
     !Array.isArray(deck.categories) ||
     !Array.isArray(deck.links) ||
     !Array.isArray(deck.iconFiles) ||
-    !isDisplaySize(deck.displaySize) ||
-    !isSortMode(deck.sortMode) ||
     !isTimestamp(deck.createdAt) ||
     !isTimestamp(deck.updatedAt)
   ) {
@@ -145,8 +136,6 @@ export async function parseDeckBackupPayload(json: string): Promise<PersistedApp
     categories,
     links,
     iconFiles,
-    displaySize: deck.displaySize,
-    sortMode: deck.sortMode as SortMode,
     createdAt: deck.createdAt,
     updatedAt: deck.updatedAt,
   }

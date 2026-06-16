@@ -2,15 +2,7 @@
 
 import { openDB, type DBSchema, type StoreKey, type StoreNames, type StoreValue } from 'idb'
 
-import type { Category, SavedLink, SortMode, StoredIconFile } from '@/domain/deck/types'
-import type { DisplaySize } from '@/domain/settings/types'
-
-export type SettingsRecord = {
-  id: 'settings'
-  displaySize?: DisplaySize
-  sortMode: SortMode
-  updatedAt: string
-}
+import type { Category, SavedLink, StoredIconFile } from '@/domain/deck/types'
 
 export interface LinkDeckDb extends DBSchema {
   categories: {
@@ -26,13 +18,7 @@ export interface LinkDeckDb extends DBSchema {
     key: string
     value: StoredIconFile
   }
-  settings: {
-    key: string
-    value: SettingsRecord
-  }
 }
-
-export const SETTINGS_ID: SettingsRecord['id'] = 'settings'
 
 const DATABASE_NAME = 'link-deck'
 const DATABASE_VERSION = 2
@@ -51,10 +37,6 @@ export const dbPromise = openDB<LinkDeckDb>(DATABASE_NAME, DATABASE_VERSION, {
 
     if (!db.objectStoreNames.contains('icons')) {
       db.createObjectStore('icons', { keyPath: 'id' })
-    }
-
-    if (!db.objectStoreNames.contains('settings')) {
-      db.createObjectStore('settings', { keyPath: 'id' })
     }
   },
 })

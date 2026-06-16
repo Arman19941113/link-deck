@@ -3,8 +3,6 @@
 import type { SavedLinkIcon } from './icon-types'
 import type { Category, DeckDocument, PersistedAppState, SavedLink } from './types'
 import { createDefaultCategory } from './categories'
-import { DEFAULT_SORT_MODE } from './sort-mode'
-import { DEFAULT_DISPLAY_SIZE } from '@/domain/settings/display-size'
 
 const DEFAULT_LINK_BUILTIN_ICONS: Record<string, Extract<SavedLinkIcon, { type: 'builtin' }>> = {
   bilibili: {
@@ -243,13 +241,9 @@ export function createDefaultDeck(): DeckDocument {
   }
 }
 
-/** Creates the default persisted deck state with settings attached. */
+/** Creates the default persisted deck state. */
 export function createDefaultPersistedDeck(): PersistedAppState {
-  return {
-    ...createDefaultDeck(),
-    displaySize: DEFAULT_DISPLAY_SIZE,
-    sortMode: DEFAULT_SORT_MODE,
-  }
+  return createDefaultDeck()
 }
 
 /** Creates an empty persisted deck with one usable default category. */
@@ -260,8 +254,6 @@ export function createEmptyPersistedDeck(now = new Date().toISOString()): Persis
     categories: [createDefaultCategory(now)],
     links: [],
     iconFiles: [],
-    displaySize: DEFAULT_DISPLAY_SIZE,
-    sortMode: DEFAULT_SORT_MODE,
     createdAt: now,
     updatedAt: now,
   }
