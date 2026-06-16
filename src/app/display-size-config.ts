@@ -15,6 +15,7 @@ export type DisplaySizeConfig = {
   }
   topBar: {
     className: string
+    iconClassName: string
     titleClassName: string
     actionsClassName: string
   }
@@ -75,6 +76,7 @@ const DISPLAY_SIZE_CONFIG: Record<DisplaySize, DisplaySizeConfig> = {
     },
     topBar: {
       className: 'flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between',
+      iconClassName: 'size-8 rounded-md',
       titleClassName: 'truncate text-xl leading-tight font-medium tracking-normal',
       actionsClassName: 'flex flex-wrap items-center gap-1.5',
     },
@@ -127,6 +129,7 @@ const DISPLAY_SIZE_CONFIG: Record<DisplaySize, DisplaySizeConfig> = {
     },
     topBar: {
       className: 'flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between',
+      iconClassName: 'size-9 rounded-md',
       titleClassName: 'truncate text-2xl leading-tight font-medium tracking-normal',
       actionsClassName: 'flex flex-wrap items-center gap-2',
     },
@@ -179,6 +182,7 @@ const DISPLAY_SIZE_CONFIG: Record<DisplaySize, DisplaySizeConfig> = {
     },
     topBar: {
       className: 'flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between',
+      iconClassName: 'size-10 rounded-md',
       titleClassName: 'truncate text-3xl leading-tight font-medium tracking-normal',
       actionsClassName: 'flex flex-wrap items-center gap-2.5',
     },

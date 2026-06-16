@@ -7,12 +7,15 @@ import { Button } from '@/components/ui/button'
 import type { DisplaySizeConfig } from '@/app/display-size-config'
 import { matchesKeyboardShortcut } from '@/app/keyboard-shortcuts'
 import type { SettingsTab } from '@/app/settings/types'
+import { cn } from '@/lib/utils'
 
 type DeckToolbarProps = {
   displaySizeConfig: DisplaySizeConfig
   onAddLink: () => void
   onOpenSettings: (tab?: SettingsTab) => void
 }
+
+const appIconSrc = `${import.meta.env.BASE_URL}favicon.svg`
 
 /** Shows the app brand and global action area. */
 export function DeckToolbar({ displaySizeConfig, onAddLink, onOpenSettings }: DeckToolbarProps) {
@@ -45,7 +48,13 @@ export function DeckToolbar({ displaySizeConfig, onAddLink, onOpenSettings }: De
 
   return (
     <header className={displaySizeConfig.topBar.className}>
-      <div className="flex min-w-0 flex-col">
+      <div className="flex min-w-0 items-center gap-1">
+        <img
+          src={appIconSrc}
+          alt=""
+          aria-hidden="true"
+          className={cn('shrink-0', displaySizeConfig.topBar.iconClassName)}
+        />
         <h1 className={displaySizeConfig.topBar.titleClassName}>Link Deck</h1>
       </div>
 
