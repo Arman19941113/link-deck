@@ -106,8 +106,8 @@
       "shortcuts": "Shortcuts"
     },
     "general": {
-      "theme": "Theme",
-      "themes": {
+      "themeColor": "Theme color",
+      "themeColors": {
         "auto": "Auto",
         "light": "Light",
         "dark": "Dark"

@@ -106,8 +106,8 @@
       "shortcuts": "快捷键"
     },
     "general": {
-      "theme": "主题",
-      "themes": {
+      "themeColor": "主题色",
+      "themeColors": {
         "auto": "跟随系统",
         "light": "浅色",
         "dark": "深色"

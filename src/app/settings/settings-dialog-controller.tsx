@@ -20,7 +20,7 @@ import type { DeleteCategoryLinksStrategy } from '@/domain/deck/category-delete-
 import type { Category, SavedLink, SortMode } from '@/domain/deck/types'
 import type { DesignStylePreference } from '@/domain/settings/design-style'
 import type { AppLanguage } from '@/domain/settings/language'
-import type { ThemePreference } from '@/domain/settings/theme'
+import type { ThemeColorPreference } from '@/domain/settings/theme-color'
 import type { DisplaySize } from '@/domain/settings/types'
 
 export type SettingsDialogControllerProps = {
@@ -30,14 +30,14 @@ export type SettingsDialogControllerProps = {
   displaySize: DisplaySize
   designStylePreference: DesignStylePreference
   sortMode: SortMode
-  themePreference: ThemePreference
+  themeColorPreference: ThemeColorPreference
   language: AppLanguage
   onOpenChange: (open: boolean) => void
   onDisplaySizeChange: (displaySize: DisplaySize) => void
   onDesignStylePreferenceChange: (designStylePreference: DesignStylePreference) => void
   onLanguageChange: (language: AppLanguage) => void
   onSortModeChange: (sortMode: SortMode) => void
-  onThemePreferenceChange: (themePreference: ThemePreference) => void
+  onThemeColorPreferenceChange: (themeColorPreference: ThemeColorPreference) => void
   addCategory: (name: string) => Promise<Category>
   renameCategory: (categoryId: string, name: string) => Promise<void>
   deleteCategory: (categoryId: string, options?: DeleteCategoryLinksStrategy) => Promise<void>
@@ -56,14 +56,14 @@ export function SettingsDialogController({
   displaySize,
   designStylePreference,
   sortMode,
-  themePreference,
+  themeColorPreference,
   language,
   onOpenChange,
   onDisplaySizeChange,
   onDesignStylePreferenceChange,
   onLanguageChange,
   onSortModeChange,
-  onThemePreferenceChange,
+  onThemeColorPreferenceChange,
   addCategory,
   renameCategory,
   deleteCategory,
@@ -88,9 +88,9 @@ export function SettingsDialogController({
     onDesignStylePreferenceChange,
   )
   const [localSortMode, handleSortModeChange] = useImmediateSetting(sortMode, onSortModeChange)
-  const [localThemePreference, handleThemePreferenceChange] = useImmediateSetting(
-    themePreference,
-    onThemePreferenceChange,
+  const [localThemeColorPreference, handleThemeColorPreferenceChange] = useImmediateSetting(
+    themeColorPreference,
+    onThemeColorPreferenceChange,
   )
   const settingsError = useSettingsError()
   const isBusy = busyAction !== null
@@ -134,12 +134,12 @@ export function SettingsDialogController({
           displaySize={localDisplaySize}
           designStylePreference={localDesignStylePreference}
           sortMode={localSortMode}
-          themePreference={localThemePreference}
+          themeColorPreference={localThemeColorPreference}
           language={language}
           onDisplaySizeChange={handleDisplaySizeChange}
           onDesignStylePreferenceChange={handleDesignStylePreferenceChange}
           onSortModeChange={handleSortModeChange}
-          onThemePreferenceChange={handleThemePreferenceChange}
+          onThemeColorPreferenceChange={handleThemeColorPreferenceChange}
           onLanguageChange={onLanguageChange}
         />
       )

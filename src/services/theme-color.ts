@@ -1,10 +1,10 @@
 import {
   COLOR_SCHEME_MEDIA_QUERY,
   THEME_COLOR_BY_RESOLVED_THEME,
-  resolveThemePreference,
-  type ThemePreference,
-  type ResolvedTheme,
-} from '@/domain/settings/theme'
+  resolveThemeColorPreference,
+  type ResolvedThemeColor,
+  type ThemeColorPreference,
+} from '@/domain/settings/theme-color'
 import {
   DEFAULT_DESIGN_STYLE_PREFERENCE,
   DESIGN_STYLE_ASSETS,
@@ -12,22 +12,22 @@ import {
   type DesignStylePreference,
 } from '@/domain/settings/design-style'
 
-const PRISM_THEME_COLOR_BY_RESOLVED_THEME: Record<ResolvedTheme, string> = {
+const PRISM_THEME_COLOR_BY_RESOLVED_THEME: Record<ResolvedThemeColor, string> = {
   light: '#f6f6f6',
   dark: '#242424',
 }
 
-/** Applies the selected or system-resolved theme to the document root. */
-export function applyThemePreference(themePreference: ThemePreference): ResolvedTheme {
-  return applyAppearancePreference(themePreference, getAppliedDesignStylePreference())
+/** Applies the selected or system-resolved theme color mode to the document root. */
+export function applyThemeColorPreference(themeColorPreference: ThemeColorPreference): ResolvedThemeColor {
+  return applyAppearancePreference(themeColorPreference, getAppliedDesignStylePreference())
 }
 
-/** Applies the selected style and selected or system-resolved theme to the document root. */
+/** Applies the selected style and selected or system-resolved theme color mode to the document root. */
 export function applyAppearancePreference(
-  themePreference: ThemePreference,
+  themeColorPreference: ThemeColorPreference,
   designStylePreference: DesignStylePreference,
-): ResolvedTheme {
-  const resolvedTheme = resolveThemePreference(themePreference, prefersDarkColorScheme())
+): ResolvedThemeColor {
+  const resolvedTheme = resolveThemeColorPreference(themeColorPreference, prefersDarkColorScheme())
 
   if (typeof document === 'undefined') {
     return resolvedTheme
@@ -36,7 +36,7 @@ export function applyAppearancePreference(
   const root = document.documentElement
 
   root.classList.toggle('dark', resolvedTheme === 'dark')
-  root.dataset.theme = themePreference
+  root.dataset.themeColor = themeColorPreference
   root.dataset.designStyle = designStylePreference
   root.style.colorScheme = resolvedTheme
   updateThemeColor(resolvedTheme, designStylePreference)
@@ -46,8 +46,11 @@ export function applyAppearancePreference(
 }
 
 /** Watches the system color scheme only when the app is set to Auto. */
-export function subscribeThemePreference(themePreference: ThemePreference, onChange: () => void): () => void {
-  if (themePreference !== 'auto' || typeof window === 'undefined' || !window.matchMedia) {
+export function subscribeThemeColorPreference(
+  themeColorPreference: ThemeColorPreference,
+  onChange: () => void,
+): () => void {
+  if (themeColorPreference !== 'auto' || typeof window === 'undefined' || !window.matchMedia) {
     return () => undefined
   }
 
@@ -77,7 +80,7 @@ function getAppliedDesignStylePreference(): DesignStylePreference {
 }
 
 /** Keeps browser chrome color aligned with the rendered app theme. */
-function updateThemeColor(resolvedTheme: ResolvedTheme, designStylePreference: DesignStylePreference): void {
+function updateThemeColor(resolvedTheme: ResolvedThemeColor, designStylePreference: DesignStylePreference): void {
   const themeColor = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')
 
   if (!themeColor) {

@@ -1,17 +1,17 @@
-// General settings panel for display, theme, and language preferences.
+// General settings panel for display, theme color, and language preferences.
 
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { DisplaySizePicker } from './components/display-size-picker'
 import { StylePicker } from './components/style-picker'
-import { ThemePicker } from './components/theme-picker'
+import { ThemeColorPicker } from './components/theme-color-picker'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import type { SortMode } from '@/domain/deck/types'
 import type { DesignStylePreference } from '@/domain/settings/design-style'
 import { SUPPORTED_LANGUAGES, type AppLanguage } from '@/domain/settings/language'
-import type { ThemePreference } from '@/domain/settings/theme'
+import type { ThemeColorPreference } from '@/domain/settings/theme-color'
 import type { DisplaySize } from '@/domain/settings/types'
 import { cn } from '@/lib/utils'
 
@@ -19,12 +19,12 @@ type GeneralSettingsPanelProps = {
   displaySize: DisplaySize
   designStylePreference: DesignStylePreference
   sortMode: SortMode
-  themePreference: ThemePreference
+  themeColorPreference: ThemeColorPreference
   language: AppLanguage
   onDisplaySizeChange: (displaySize: DisplaySize) => void
   onDesignStylePreferenceChange: (designStylePreference: DesignStylePreference) => void
   onSortModeChange: (sortMode: SortMode) => void
-  onThemePreferenceChange: (themePreference: ThemePreference) => void
+  onThemeColorPreferenceChange: (themeColorPreference: ThemeColorPreference) => void
   onLanguageChange: (language: AppLanguage) => void
 }
 
@@ -33,12 +33,12 @@ export function GeneralSettingsPanel({
   displaySize,
   designStylePreference,
   sortMode,
-  themePreference,
+  themeColorPreference,
   language,
   onDisplaySizeChange,
   onDesignStylePreferenceChange,
   onSortModeChange,
-  onThemePreferenceChange,
+  onThemeColorPreferenceChange,
   onLanguageChange,
 }: GeneralSettingsPanelProps) {
   const { t } = useTranslation()
@@ -54,7 +54,7 @@ export function GeneralSettingsPanel({
   return (
     <div className="flex max-w-none flex-col gap-4">
       <div className="flex flex-col gap-2">
-        <ThemePicker value={themePreference} onChange={onThemePreferenceChange} />
+        <ThemeColorPicker value={themeColorPreference} onChange={onThemeColorPreferenceChange} />
       </div>
 
       <div className="flex flex-col gap-2">

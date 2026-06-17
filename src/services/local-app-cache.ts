@@ -8,13 +8,17 @@ import {
   isDesignStylePreference,
   type DesignStylePreference,
 } from '@/domain/settings/design-style'
+import {
+  DEFAULT_THEME_COLOR_PREFERENCE,
+  isThemeColorPreference,
+  type ThemeColorPreference,
+} from '@/domain/settings/theme-color'
 import type { DisplaySize } from '@/domain/settings/types'
-import { DEFAULT_THEME_PREFERENCE, isThemePreference, type ThemePreference } from '@/domain/settings/theme'
 import { isAppLanguage, type AppLanguage } from '@/domain/settings/language'
 import { isCategory, isRecord, isSavedLink } from '@/domain/deck/deck-guards'
 import { readLocalStorageJsonOrString, writeLocalStorageJson } from '@/lib/local-storage'
 
-const LOCAL_STORAGE_KEY_THEME = 'link-deck.theme'
+const LOCAL_STORAGE_KEY_THEME_COLOR = 'link-deck.theme-color'
 const LOCAL_STORAGE_KEY_DESIGN_STYLE = 'link-deck.design-style'
 const LOCAL_STORAGE_KEY_DISPLAY_SIZE = 'link-deck.display-size'
 const LOCAL_STORAGE_KEY_LANGUAGE = 'link-deck.language'
@@ -38,13 +42,13 @@ export const localAppCacheService = {
   getDisplaySize,
   getLanguagePreference,
   getSortMode,
-  getThemePreference,
+  getThemeColorPreference,
   setStartupDeckSnapshot,
   setDesignStylePreference,
   setDisplaySize,
   setLanguagePreference,
   setSortMode,
-  setThemePreference,
+  setThemeColorPreference,
 }
 
 /** Returns the best synchronous initial display size before IndexedDB has opened. */
@@ -59,11 +63,13 @@ function getSortMode(): SortMode {
   return isSortMode(storedSortMode) ? storedSortMode : DEFAULT_SORT_MODE
 }
 
-/** Reads the saved theme preference from localStorage. */
-function getThemePreference(): ThemePreference {
-  const storedThemePreference = readLocalStorageJsonOrString<unknown>(LOCAL_STORAGE_KEY_THEME)
+/** Reads the saved theme color preference from localStorage. */
+function getThemeColorPreference(): ThemeColorPreference {
+  const storedThemeColorPreference = readLocalStorageJsonOrString<unknown>(LOCAL_STORAGE_KEY_THEME_COLOR)
 
-  return isThemePreference(storedThemePreference) ? storedThemePreference : DEFAULT_THEME_PREFERENCE
+  return isThemeColorPreference(storedThemeColorPreference)
+    ? storedThemeColorPreference
+    : DEFAULT_THEME_COLOR_PREFERENCE
 }
 
 /** Reads the saved design style preference from localStorage. */
@@ -82,9 +88,9 @@ function getLanguagePreference(): AppLanguage | null {
   return isAppLanguage(storedLanguagePreference) ? storedLanguagePreference : null
 }
 
-/** Saves the selected theme preference to localStorage. */
-function setThemePreference(themePreference: ThemePreference): void {
-  writeLocalStorageJson(LOCAL_STORAGE_KEY_THEME, themePreference)
+/** Saves the selected theme color preference to localStorage. */
+function setThemeColorPreference(themeColorPreference: ThemeColorPreference): void {
+  writeLocalStorageJson(LOCAL_STORAGE_KEY_THEME_COLOR, themeColorPreference)
 }
 
 /** Saves the selected design style preference to localStorage. */

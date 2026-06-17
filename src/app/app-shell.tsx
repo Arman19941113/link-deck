@@ -8,7 +8,7 @@ import { LinkEditor } from '@/app/deck/components/link-editor'
 import { DeckContainer } from '@/app/deck/deck-container'
 import { useDeckShellViewModel } from '@/app/deck/hooks/use-deck-shell-view-model'
 import { useLanguagePreference } from '@/app/hooks/use-language-preference'
-import { useThemePreference } from '@/app/hooks/use-theme-preference'
+import { useThemeColorPreference } from '@/app/hooks/use-theme-color-preference'
 import { preloadPinyinSearchModule } from '@/domain/deck/pinyin-search-loader'
 import type { SavedLink } from '@/domain/deck/types'
 import { SettingsDialog } from '@/app/settings/settings-dialog'
@@ -24,7 +24,8 @@ export function AppShell() {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [settingsInitialTab, setSettingsInitialTab] = useState<SettingsTab>('general')
   const { language, setLanguage } = useLanguagePreference()
-  const { designStylePreference, setDesignStylePreference, setThemePreference, themePreference } = useThemePreference()
+  const { designStylePreference, setDesignStylePreference, setThemeColorPreference, themeColorPreference } =
+    useThemeColorPreference()
   const {
     categories,
     links,
@@ -159,14 +160,14 @@ export function AppShell() {
         displaySize={displaySize}
         designStylePreference={designStylePreference}
         sortMode={sortMode}
-        themePreference={themePreference}
+        themeColorPreference={themeColorPreference}
         language={language}
         onOpenChange={setSettingsOpen}
         onDisplaySizeChange={setDisplaySize}
         onDesignStylePreferenceChange={setDesignStylePreference}
         onLanguageChange={setLanguage}
         onSortModeChange={setSortMode}
-        onThemePreferenceChange={setThemePreference}
+        onThemeColorPreferenceChange={setThemeColorPreference}
         addCategory={addCategory}
         renameCategory={renameCategory}
         deleteCategory={deleteCategory}
