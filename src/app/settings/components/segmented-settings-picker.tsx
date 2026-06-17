@@ -48,7 +48,7 @@ export function SegmentedSettingsPicker<TValue extends string>({
         aria-labelledby={id}
       >
         <span
-          className="pointer-events-none absolute top-0.5 bottom-0.5 left-0.5 rounded-sm bg-muted shadow-xs transition-transform duration-200 ease-app-hover motion-reduce:transition-none"
+          className="settings-segment-indicator pointer-events-none absolute top-0.5 bottom-0.5 left-0.5 rounded-sm transition-transform duration-200 ease-app-hover motion-reduce:transition-none"
           style={{
             width: `calc((100% - 0.25rem) / ${options.length})`,
             transform: `translateX(${selectedIndex * 100}%)`,
@@ -63,7 +63,7 @@ export function SegmentedSettingsPicker<TValue extends string>({
               key={option.value}
               className={cn(
                 'relative z-10 flex h-full min-w-0 cursor-pointer items-center justify-center gap-2 rounded-sm px-3 text-sm font-medium text-muted-foreground outline-none transition-colors duration-200 ease-app-hover hover:text-foreground has-[input:focus-visible]:ring-[3px] has-[input:focus-visible]:ring-ring/50',
-                isSelected && 'text-foreground',
+                isSelected && 'settings-segment-option-selected',
               )}
               title={option.title}
             >

@@ -16,9 +16,8 @@ type LinkIconProps = {
 }
 
 const AUTO_ICON_TIMEOUT_MS = 3000
-const ICON_TILE_CLASS =
-  'flex shrink-0 items-center justify-center border bg-secondary dark:border-[#6a625a] dark:bg-[#e8e1d8]'
-const ICON_FALLBACK_CLASS = 'font-medium text-secondary-foreground dark:text-[#161513]'
+const ICON_TILE_CLASS = 'app-icon-tile flex shrink-0 items-center justify-center border'
+const ICON_FALLBACK_CLASS = 'app-icon-fallback font-medium'
 
 /** Loads images from link icon settings and shows a text placeholder on failure. */
 export function LinkCardIcon({ link, loadStoredIconFile, imageClassName, wrapperClassName }: LinkIconProps) {

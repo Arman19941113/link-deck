@@ -1,10 +1,12 @@
 // General settings panel for display, theme, and language preferences.
 
 import { DisplaySizePicker } from './components/display-size-picker'
+import { StylePicker } from './components/style-picker'
 import { ThemePicker } from './components/theme-picker'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import type { SortMode } from '@/domain/deck/types'
+import type { DesignStylePreference } from '@/domain/settings/design-style'
 import type { ThemePreference } from '@/domain/settings/theme'
 import type { DisplaySize } from '@/domain/settings/types'
 import type { SettingsLanguage } from './types'
@@ -12,10 +14,12 @@ import { cn } from '@/lib/utils'
 
 type GeneralSettingsPanelProps = {
   displaySize: DisplaySize
+  designStylePreference: DesignStylePreference
   sortMode: SortMode
   themePreference: ThemePreference
   language: SettingsLanguage
   onDisplaySizeChange: (displaySize: DisplaySize) => void
+  onDesignStylePreferenceChange: (designStylePreference: DesignStylePreference) => void
   onSortModeChange: (sortMode: SortMode) => void
   onThemePreferenceChange: (themePreference: ThemePreference) => void
   onLanguageChange: (language: SettingsLanguage) => void
@@ -33,10 +37,12 @@ const LANGUAGE_LABELS: Record<SettingsLanguage, string> = {
 /** Renders general preferences that apply immediately. */
 export function GeneralSettingsPanel({
   displaySize,
+  designStylePreference,
   sortMode,
   themePreference,
   language,
   onDisplaySizeChange,
+  onDesignStylePreferenceChange,
   onSortModeChange,
   onThemePreferenceChange,
   onLanguageChange,
@@ -45,6 +51,10 @@ export function GeneralSettingsPanel({
     <div className="flex max-w-none flex-col gap-4">
       <div className="flex flex-col gap-2">
         <ThemePicker value={themePreference} onChange={onThemePreferenceChange} />
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <StylePicker value={designStylePreference} onChange={onDesignStylePreferenceChange} />
       </div>
 
       <div className="flex flex-col gap-2">

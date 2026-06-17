@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button'
 import { DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import type { DeleteCategoryLinksStrategy } from '@/domain/deck/category-delete-changes'
 import type { Category, SavedLink, SortMode } from '@/domain/deck/types'
+import type { DesignStylePreference } from '@/domain/settings/design-style'
 import type { ThemePreference } from '@/domain/settings/theme'
 import type { DisplaySize } from '@/domain/settings/types'
 
@@ -25,10 +26,12 @@ export type SettingsDialogControllerProps = {
   categories: Category[]
   links: SavedLink[]
   displaySize: DisplaySize
+  designStylePreference: DesignStylePreference
   sortMode: SortMode
   themePreference: ThemePreference
   onOpenChange: (open: boolean) => void
   onDisplaySizeChange: (displaySize: DisplaySize) => void
+  onDesignStylePreferenceChange: (designStylePreference: DesignStylePreference) => void
   onSortModeChange: (sortMode: SortMode) => void
   onThemePreferenceChange: (themePreference: ThemePreference) => void
   addCategory: (name: string) => Promise<Category>
@@ -47,10 +50,12 @@ export function SettingsDialogController({
   categories,
   links,
   displaySize,
+  designStylePreference,
   sortMode,
   themePreference,
   onOpenChange,
   onDisplaySizeChange,
+  onDesignStylePreferenceChange,
   onSortModeChange,
   onThemePreferenceChange,
   addCategory,
@@ -72,6 +77,10 @@ export function SettingsDialogController({
   } = useSettingsTabNavigation(initialTab)
   const [language, setLanguage] = useState<SettingsLanguage>('en')
   const [localDisplaySize, handleDisplaySizeChange] = useImmediateSetting(displaySize, onDisplaySizeChange)
+  const [localDesignStylePreference, handleDesignStylePreferenceChange] = useImmediateSetting(
+    designStylePreference,
+    onDesignStylePreferenceChange,
+  )
   const [localSortMode, handleSortModeChange] = useImmediateSetting(sortMode, onSortModeChange)
   const [localThemePreference, handleThemePreferenceChange] = useImmediateSetting(
     themePreference,
@@ -116,10 +125,12 @@ export function SettingsDialogController({
       return (
         <GeneralSettingsPanel
           displaySize={localDisplaySize}
+          designStylePreference={localDesignStylePreference}
           sortMode={localSortMode}
           themePreference={localThemePreference}
           language={language}
           onDisplaySizeChange={handleDisplaySizeChange}
+          onDesignStylePreferenceChange={handleDesignStylePreferenceChange}
           onSortModeChange={handleSortModeChange}
           onThemePreferenceChange={handleThemePreferenceChange}
           onLanguageChange={setLanguage}
@@ -226,7 +237,7 @@ type SettingsNavigationProps = {
 function SettingsNavigation({ activeTab, onTabButtonRef, onTabChange, onTabKeyDown }: SettingsNavigationProps) {
   return (
     <nav
-      className="flex gap-1 overflow-x-auto border-b bg-muted/40 p-2 sm:flex-col sm:border-r sm:border-b-0"
+      className="settings-nav flex gap-1 overflow-x-auto border-b p-2 sm:flex-col sm:border-r sm:border-b-0"
       aria-label="Settings navigation"
     >
       {SETTINGS_TABS.map(tab => (
@@ -234,9 +245,9 @@ function SettingsNavigation({ activeTab, onTabButtonRef, onTabChange, onTabKeyDo
           key={tab.value}
           ref={node => onTabButtonRef(tab.value, node)}
           type="button"
-          variant={activeTab === tab.value ? 'secondary' : 'ghost'}
+          variant="ghost"
           size="default"
-          className="justify-start"
+          className="settings-nav-item justify-start"
           aria-current={activeTab === tab.value ? 'page' : undefined}
           onClick={() => onTabChange(tab.value)}
           onKeyDown={event => onTabKeyDown(event, tab.value)}

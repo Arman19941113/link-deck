@@ -148,7 +148,7 @@ export function LinkCard({
       ref={cardDragRef}
       {...cardDragAttributes}
       className={cn(
-        'group flex h-full w-full rounded-md border bg-card text-card-foreground outline-none transition-[background-color,border-color,box-shadow,translate] duration-300 ease-app-hover hover:-translate-y-px hover:border-accent/35 hover:bg-card/95 hover:shadow-[0_12px_26px_-20px_rgb(17_17_17/0.45)] focus-within:border-ring/50 focus-within:shadow-sm has-[a:focus-visible]:ring-[3px] has-[a:focus-visible]:ring-ring/50 motion-reduce:hover:translate-y-0 motion-reduce:transition-none dark:hover:shadow-[0_12px_28px_-22px_rgb(0_0_0/0.75)]',
+        'group flex h-full w-full rounded-md border bg-card text-card-foreground outline-none transition-[background-color,border-color,box-shadow,translate] duration-300 ease-app-hover hover:-translate-y-px hover:border-accent/35 hover:bg-card/95 hover:shadow-[var(--app-card-hover-shadow)] focus-within:border-ring/50 focus-within:shadow-sm has-[a:focus-visible]:ring-[3px] has-[a:focus-visible]:ring-ring/50 motion-reduce:hover:translate-y-0 motion-reduce:transition-none',
         cardDragProps && 'cursor-grab touch-none active:cursor-grabbing',
         isDragging && 'border-accent',
       )}

@@ -11,10 +11,12 @@ import type { DeckLinkHandlers, IconFileLoader } from './deck-board-types'
 import type { DisplaySizeConfig } from '@/app/display-size-config'
 import type { SettingsTab } from '@/app/settings/types'
 import type { VisibleCategorySection } from '@/domain/deck/types'
+import type { DesignStylePreference } from '@/domain/settings/design-style'
 import { cn } from '@/lib/utils'
 
 type DeckBoardViewProps = {
   displaySizeConfig: DisplaySizeConfig
+  designStylePreference: DesignStylePreference
   error: string | null
   loadStoredIconFile: IconFileLoader
   hasQuery: boolean
@@ -47,6 +49,7 @@ const linkDragSensors = [
 /** Composes the visible deck area while keeping drag provider setup close to the section list. */
 export function DeckBoardView({
   displaySizeConfig,
+  designStylePreference,
   error,
   loadStoredIconFile,
   hasQuery,
@@ -88,9 +91,10 @@ export function DeckBoardView({
 
   return (
     <>
-      <div className="sticky top-0 z-20 border-b border-border/60 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/85">
+      <div className="app-top-bar sticky top-0 z-20 border-b border-border/60 backdrop-blur">
         <div className={cn(displaySizeConfig.page.className, displaySizeConfig.page.stackClassName, 'min-h-0')}>
           <DeckToolbar
+            designStylePreference={designStylePreference}
             displaySizeConfig={displaySizeConfig}
             onAddLink={onCreateLinkFromToolbar}
             onOpenSettings={onOpenSettings}

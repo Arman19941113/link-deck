@@ -9,10 +9,12 @@ import type { DisplaySizeConfig } from '@/app/display-size-config'
 import type { SettingsTab } from '@/app/settings/types'
 import { selectRenderableSections } from '@/domain/deck/selectors'
 import type { Category, VisibleCategorySection, SavedLink, SortMode } from '@/domain/deck/types'
+import type { DesignStylePreference } from '@/domain/settings/design-style'
 
 type DeckContainerProps = {
   categories: Category[]
   links: SavedLink[]
+  designStylePreference: DesignStylePreference
   displaySizeConfig: DisplaySizeConfig
   error: string | null
   loadStoredIconFile: IconFileLoader
@@ -32,6 +34,7 @@ type DeckContainerProps = {
 export function DeckContainer({
   categories,
   links,
+  designStylePreference,
   displaySizeConfig,
   error,
   loadStoredIconFile,
@@ -70,6 +73,7 @@ export function DeckContainer({
 
   return (
     <DeckBoardView
+      designStylePreference={designStylePreference}
       displaySizeConfig={displaySizeConfig}
       error={error}
       loadStoredIconFile={loadStoredIconFile}

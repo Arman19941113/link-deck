@@ -20,7 +20,7 @@ export function AppShell() {
   const [newLinkDefaultCategoryId, setNewLinkDefaultCategoryId] = useState<string | null>(null)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [settingsInitialTab, setSettingsInitialTab] = useState<SettingsTab>('general')
-  const { setThemePreference, themePreference } = useThemePreference()
+  const { designStylePreference, setDesignStylePreference, setThemePreference, themePreference } = useThemePreference()
   const {
     categories,
     links,
@@ -114,10 +114,11 @@ export function AppShell() {
   }
 
   return (
-    <main className="min-h-svh bg-background text-foreground">
+    <main className="app-surface-root min-h-svh text-foreground">
       <DeckContainer
         categories={categories}
         links={links}
+        designStylePreference={designStylePreference}
         displaySizeConfig={displaySizeConfig}
         error={error}
         loadStoredIconFile={loadStoredIconFile}
@@ -152,10 +153,12 @@ export function AppShell() {
         categories={categories}
         links={links}
         displaySize={displaySize}
+        designStylePreference={designStylePreference}
         sortMode={sortMode}
         themePreference={themePreference}
         onOpenChange={setSettingsOpen}
         onDisplaySizeChange={setDisplaySize}
+        onDesignStylePreferenceChange={setDesignStylePreference}
         onSortModeChange={setSortMode}
         onThemePreferenceChange={setThemePreference}
         addCategory={addCategory}

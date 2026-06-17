@@ -3,12 +3,18 @@
 import type { Category, SavedLink, SortMode } from '@/domain/deck/types'
 import { DEFAULT_SORT_MODE, isSortMode } from '@/domain/deck/sort-mode'
 import { DEFAULT_DISPLAY_SIZE, isDisplaySize } from '@/domain/settings/display-size'
+import {
+  DEFAULT_DESIGN_STYLE_PREFERENCE,
+  isDesignStylePreference,
+  type DesignStylePreference,
+} from '@/domain/settings/design-style'
 import type { DisplaySize } from '@/domain/settings/types'
 import { DEFAULT_THEME_PREFERENCE, isThemePreference, type ThemePreference } from '@/domain/settings/theme'
 import { isCategory, isRecord, isSavedLink } from '@/domain/deck/deck-guards'
 import { readLocalStorageJsonOrString, writeLocalStorageJson } from '@/lib/local-storage'
 
 const LOCAL_STORAGE_KEY_THEME = 'link-deck.theme'
+const LOCAL_STORAGE_KEY_DESIGN_STYLE = 'link-deck.design-style'
 const LOCAL_STORAGE_KEY_DISPLAY_SIZE = 'link-deck.display-size'
 const LOCAL_STORAGE_KEY_SORT_MODE = 'link-deck.sort-mode'
 const LOCAL_STORAGE_KEY_STARTUP_DECK_SNAPSHOT = 'link-deck.deck-snapshot'
@@ -26,10 +32,12 @@ type StartupDeckSnapshot = {
 /** Public localStorage cache operations; IndexedDB persistence belongs in the deck repositories. */
 export const localAppCacheService = {
   getStartupDeckSnapshot,
+  getDesignStylePreference,
   getDisplaySize,
   getSortMode,
   getThemePreference,
   setStartupDeckSnapshot,
+  setDesignStylePreference,
   setDisplaySize,
   setSortMode,
   setThemePreference,
@@ -54,9 +62,23 @@ function getThemePreference(): ThemePreference {
   return isThemePreference(storedThemePreference) ? storedThemePreference : DEFAULT_THEME_PREFERENCE
 }
 
+/** Reads the saved design style preference from localStorage. */
+function getDesignStylePreference(): DesignStylePreference {
+  const storedDesignStylePreference = readLocalStorageJsonOrString<unknown>(LOCAL_STORAGE_KEY_DESIGN_STYLE)
+
+  return isDesignStylePreference(storedDesignStylePreference)
+    ? storedDesignStylePreference
+    : DEFAULT_DESIGN_STYLE_PREFERENCE
+}
+
 /** Saves the selected theme preference to localStorage. */
 function setThemePreference(themePreference: ThemePreference): void {
   writeLocalStorageJson(LOCAL_STORAGE_KEY_THEME, themePreference)
+}
+
+/** Saves the selected design style preference to localStorage. */
+function setDesignStylePreference(designStylePreference: DesignStylePreference): void {
+  writeLocalStorageJson(LOCAL_STORAGE_KEY_DESIGN_STYLE, designStylePreference)
 }
 
 /** Reads the synchronous deck snapshot used to avoid a blank first render on refresh. */

@@ -61,9 +61,24 @@
   --chart-3: #0bdf50;
   --chart-4: #ff2067;
   --chart-5: #03b2cb;
+  --app-background-image: none;
   --app-font-sans: Saans, Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --app-font-mono: SaansMono, "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   --app-hover-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --app-card-hover-shadow: 0 12px 26px -20px rgb(17 17 17 / 0.45);
+  --app-icon-tile-bg: #ebe7e1;
+  --app-icon-tile-border: #d3cec6;
+  --app-icon-tile-fg: #111111;
+  --app-search-bg: var(--card);
+  --app-segment-selected-bg: var(--muted);
+  --app-segment-selected-shadow: 0 1px 2px rgb(0 0 0 / 0.08);
+  --app-settings-nav-active-bg: var(--primary);
+  --app-settings-nav-active-fg: var(--primary-foreground);
+  --app-settings-nav-active-shadow: none;
+  --app-settings-nav-bg: color-mix(in srgb, var(--muted) 40%, transparent);
+  --app-settings-nav-hover-bg: color-mix(in srgb, var(--muted) 72%, var(--card));
+  --app-settings-nav-hover-fg: var(--foreground);
+  --app-top-bar-bg: var(--background);
 }
 
 .dark {
@@ -90,6 +105,103 @@
   --chart-3: #0bdf50;
   --chart-4: #ff2067;
   --chart-5: #03b2cb;
+  --app-background-image: none;
+  --app-card-hover-shadow: 0 12px 28px -22px rgb(0 0 0 / 0.75);
+  --app-icon-tile-bg: #e8e1d8;
+  --app-icon-tile-border: #6a625a;
+  --app-icon-tile-fg: #161513;
+  --app-search-bg: var(--card);
+  --app-segment-selected-bg: var(--muted);
+  --app-segment-selected-shadow: 0 1px 2px rgb(0 0 0 / 0.2);
+  --app-settings-nav-active-bg: var(--primary);
+  --app-settings-nav-active-fg: var(--primary-foreground);
+  --app-settings-nav-active-shadow: none;
+  --app-settings-nav-bg: color-mix(in srgb, var(--muted) 40%, transparent);
+  --app-settings-nav-hover-bg: color-mix(in srgb, var(--muted) 70%, var(--card));
+  --app-settings-nav-hover-fg: var(--foreground);
+  --app-top-bar-bg: var(--background);
+}
+
+[data-design-style="prism"] {
+  --background: #ffffff;
+  --foreground: #111827;
+  --card: #ffffff;
+  --card-foreground: #111827;
+  --popover: #ffffff;
+  --popover-foreground: #111827;
+  --primary: #30343a;
+  --primary-foreground: #ffffff;
+  --secondary: #f7f7f7;
+  --secondary-foreground: #111827;
+  --muted: #f2f2f2;
+  --muted-foreground: #666666;
+  --accent: #30343a;
+  --accent-foreground: #ffffff;
+  --destructive: #dc2626;
+  --border: #e2e2e2;
+  --input: #cfcfcf;
+  --ring: #666666;
+  --chart-1: #30343a;
+  --chart-2: #525252;
+  --chart-3: #737373;
+  --chart-4: #a3a3a3;
+  --chart-5: #d4d4d4;
+  --app-background-image: none;
+  --app-card-hover-shadow: 0 12px 26px -20px rgb(36 36 36 / 0.3);
+  --app-icon-tile-bg: #f6f6f6;
+  --app-icon-tile-border: #e2e2e2;
+  --app-icon-tile-fg: #111827;
+  --app-search-bg: #f6f6f6;
+  --app-segment-selected-bg: #e4e4e4;
+  --app-segment-selected-shadow: 0 1px 3px rgb(36 36 36 / 0.12);
+  --app-settings-nav-active-bg: #30343a;
+  --app-settings-nav-active-fg: #ffffff;
+  --app-settings-nav-active-shadow: 0 10px 20px -16px rgb(36 36 36 / 0.45);
+  --app-settings-nav-bg: #f6f6f6;
+  --app-settings-nav-hover-bg: #e9e9e9;
+  --app-settings-nav-hover-fg: #111827;
+  --app-top-bar-bg: #f6f6f6;
+}
+
+[data-design-style="prism"].dark {
+  --background: #242424;
+  --foreground: #f4f4f5;
+  --card: #2c2c2c;
+  --card-foreground: #f4f4f5;
+  --popover: #303030;
+  --popover-foreground: #f4f4f5;
+  --primary: #d8d8d8;
+  --primary-foreground: #2a2a2a;
+  --secondary: #383838;
+  --secondary-foreground: #f4f4f5;
+  --muted: #383838;
+  --muted-foreground: #b8b8b8;
+  --accent: #d8d8d8;
+  --accent-foreground: #2a2a2a;
+  --destructive: #f87171;
+  --border: #454545;
+  --input: #555555;
+  --ring: #b8b8b8;
+  --chart-1: #d8d8d8;
+  --chart-2: #b8b8b8;
+  --chart-3: #8f8f8f;
+  --chart-4: #6f6f6f;
+  --chart-5: #555555;
+  --app-background-image: none;
+  --app-card-hover-shadow: 0 16px 34px -24px rgb(0 0 0 / 0.72);
+  --app-icon-tile-bg: var(--primary);
+  --app-icon-tile-border: #c6c6c6;
+  --app-icon-tile-fg: var(--primary-foreground);
+  --app-search-bg: #303030;
+  --app-segment-selected-bg: #4a4a4a;
+  --app-segment-selected-shadow: 0 1px 4px rgb(0 0 0 / 0.26);
+  --app-settings-nav-active-bg: #505050;
+  --app-settings-nav-active-fg: #ffffff;
+  --app-settings-nav-active-shadow: 0 10px 22px -18px rgb(0 0 0 / 0.7);
+  --app-settings-nav-bg: #2a2a2a;
+  --app-settings-nav-hover-bg: #3a3a3a;
+  --app-settings-nav-hover-fg: #f4f4f5;
+  --app-top-bar-bg: #2a2a2a;
 }
 
 @layer base {
@@ -98,7 +210,9 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply text-foreground;
+    background-color: var(--background);
+    background-image: var(--app-background-image);
     margin: 0;
     min-width: 64rem;
     min-height: 100svh;
@@ -123,5 +237,59 @@
 
   [data-dnd-placeholder="clone"] {
     opacity: 0.45;
+  }
+
+  .app-surface-root {
+    background-color: var(--background);
+    background-image: var(--app-background-image);
+  }
+
+  .app-top-bar {
+    background-color: color-mix(in srgb, var(--app-top-bar-bg) 95%, transparent);
+  }
+
+  @supports (backdrop-filter: blur(1px)) {
+    .app-top-bar {
+      background-color: color-mix(in srgb, var(--app-top-bar-bg) 85%, transparent);
+    }
+  }
+
+  .app-icon-tile {
+    border-color: var(--app-icon-tile-border);
+    background: var(--app-icon-tile-bg);
+    color: var(--app-icon-tile-fg);
+  }
+
+  .app-icon-fallback {
+    color: var(--app-icon-tile-fg);
+  }
+
+  .settings-segment-indicator {
+    background: var(--app-segment-selected-bg);
+    box-shadow: var(--app-segment-selected-shadow);
+  }
+
+  .settings-segment-option-selected {
+    color: var(--foreground);
+  }
+
+  .settings-nav {
+    background: var(--app-settings-nav-bg);
+  }
+
+  .settings-nav-item[aria-current="page"] {
+    background: var(--app-settings-nav-active-bg);
+    color: var(--app-settings-nav-active-fg);
+    box-shadow: var(--app-settings-nav-active-shadow);
+  }
+
+  .settings-nav-item[aria-current="page"]:hover {
+    background: var(--app-settings-nav-active-bg) !important;
+    color: var(--app-settings-nav-active-fg) !important;
+  }
+
+  .settings-nav-item:not([aria-current="page"]):hover {
+    background: var(--app-settings-nav-hover-bg) !important;
+    color: var(--app-settings-nav-hover-fg) !important;
   }
 }

@@ -71,7 +71,7 @@ export function LinkSearchBox({ value, onChange, onFocus, displaySizeConfig }: L
           aria-keyshortcuts={`${getKeyboardShortcutAriaKeys('search')} ${getKeyboardShortcutAriaKeys('createLink')}`}
           placeholder="Search links, notes, or URLs..."
           className={cn(
-            'bg-card shadow-none',
+            '!bg-[var(--app-search-bg)] shadow-none',
             displaySizeConfig.control.inputClassName,
             displaySizeConfig.control.searchInputClassName,
           )}

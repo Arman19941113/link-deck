@@ -7,18 +7,18 @@ import { Button } from '@/components/ui/button'
 import type { DisplaySizeConfig } from '@/app/display-size-config'
 import { matchesKeyboardShortcut } from '@/app/keyboard-shortcuts'
 import type { SettingsTab } from '@/app/settings/types'
+import { DESIGN_STYLE_ASSETS, type DesignStylePreference } from '@/domain/settings/design-style'
 import { cn } from '@/lib/utils'
 
 type DeckToolbarProps = {
+  designStylePreference: DesignStylePreference
   displaySizeConfig: DisplaySizeConfig
   onAddLink: () => void
   onOpenSettings: (tab?: SettingsTab) => void
 }
 
-const appIconSrc = `${import.meta.env.BASE_URL}favicon.svg`
-
 /** Shows the app brand and global action area. */
-export function DeckToolbar({ displaySizeConfig, onAddLink, onOpenSettings }: DeckToolbarProps) {
+export function DeckToolbar({ designStylePreference, displaySizeConfig, onAddLink, onOpenSettings }: DeckToolbarProps) {
   useEffect(() => {
     function handleTopBarShortcut(event: KeyboardEvent): void {
       if (isModalOpen()) {
@@ -48,9 +48,9 @@ export function DeckToolbar({ displaySizeConfig, onAddLink, onOpenSettings }: De
 
   return (
     <header className={displaySizeConfig.topBar.className}>
-      <div className="flex min-w-0 items-center gap-1">
+      <div className="flex min-w-0 items-center gap-3">
         <img
-          src={appIconSrc}
+          src={`${import.meta.env.BASE_URL}${DESIGN_STYLE_ASSETS[designStylePreference].logo}`}
           alt=""
           aria-hidden="true"
           className={cn('shrink-0', displaySizeConfig.topBar.iconClassName)}
