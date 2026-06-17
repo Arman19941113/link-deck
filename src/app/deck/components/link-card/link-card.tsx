@@ -180,7 +180,7 @@ export function LinkCard({
         />
         <span className={cn('flex min-w-0 flex-1 flex-col', cardConfig.textGapClassName)}>
           <span className={cn('truncate', cardConfig.titleClassName)}>{link.name}</span>
-          <span className={cardConfig.noteClassName}>{link.note || t('deck.linkCard.noNotes')}</span>
+          {link.note ? <span className={cardConfig.noteClassName}>{link.note}</span> : null}
         </span>
       </a>
 

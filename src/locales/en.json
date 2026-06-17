@@ -38,7 +38,6 @@
     "linkCard": {
       "open": "Open {{name}}",
       "moreActions": "More actions for {{name}}",
-      "noNotes": "No notes",
       "edit": "Edit",
       "copyLink": "Copy link",
       "delete": "Delete",
