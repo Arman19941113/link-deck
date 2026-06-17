@@ -69,12 +69,28 @@ export function LinkCardIcon({ link, loadStoredIconFile, imageClassName, wrapper
       return undefined
     }
 
+    const image = new Image()
     const timeoutId = window.setTimeout(() => {
       setFailedImageUrl(resolvedImageUrl)
     }, AUTO_ICON_TIMEOUT_MS)
 
+    image.onload = () => {
+      window.clearTimeout(timeoutId)
+      setLoadedImageUrl(resolvedImageUrl)
+      setFailedImageUrl(currentFailedImageUrl =>
+        currentFailedImageUrl === resolvedImageUrl ? null : currentFailedImageUrl,
+      )
+    }
+    image.onerror = () => {
+      window.clearTimeout(timeoutId)
+      setFailedImageUrl(resolvedImageUrl)
+    }
+    image.src = resolvedImageUrl
+
     return () => {
       window.clearTimeout(timeoutId)
+      image.onload = null
+      image.onerror = null
     }
   }, [icon.type, resolvedImageUrl, loadedImageUrl])
 
@@ -104,8 +120,10 @@ export function LinkCardIcon({ link, loadStoredIconFile, imageClassName, wrapper
   }
 
   const imageFailed = resolvedImageUrl ? failedImageUrl === resolvedImageUrl : false
+  const shouldUseLoadedAutoImage =
+    icon.type === 'auto' && resolvedImageUrl ? loadedImageUrl === resolvedImageUrl && !imageFailed : true
 
-  if (!resolvedImageUrl || imageFailed) {
+  if (!resolvedImageUrl || imageFailed || !shouldUseLoadedAutoImage) {
     return (
       <span
         className={cn(ICON_TILE_CLASS, ICON_FALLBACK_CLASS, wrapperClassName ?? 'size-11 rounded-md text-sm')}

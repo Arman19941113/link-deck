@@ -2,7 +2,7 @@
 
 export type DisplaySize = 'compact' | 'normal' | 'spacious'
 
-export const DEFAULT_DISPLAY_SIZE: DisplaySize = 'normal'
+export const DEFAULT_DISPLAY_SIZE: DisplaySize = 'compact'
 
 const DISPLAY_SIZE_VALUES = new Set<DisplaySize>(['compact', 'normal', 'spacious'])
 

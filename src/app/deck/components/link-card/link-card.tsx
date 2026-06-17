@@ -158,6 +158,8 @@ export function LinkCard({
       <a
         ref={linkActionRef}
         href={link.url}
+        target="_blank"
+        rel="noopener"
         data-link-card-action="true"
         {...{ [LINK_CARD_ID_ATTRIBUTE]: link.id }}
         aria-label={t('deck.linkCard.open', { name: link.name })}

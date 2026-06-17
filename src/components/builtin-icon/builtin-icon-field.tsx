@@ -34,6 +34,7 @@ export function BuiltinIconField({ value, disabled = false, displaySizeConfig, o
   const [pickerOpen, setPickerOpen] = useState(false)
   const [draftIcon, setDraftIcon] = useState<BuiltinIconValue | null>(value)
   const selectedIcon = useMemo(() => (value ? getBuiltinIconMetadata(value) : null), [value])
+  const previewSizeClassNames = getBuiltinIconPreviewSizeClassNames(displaySizeConfig.control.iconButtonSize)
 
   /** Opens the chooser with the current saved draft value. */
   function openPicker(): void {
@@ -73,9 +74,13 @@ export function BuiltinIconField({ value, disabled = false, displaySizeConfig, o
         >
           <span className="flex min-w-0 flex-1 items-center gap-3">
             {selectedIcon ? (
-              <BuiltinIconPreviewTile icon={selectedIcon} className="size-8 rounded-md" iconClassName="size-5" />
+              <BuiltinIconPreviewTile
+                icon={selectedIcon}
+                className={cn(previewSizeClassNames.tile, 'rounded-md')}
+                iconClassName={previewSizeClassNames.icon}
+              />
             ) : (
-              <span className="app-icon-tile size-8 rounded-md border" aria-hidden="true" />
+              <span className={cn('app-icon-tile rounded-md border', previewSizeClassNames.tile)} aria-hidden="true" />
             )}
             <span className="min-w-0">
               <span className="block truncate text-sm font-medium">
@@ -162,4 +167,24 @@ export function BuiltinIconField({ value, disabled = false, displaySizeConfig, o
 /** Returns field button spacing that keeps top, bottom, and right inset balanced. */
 function getBuiltinIconActionInsetClassName(buttonSize: DisplaySizeConfig['control']['buttonSize']) {
   return buttonSize === 'default' ? 'py-1 pr-[3px] pl-3' : 'py-0.5 pr-px pl-3'
+}
+
+function getBuiltinIconPreviewSizeClassNames(iconButtonSize: DisplaySizeConfig['control']['iconButtonSize']) {
+  switch (iconButtonSize) {
+    case 'icon-compact':
+      return {
+        tile: 'size-7',
+        icon: 'size-4',
+      }
+    case 'icon-spacious':
+      return {
+        tile: 'size-10',
+        icon: 'size-6',
+      }
+    case 'icon-sm':
+      return {
+        tile: 'size-8',
+        icon: 'size-5',
+      }
+  }
 }
