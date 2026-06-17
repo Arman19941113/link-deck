@@ -10,6 +10,8 @@ import type { SettingsTab } from '@/app/settings/types'
 import { DESIGN_STYLE_ASSETS, type DesignStylePreference } from '@/domain/settings/design-style'
 import { cn } from '@/lib/utils'
 
+const GITHUB_REPOSITORY_URL = 'https://github.com/Arman19941113/link-deck'
+
 type DeckToolbarProps = {
   designStylePreference: DesignStylePreference
   displaySizeConfig: DisplaySizeConfig
@@ -48,7 +50,13 @@ export function DeckToolbar({ designStylePreference, displaySizeConfig, onAddLin
 
   return (
     <header className={displaySizeConfig.topBar.className}>
-      <div className="flex min-w-0 items-center gap-3">
+      <a
+        href={GITHUB_REPOSITORY_URL}
+        target="_blank"
+        rel="noreferrer"
+        aria-label="Open Link Deck GitHub repository"
+        className="flex min-w-0 items-center gap-3 rounded-md outline-none transition-opacity duration-200 ease-app-hover hover:opacity-80 focus-visible:ring-[3px] focus-visible:ring-ring/50 motion-reduce:transition-none"
+      >
         <img
           src={`${import.meta.env.BASE_URL}${DESIGN_STYLE_ASSETS[designStylePreference].logo}`}
           alt=""
@@ -56,7 +64,7 @@ export function DeckToolbar({ designStylePreference, displaySizeConfig, onAddLin
           className={cn('shrink-0', displaySizeConfig.topBar.iconClassName)}
         />
         <h1 className={displaySizeConfig.topBar.titleClassName}>Link Deck</h1>
-      </div>
+      </a>
 
       <div className={displaySizeConfig.topBar.actionsClassName}>
         <Button
