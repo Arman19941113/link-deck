@@ -69,6 +69,7 @@
   --app-icon-tile-bg: #ebe7e1;
   --app-icon-tile-border: #d3cec6;
   --app-icon-tile-fg: #111111;
+  --app-icon-tile-shadow: none;
   --app-search-bg: var(--card);
   --app-segment-selected-bg: var(--muted);
   --app-segment-selected-shadow: 0 1px 2px rgb(0 0 0 / 0.08);
@@ -110,6 +111,7 @@
   --app-icon-tile-bg: #e8e1d8;
   --app-icon-tile-border: #6a625a;
   --app-icon-tile-fg: #161513;
+  --app-icon-tile-shadow: none;
   --app-search-bg: var(--card);
   --app-segment-selected-bg: var(--muted);
   --app-segment-selected-shadow: 0 1px 2px rgb(0 0 0 / 0.2);
@@ -122,7 +124,7 @@
   --app-top-bar-bg: var(--background);
 }
 
-[data-design-style="prism"] {
+[data-design-style="slate"] {
   --background: #ffffff;
   --foreground: #111827;
   --card: #ffffff;
@@ -151,6 +153,7 @@
   --app-icon-tile-bg: #f6f6f6;
   --app-icon-tile-border: #e2e2e2;
   --app-icon-tile-fg: #111827;
+  --app-icon-tile-shadow: none;
   --app-search-bg: #f6f6f6;
   --app-segment-selected-bg: #e4e4e4;
   --app-segment-selected-shadow: 0 1px 3px rgb(36 36 36 / 0.12);
@@ -163,7 +166,7 @@
   --app-top-bar-bg: #f6f6f6;
 }
 
-[data-design-style="prism"].dark {
+[data-design-style="slate"].dark {
   --background: #242424;
   --foreground: #f4f4f5;
   --card: #2c2c2c;
@@ -192,6 +195,7 @@
   --app-icon-tile-bg: var(--primary);
   --app-icon-tile-border: #c6c6c6;
   --app-icon-tile-fg: var(--primary-foreground);
+  --app-icon-tile-shadow: none;
   --app-search-bg: #303030;
   --app-segment-selected-bg: #4a4a4a;
   --app-segment-selected-shadow: 0 1px 4px rgb(0 0 0 / 0.26);
@@ -202,6 +206,90 @@
   --app-settings-nav-hover-bg: #3a3a3a;
   --app-settings-nav-hover-fg: #f4f4f5;
   --app-top-bar-bg: #2a2a2a;
+}
+
+[data-design-style="cobalt"] {
+  --background: #ffffff;
+  --foreground: #111827;
+  --card: #ffffff;
+  --card-foreground: #111827;
+  --popover: #ffffff;
+  --popover-foreground: #111827;
+  --primary: #1d4ed8;
+  --primary-foreground: #ffffff;
+  --secondary: #f7f9fc;
+  --secondary-foreground: #111827;
+  --muted: #f7f9fc;
+  --muted-foreground: #667085;
+  --accent: #1d4ed8;
+  --accent-foreground: #ffffff;
+  --destructive: #dc2626;
+  --border: #e3e8ef;
+  --input: #d5deea;
+  --ring: #5b8def;
+  --chart-1: #1d4ed8;
+  --chart-2: #5b8def;
+  --chart-3: #38bdf8;
+  --chart-4: #64748b;
+  --chart-5: #111827;
+  --app-background-image: none;
+  --app-card-hover-shadow: 0 14px 30px -22px rgb(29 78 216 / 0.34);
+  --app-icon-tile-bg: #ffffff;
+  --app-icon-tile-border: #d5deea;
+  --app-icon-tile-fg: #1d4ed8;
+  --app-icon-tile-shadow: inset 0 0 0 4px #f2f6ff;
+  --app-search-bg: #ffffff;
+  --app-segment-selected-bg: #eef4ff;
+  --app-segment-selected-shadow: 0 1px 4px rgb(29 78 216 / 0.14);
+  --app-settings-nav-active-bg: #1d4ed8;
+  --app-settings-nav-active-fg: #ffffff;
+  --app-settings-nav-active-shadow: 0 12px 24px -18px rgb(29 78 216 / 0.48);
+  --app-settings-nav-bg: #ffffff;
+  --app-settings-nav-hover-bg: #eef4ff;
+  --app-settings-nav-hover-fg: #111827;
+  --app-top-bar-bg: #ffffff;
+}
+
+[data-design-style="cobalt"].dark {
+  --background: #111827;
+  --foreground: #f8fafc;
+  --card: #1f2937;
+  --card-foreground: #f8fafc;
+  --popover: #253145;
+  --popover-foreground: #f8fafc;
+  --primary: #5b8def;
+  --primary-foreground: #111827;
+  --secondary: #253145;
+  --secondary-foreground: #f8fafc;
+  --muted: #253145;
+  --muted-foreground: #c1cad8;
+  --accent: #5b8def;
+  --accent-foreground: #111827;
+  --destructive: #f87171;
+  --border: #374151;
+  --input: #4b5563;
+  --ring: #93b4f8;
+  --chart-1: #5b8def;
+  --chart-2: #93b4f8;
+  --chart-3: #38bdf8;
+  --chart-4: #c1cad8;
+  --chart-5: #64748b;
+  --app-background-image: none;
+  --app-card-hover-shadow: 0 18px 36px -24px rgb(0 0 0 / 0.78);
+  --app-icon-tile-bg: #1f2937;
+  --app-icon-tile-border: #506074;
+  --app-icon-tile-fg: #93b4f8;
+  --app-icon-tile-shadow: inset 0 0 0 4px #18202c;
+  --app-search-bg: #1f2937;
+  --app-segment-selected-bg: #334155;
+  --app-segment-selected-shadow: 0 1px 5px rgb(0 0 0 / 0.28);
+  --app-settings-nav-active-bg: #5b8def;
+  --app-settings-nav-active-fg: #111827;
+  --app-settings-nav-active-shadow: 0 12px 24px -18px rgb(91 141 239 / 0.55);
+  --app-settings-nav-bg: #172033;
+  --app-settings-nav-hover-bg: #253145;
+  --app-settings-nav-hover-fg: #f8fafc;
+  --app-top-bar-bg: #111827;
 }
 
 @layer base {
@@ -257,6 +345,7 @@
   .app-icon-tile {
     border-color: var(--app-icon-tile-border);
     background: var(--app-icon-tile-bg);
+    box-shadow: var(--app-icon-tile-shadow);
     color: var(--app-icon-tile-fg);
   }
 

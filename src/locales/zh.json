@@ -113,8 +113,9 @@
       },
       "style": "风格",
       "styles": {
-        "editorial": "Editorial",
-        "prism": "Prism"
+        "paper": "纸页",
+        "slate": "石板",
+        "cobalt": "钴蓝"
       },
       "displaySize": "显示尺寸",
       "displaySizes": {

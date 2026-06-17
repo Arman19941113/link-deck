@@ -1,6 +1,6 @@
 // Segmented picker for the app design style preference.
 
-import { GalleryHorizontalEnd, Sparkles } from 'lucide-react'
+import { GalleryHorizontalEnd, Orbit, SquareStack } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { DESIGN_STYLE_OPTIONS, type DesignStylePreference } from '@/domain/settings/design-style'
@@ -13,8 +13,9 @@ type StylePickerProps = {
 }
 
 const STYLE_ICONS = {
-  editorial: GalleryHorizontalEnd,
-  prism: Sparkles,
+  paper: GalleryHorizontalEnd,
+  slate: SquareStack,
+  cobalt: Orbit,
 } satisfies Record<DesignStylePreference, typeof GalleryHorizontalEnd>
 
 /** Lets users switch the visual skin independently from light or dark color mode. */

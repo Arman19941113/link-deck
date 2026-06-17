@@ -12,9 +12,16 @@ import {
   type DesignStylePreference,
 } from '@/domain/settings/design-style'
 
-const PRISM_THEME_COLOR_BY_RESOLVED_THEME: Record<ResolvedThemeColor, string> = {
-  light: '#f6f6f6',
-  dark: '#242424',
+const THEME_COLOR_BY_DESIGN_STYLE: Record<DesignStylePreference, Record<ResolvedThemeColor, string>> = {
+  paper: THEME_COLOR_BY_RESOLVED_THEME,
+  slate: {
+    light: '#f6f6f6',
+    dark: '#242424',
+  },
+  cobalt: {
+    light: '#ffffff',
+    dark: '#111827',
+  },
 }
 
 /** Applies the selected or system-resolved theme color mode to the document root. */
@@ -87,10 +94,7 @@ function updateThemeColor(resolvedTheme: ResolvedThemeColor, designStylePreferen
     return
   }
 
-  themeColor.content =
-    designStylePreference === 'prism'
-      ? PRISM_THEME_COLOR_BY_RESOLVED_THEME[resolvedTheme]
-      : THEME_COLOR_BY_RESOLVED_THEME[resolvedTheme]
+  themeColor.content = THEME_COLOR_BY_DESIGN_STYLE[designStylePreference][resolvedTheme]
 }
 
 /** Keeps the browser favicon aligned with the selected design style. */

@@ -1,9 +1,9 @@
-// Generates installable PWA icon PNGs from the editorial SVG logo without extra image dependencies.
+// Generates installable PWA icon PNGs from the default Paper SVG logo without extra image dependencies.
 
 import { deflateSync } from 'node:zlib'
 import { readFileSync, writeFileSync } from 'node:fs'
 
-const sourceLogoPath = 'public/brand/logo-editorial.svg'
+const sourceLogoPath = 'public/brand/logo-paper.svg'
 const iconTargets = [
   { size: 192, path: 'public/pwa-192x192.png' },
   { size: 512, path: 'public/pwa-512x512.png' },

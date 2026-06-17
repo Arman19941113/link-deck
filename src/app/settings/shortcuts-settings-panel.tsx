@@ -14,7 +14,7 @@ export function ShortcutsSettingsPanel() {
         {KEYBOARD_SHORTCUTS.map(shortcut => (
           <div
             key={shortcut.id}
-            className="flex min-h-[3.75rem] flex-col gap-3 rounded-md bg-muted/30 px-3 py-3 sm:flex-row sm:items-center sm:justify-between"
+            className="flex min-h-15 flex-col gap-3 rounded-md bg-muted/30 px-3 py-3 sm:flex-row sm:items-center sm:justify-between"
           >
             <div className="min-w-0">
               <p className="text-sm font-medium">{t(`shortcuts.${shortcut.id}`)}</p>

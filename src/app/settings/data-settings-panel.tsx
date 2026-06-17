@@ -106,7 +106,7 @@ type DataSettingsActionRowProps = {
 
 function DataSettingsActionRow({ title, children }: DataSettingsActionRowProps) {
   return (
-    <div className="flex min-h-[3.75rem] flex-col gap-3 rounded-md bg-muted/30 px-3 py-3 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex min-h-15 flex-col gap-3 rounded-md bg-muted/30 px-3 py-3 sm:flex-row sm:items-center sm:justify-between">
       <p className="min-w-0 text-sm font-medium">{title}</p>
       {children}
     </div>

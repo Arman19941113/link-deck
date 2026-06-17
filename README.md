@@ -22,7 +22,7 @@ Use it as:
 ## Product Highlights
 
 - **Clean by default**: A quiet layout with generous spacing, simple cards, and clear grouping.
-- **Modern visual style**: Refined surfaces, compact controls, crisp icon treatment, and two built-in styles: Editorial and Prism.
+- **Modern visual style**: Refined surfaces, compact controls, crisp icon treatment, and three built-in styles: Paper, Slate, and Cobalt.
 - **Fast daily access**: Search, open, add, and delete links with keyboard shortcuts.
 - **Organized collections**: Keep links in categories such as tools, social, video, discovery, or your own custom groups.
 - **Friendly link cards**: Each link can include a title, URL, notes, category, and icon.

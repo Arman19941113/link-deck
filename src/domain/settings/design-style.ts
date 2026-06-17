@@ -1,8 +1,8 @@
 // Defines app design style options and validation helpers.
 
-export type DesignStylePreference = 'editorial' | 'prism'
+export type DesignStylePreference = 'paper' | 'slate' | 'cobalt'
 
-export const DEFAULT_DESIGN_STYLE_PREFERENCE: DesignStylePreference = 'editorial'
+export const DEFAULT_DESIGN_STYLE_PREFERENCE: DesignStylePreference = 'paper'
 
 export const DESIGN_STYLE_OPTIONS: Array<{
   value: DesignStylePreference
@@ -10,14 +10,19 @@ export const DESIGN_STYLE_OPTIONS: Array<{
   description: string
 }> = [
   {
-    value: 'editorial',
-    label: 'Editorial',
-    description: 'Warm editorial canvas with charcoal type and orange accents',
+    value: 'paper',
+    label: 'Paper',
+    description: 'Warm paper canvas with charcoal type and orange accents',
   },
   {
-    value: 'prism',
-    label: 'Prism',
-    description: 'Crisp blue-green workspace with bright cards and soft icons',
+    value: 'slate',
+    label: 'Slate',
+    description: 'Calm grayscale workspace with bright cards and crisp contrast',
+  },
+  {
+    value: 'cobalt',
+    label: 'Cobalt',
+    description: 'Crisp white workspace with balanced cobalt actions and calm blue surfaces',
   },
 ]
 
@@ -28,13 +33,17 @@ export const DESIGN_STYLE_ASSETS: Record<
     logo: string
   }
 > = {
-  editorial: {
-    favicon: 'brand/logo-editorial.svg',
-    logo: 'brand/logo-editorial.svg',
+  paper: {
+    favicon: 'brand/logo-paper.svg',
+    logo: 'brand/logo-paper.svg',
   },
-  prism: {
-    favicon: 'brand/logo-prism.svg',
-    logo: 'brand/logo-prism.svg',
+  slate: {
+    favicon: 'brand/logo-slate.svg',
+    logo: 'brand/logo-slate.svg',
+  },
+  cobalt: {
+    favicon: 'brand/logo-cobalt.svg',
+    logo: 'brand/logo-cobalt.svg',
   },
 }
 

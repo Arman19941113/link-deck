@@ -113,8 +113,9 @@
       },
       "style": "Style",
       "styles": {
-        "editorial": "Editorial",
-        "prism": "Prism"
+        "paper": "Paper",
+        "slate": "Slate",
+        "cobalt": "Cobalt"
       },
       "displaySize": "Display size",
       "displaySizes": {

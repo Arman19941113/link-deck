@@ -171,7 +171,7 @@ export function SettingsDialogController({
     <>
       <DialogContent
         aria-describedby={undefined}
-        className="grid h-[592px] w-[672px] max-w-none grid-rows-[auto_minmax(0,1fr)_auto] gap-0 overflow-hidden p-0 sm:max-w-none"
+        className="grid h-148 w-2xl max-w-none grid-rows-[auto_minmax(0,1fr)_auto] gap-0 overflow-hidden p-0 sm:max-w-none"
         showCloseButton={false}
         onOpenAutoFocus={event => {
           event.preventDefault()

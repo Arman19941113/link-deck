@@ -23,7 +23,7 @@ export function AddLinkCard({ displaySizeConfig, categoryName, onAddLink }: AddL
       aria-label={t('deck.addCard.description', { categoryName })}
       tabIndex={-1}
       className={cn(
-        'group flex h-full w-full cursor-pointer items-center rounded-md border border-dashed border-border/70 bg-transparent text-left text-muted-foreground outline-none transition-[background-color,border-color,box-shadow,color,translate] duration-300 ease-app-hover hover:-translate-y-px hover:border-accent/35 hover:bg-card/35 hover:text-foreground hover:shadow-[var(--app-card-hover-shadow)] focus-visible:border-ring/40 focus-visible:ring-[3px] focus-visible:ring-ring/35 motion-reduce:hover:translate-y-0 motion-reduce:transition-none',
+        'group flex h-full w-full cursor-pointer items-center rounded-md border border-dashed border-border/70 bg-transparent text-left text-muted-foreground outline-none transition-[background-color,border-color,box-shadow,color,translate] duration-300 ease-app-hover hover:-translate-y-px hover:border-accent/35 hover:bg-card/35 hover:text-foreground hover:shadow-(--app-card-hover-shadow) focus-visible:border-ring/40 focus-visible:ring-[3px] focus-visible:ring-ring/35 motion-reduce:hover:translate-y-0 motion-reduce:transition-none',
         cardConfig.paddingClassName,
         cardConfig.contentGapClassName,
       )}
