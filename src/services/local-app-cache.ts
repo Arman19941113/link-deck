@@ -1,8 +1,8 @@
 // Provides best-effort browser cache operations for startup state and local preferences.
 
-import type { Category, SavedLink, SortMode } from '@/domain/deck/types'
-import { DEFAULT_SORT_MODE, isSortMode } from '@/domain/deck/sort-mode'
-import { DEFAULT_DISPLAY_SIZE, isDisplaySize } from '@/domain/settings/display-size'
+import { DEFAULT_SORT_MODE, isSortMode, type SortMode } from '@/domain/deck/sort-mode'
+import type { Category, SavedLink } from '@/domain/deck/types'
+import { DEFAULT_DISPLAY_SIZE, isDisplaySize, type DisplaySize } from '@/domain/settings/display-size'
 import {
   DEFAULT_DESIGN_STYLE_PREFERENCE,
   isDesignStylePreference,
@@ -13,7 +13,6 @@ import {
   isThemeColorPreference,
   type ThemeColorPreference,
 } from '@/domain/settings/theme-color'
-import type { DisplaySize } from '@/domain/settings/types'
 import { isAppLanguage, type AppLanguage } from '@/domain/settings/language'
 import { isCategory, isRecord, isSavedLink } from '@/domain/deck/deck-guards'
 import { readLocalStorageJsonOrString, writeLocalStorageJson } from '@/lib/local-storage'

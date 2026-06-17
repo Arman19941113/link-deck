@@ -2,7 +2,7 @@
 
 import { useTranslation } from 'react-i18next'
 
-import type { DisplaySize } from '@/domain/settings/types'
+import type { DisplaySize } from '@/domain/settings/display-size'
 import { DISPLAY_SIZE_OPTIONS } from '@/app/display-size-config'
 import { SegmentedSettingsPicker } from './segmented-settings-picker'
 import { cn } from '@/lib/utils'

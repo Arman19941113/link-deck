@@ -1,6 +1,6 @@
-// Defines display-size setting defaults and validation helpers.
+// Defines display-size setting value, defaults, and validation helpers.
 
-import type { DisplaySize } from './types'
+export type DisplaySize = 'compact' | 'normal' | 'spacious'
 
 export const DEFAULT_DISPLAY_SIZE: DisplaySize = 'normal'
 

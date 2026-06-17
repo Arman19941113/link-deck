@@ -1,7 +1,8 @@
 // Provides domain selectors for UI display.
 
 import { matchesNormalizedSearchQuery, normalizeSearchText } from '@/lib/search'
-import type { Category, VisibleCategorySection, SavedLink, SortMode } from '@/domain/deck/types'
+import type { SortMode } from '@/domain/deck/sort-mode'
+import type { Category, VisibleCategorySection, SavedLink } from '@/domain/deck/types'
 
 /** Builds the final deck sections for rendering, optionally including empty categories. */
 export function selectRenderableSections({

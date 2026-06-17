@@ -2,10 +2,6 @@
 
 import type { SavedLinkIcon } from './icon-types'
 
-export type { SavedLinkIcon } from './icon-types'
-
-export type SortMode = 'manual' | 'name'
-
 /** Base metadata for a navigation category. */
 export interface Category {
   id: string

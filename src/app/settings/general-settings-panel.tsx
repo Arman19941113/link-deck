@@ -5,11 +5,11 @@ import { LanguagePicker } from './components/language-picker'
 import { LinkOrderPicker } from './components/link-order-picker'
 import { StylePicker } from './components/style-picker'
 import { ThemeColorPicker } from './components/theme-color-picker'
-import type { SortMode } from '@/domain/deck/types'
+import type { SortMode } from '@/domain/deck/sort-mode'
 import type { DesignStylePreference } from '@/domain/settings/design-style'
 import type { AppLanguage } from '@/domain/settings/language'
 import type { ThemeColorPreference } from '@/domain/settings/theme-color'
-import type { DisplaySize } from '@/domain/settings/types'
+import type { DisplaySize } from '@/domain/settings/display-size'
 
 type GeneralSettingsPanelProps = {
   displaySize: DisplaySize

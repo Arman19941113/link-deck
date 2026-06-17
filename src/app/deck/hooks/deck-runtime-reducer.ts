@@ -1,7 +1,8 @@
 // Centralizes deck runtime state transitions for the shell model hook.
 
-import type { Category, SavedLink, SortMode } from '@/domain/deck/types'
-import type { DisplaySize } from '@/domain/settings/types'
+import type { SortMode } from '@/domain/deck/sort-mode'
+import type { Category, SavedLink } from '@/domain/deck/types'
+import type { DisplaySize } from '@/domain/settings/display-size'
 
 export type DeckDataSnapshot = {
   categories: Category[]

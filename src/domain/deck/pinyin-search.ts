@@ -4,7 +4,8 @@ import { pinyin } from 'pinyin-pro'
 
 import { normalizeSearchText } from '@/lib/search'
 import { sortLinks } from './selectors'
-import type { Category, VisibleCategorySection, SavedLink, SortMode } from '@/domain/deck/types'
+import type { SortMode } from '@/domain/deck/sort-mode'
+import type { Category, VisibleCategorySection, SavedLink } from '@/domain/deck/types'
 
 /** Stores raw text, full pinyin, and initials for search matching. */
 interface PinyinSearchIndex {

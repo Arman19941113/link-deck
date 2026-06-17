@@ -17,11 +17,12 @@ import type { DataBusyAction, SettingsTab } from './types'
 import { Button } from '@/components/ui/button'
 import { DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import type { DeleteCategoryLinksStrategy } from '@/domain/deck/category-delete-changes'
-import type { Category, SavedLink, SortMode } from '@/domain/deck/types'
+import type { SortMode } from '@/domain/deck/sort-mode'
+import type { Category, SavedLink } from '@/domain/deck/types'
 import type { DesignStylePreference } from '@/domain/settings/design-style'
 import type { AppLanguage } from '@/domain/settings/language'
 import type { ThemeColorPreference } from '@/domain/settings/theme-color'
-import type { DisplaySize } from '@/domain/settings/types'
+import type { DisplaySize } from '@/domain/settings/display-size'
 
 export type SettingsDialogControllerProps = {
   initialTab?: SettingsTab

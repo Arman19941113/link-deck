@@ -1,6 +1,6 @@
 // Defines global display-size UI options and semantic sizing tokens.
 
-import type { DisplaySize } from '@/domain/settings/types'
+import type { DisplaySize } from '@/domain/settings/display-size'
 
 type DisplaySizeOption = {
   description: string

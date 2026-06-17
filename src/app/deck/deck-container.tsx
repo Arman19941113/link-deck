@@ -8,7 +8,8 @@ import { useLinkDragPreview } from './hooks/use-link-drag-preview'
 import type { DisplaySizeConfig } from '@/app/display-size-config'
 import type { SettingsTab } from '@/app/settings/types'
 import { selectRenderableSections } from '@/domain/deck/selectors'
-import type { Category, VisibleCategorySection, SavedLink, SortMode } from '@/domain/deck/types'
+import type { SortMode } from '@/domain/deck/sort-mode'
+import type { Category, VisibleCategorySection, SavedLink } from '@/domain/deck/types'
 import type { DesignStylePreference } from '@/domain/settings/design-style'
 
 type DeckContainerProps = {

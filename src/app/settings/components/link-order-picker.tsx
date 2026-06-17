@@ -4,7 +4,7 @@ import { ArrowDownAZ, GripVertical } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { SORT_MODE_OPTIONS } from '@/domain/deck/sort-mode'
-import type { SortMode } from '@/domain/deck/types'
+import type { SortMode } from '@/domain/deck/sort-mode'
 import { cn } from '@/lib/utils'
 import { SegmentedSettingsPicker } from './segmented-settings-picker'
 

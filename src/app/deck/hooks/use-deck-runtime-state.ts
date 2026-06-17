@@ -2,8 +2,9 @@
 
 import { useCallback, useReducer, useRef, useState } from 'react'
 
-import type { Category, SavedLink, SortMode } from '@/domain/deck/types'
-import type { DisplaySize } from '@/domain/settings/types'
+import type { SortMode } from '@/domain/deck/sort-mode'
+import type { Category, SavedLink } from '@/domain/deck/types'
+import type { DisplaySize } from '@/domain/settings/display-size'
 import { localAppCacheService } from '@/services/local-app-cache'
 import {
   createDeckRuntimeState,

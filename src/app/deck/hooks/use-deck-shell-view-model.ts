@@ -4,8 +4,9 @@ import { useDeckRuntimeState } from './use-deck-runtime-state'
 import { useDeckActions, type DeckActions } from './use-deck-actions'
 import { useDeckLifecycle } from './use-deck-lifecycle'
 import { useVisibleDeckSections } from './use-visible-deck-sections'
-import type { Category, VisibleCategorySection, SavedLink, SortMode } from '@/domain/deck/types'
-import type { DisplaySize } from '@/domain/settings/types'
+import type { SortMode } from '@/domain/deck/sort-mode'
+import type { Category, VisibleCategorySection, SavedLink } from '@/domain/deck/types'
+import type { DisplaySize } from '@/domain/settings/display-size'
 import type { AppLanguage } from '@/domain/settings/language'
 
 /** State, derived data, and deck actions consumed by the shell. */

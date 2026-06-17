@@ -12,9 +12,10 @@ import { usePersistenceQueue } from './use-persistence-queue'
 import type { DeleteCategoryLinksStrategy } from '@/domain/deck/category-delete-changes'
 import type { DeckBackupPayload } from '@/domain/deck/deck-transfer'
 import type { UpsertLinkInput } from '@/domain/deck/link-upsert-plan'
-import type { Category, SavedLink, SortMode, StoredIconFile } from '@/domain/deck/types'
+import type { SortMode } from '@/domain/deck/sort-mode'
+import type { Category, SavedLink, StoredIconFile } from '@/domain/deck/types'
 import type { AppLanguage } from '@/domain/settings/language'
-import type { DisplaySize } from '@/domain/settings/types'
+import type { DisplaySize } from '@/domain/settings/display-size'
 import { deckPersistenceService } from '@/services/deck-persistence'
 
 type UseDeckActionsParams = {

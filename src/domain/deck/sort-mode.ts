@@ -1,6 +1,6 @@
 // Defines saved-link sort mode defaults and validation helpers.
 
-import type { SortMode } from './types'
+export type SortMode = 'manual' | 'name'
 
 export const DEFAULT_SORT_MODE: SortMode = 'manual'
 export const SORT_MODE_OPTIONS = ['manual', 'name'] as const satisfies readonly SortMode[]

@@ -5,7 +5,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { getDeckActionErrorMessage } from './deck-action-utils'
 import { loadPinyinSearchModule } from '@/domain/deck/pinyin-search-loader'
 import { selectSearchMatchedSections } from '@/domain/deck/selectors'
-import type { Category, VisibleCategorySection, SavedLink, SortMode } from '@/domain/deck/types'
+import type { SortMode } from '@/domain/deck/sort-mode'
+import type { Category, VisibleCategorySection, SavedLink } from '@/domain/deck/types'
 
 type UseVisibleDeckSectionsParams = {
   categories: Category[]
