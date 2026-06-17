@@ -11,6 +11,10 @@ type BuiltinIconPreviewProps = {
   decorative?: boolean
 }
 
+type BuiltinIconPreviewTileProps = BuiltinIconPreviewProps & {
+  iconClassName?: string
+}
+
 /** Displays a built-in brand icon from its local SVG data. */
 export function BuiltinIconPreview({ icon, className, decorative = false }: BuiltinIconPreviewProps) {
   const renderModel = resolveBuiltinIconRenderModel(icon)
@@ -49,5 +53,19 @@ export function BuiltinIconPreview({ icon, className, decorative = false }: Buil
       style={{ color: `#${renderModel.color}` }}
       dangerouslySetInnerHTML={{ __html: renderModel.body }}
     />
+  )
+}
+
+/** Wraps built-in icons in the same contrast tile used by link cards. */
+export function BuiltinIconPreviewTile({
+  icon,
+  className,
+  iconClassName,
+  decorative = false,
+}: BuiltinIconPreviewTileProps) {
+  return (
+    <span className={cn('app-icon-tile flex shrink-0 items-center justify-center border', className)}>
+      <BuiltinIconPreview icon={icon} className={iconClassName} decorative={decorative} />
+    </span>
   )
 }

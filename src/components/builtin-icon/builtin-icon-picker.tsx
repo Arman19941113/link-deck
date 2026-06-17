@@ -16,7 +16,7 @@ import { Label } from '@/components/ui/label'
 import type { DisplaySizeConfig } from '@/app/display-size-config'
 import { cn } from '@/lib/utils'
 
-import { BuiltinIconPreview } from './builtin-icon-preview'
+import { BuiltinIconPreviewTile } from './builtin-icon-preview'
 
 export type BuiltinIconPickerProps = {
   value: BuiltinIconValue | null
@@ -78,9 +78,14 @@ export function BuiltinIconPicker({
         <div className="mb-3 flex items-center justify-between gap-3 rounded-md border bg-background px-3 py-2">
           <span className="flex min-w-0 items-center gap-2">
             {selectedIcon ? (
-              <BuiltinIconPreview icon={selectedIcon} className="size-5" decorative />
+              <BuiltinIconPreviewTile
+                icon={selectedIcon}
+                className="size-8 rounded-md"
+                iconClassName="size-5"
+                decorative
+              />
             ) : (
-              <span className="size-5 rounded-sm" style={{ backgroundColor: `#${value.hex}` }} aria-hidden="true" />
+              <span className="app-icon-tile size-8 rounded-md border" aria-hidden="true" />
             )}
             <span className="min-w-0">
               <span className="block truncate text-sm font-medium">{value.title}</span>
@@ -127,7 +132,7 @@ export function BuiltinIconPicker({
                   onFocus={() => onChange(iconRef)}
                   onKeyDown={event => handleIconKeyDown(event, iconRef)}
                 >
-                  <BuiltinIconPreview icon={icon} decorative />
+                  <BuiltinIconPreviewTile icon={icon} className="size-7 rounded-md" decorative />
                   <span className="min-w-0">
                     <span className="block truncate text-sm">{icon.title}</span>
                   </span>

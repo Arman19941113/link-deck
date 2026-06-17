@@ -19,7 +19,7 @@ import type { DisplaySizeConfig } from '@/app/display-size-config'
 import { cn } from '@/lib/utils'
 
 import { BuiltinIconPicker } from './builtin-icon-picker'
-import { BuiltinIconPreview } from './builtin-icon-preview'
+import { BuiltinIconPreviewTile } from './builtin-icon-preview'
 
 type BuiltinIconFieldProps = {
   value: BuiltinIconValue | null
@@ -73,9 +73,9 @@ export function BuiltinIconField({ value, disabled = false, displaySizeConfig, o
         >
           <span className="flex min-w-0 flex-1 items-center gap-3">
             {selectedIcon ? (
-              <BuiltinIconPreview icon={selectedIcon} className="size-5" />
+              <BuiltinIconPreviewTile icon={selectedIcon} className="size-8 rounded-md" iconClassName="size-5" />
             ) : (
-              <span className="size-5 rounded-sm bg-muted" aria-hidden="true" />
+              <span className="app-icon-tile size-8 rounded-md border" aria-hidden="true" />
             )}
             <span className="min-w-0">
               <span className="block truncate text-sm font-medium">
