@@ -1,11 +1,15 @@
-// Converts Link Deck state to and from a portable JSON backup format.
+// Defines the portable deck backup format and validates import/export payloads.
 
 import { isCategory, isRecord, isSavedLink, isTimestamp } from './deck-guards'
-import { blobToDataUrl, dataUrlToBlob } from '@/lib/blob-data-url'
 import type { Category, StoredIconFile, SavedLink, PersistedAppState } from './types'
 
 type ExportedIconFile = Omit<StoredIconFile, 'blob'> & {
   dataUrl: string
+}
+
+type DeckBackupBlobCodec = {
+  encodeBlob: (blob: Blob, errorMessage?: string) => Promise<string>
+  decodeDataUrl: (dataUrl: string, errorMessage?: string) => Promise<Blob>
 }
 
 export type DeckBackupPayload = {
@@ -24,7 +28,10 @@ export type DeckBackupPayload = {
 }
 
 /** Creates a downloadable JSON backup from the current persisted deck state. */
-export async function createDeckBackupPayload(deck: PersistedAppState): Promise<DeckBackupPayload> {
+export async function createDeckBackupPayload(
+  deck: PersistedAppState,
+  blobCodec: DeckBackupBlobCodec,
+): Promise<DeckBackupPayload> {
   const iconFiles = await Promise.all(
     deck.iconFiles.map(async iconFile => ({
       id: iconFile.id,
@@ -32,7 +39,7 @@ export async function createDeckBackupPayload(deck: PersistedAppState): Promise<
       mimeType: iconFile.mimeType,
       size: iconFile.size,
       createdAt: iconFile.createdAt,
-      dataUrl: await blobToDataUrl(iconFile.blob, 'Icon file export failed'),
+      dataUrl: await blobCodec.encodeBlob(iconFile.blob, 'Icon file export failed'),
     })),
   )
 
@@ -53,7 +60,7 @@ export async function createDeckBackupPayload(deck: PersistedAppState): Promise<
 }
 
 /** Parses and validates a JSON backup file before replacing local data. */
-export async function parseDeckBackupPayload(json: string): Promise<PersistedAppState> {
+export async function parseDeckBackupPayload(json: string, blobCodec: DeckBackupBlobCodec): Promise<PersistedAppState> {
   let parsed: unknown
 
   try {
@@ -122,7 +129,7 @@ export async function parseDeckBackupPayload(json: string): Promise<PersistedApp
   const iconFiles = await Promise.all(
     exportedIconFiles.map(async iconFile => ({
       id: iconFile.id,
-      blob: await dataUrlToBlob(iconFile.dataUrl, 'Imported icon file could not be read'),
+      blob: await blobCodec.decodeDataUrl(iconFile.dataUrl, 'Imported icon file could not be read'),
       name: iconFile.name,
       mimeType: iconFile.mimeType,
       size: iconFile.size,

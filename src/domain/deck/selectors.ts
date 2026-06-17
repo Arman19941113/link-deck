@@ -1,6 +1,6 @@
 // Provides domain selectors for UI display.
 
-import { matchesNormalizedSearchQuery, normalizeSearchText } from '@/lib/search'
+import { matchesNormalizedSearchQuery, normalizeSearchText } from './search-text'
 import type { SortMode } from '@/domain/deck/sort-mode'
 import type { Category, VisibleCategorySection, SavedLink } from '@/domain/deck/types'
 

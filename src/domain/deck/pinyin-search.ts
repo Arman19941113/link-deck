@@ -2,7 +2,7 @@
 
 import { pinyin } from 'pinyin-pro'
 
-import { normalizeSearchText } from '@/lib/search'
+import { normalizeSearchText } from './search-text'
 import { sortLinks } from './selectors'
 import type { SortMode } from '@/domain/deck/sort-mode'
 import type { Category, VisibleCategorySection, SavedLink } from '@/domain/deck/types'

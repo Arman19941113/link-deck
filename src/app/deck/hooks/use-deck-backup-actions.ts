@@ -4,10 +4,11 @@ import { useCallback } from 'react'
 
 import { getDeckActionErrorMessage } from './deck-action-utils'
 import type { OptimisticDeckCommitter } from './use-deck-mutation-committer'
+import type { DeckBackupPayload } from '@/domain/deck/deck-backup'
 import { createDefaultPersistedDeck, createEmptyPersistedDeck } from '@/domain/deck/default-data'
-import { parseDeckBackupPayload, type DeckBackupPayload } from '@/domain/deck/deck-transfer'
 import type { PersistedAppState } from '@/domain/deck/types'
 import type { AppLanguage } from '@/domain/settings/language'
+import { parseDeckBackupPayload } from '@/services/deck-backup'
 import { deckPersistenceService } from '@/services/deck-persistence'
 
 type UseDeckBackupActionsParams = OptimisticDeckCommitter & {

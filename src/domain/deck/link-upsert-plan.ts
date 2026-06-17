@@ -5,9 +5,9 @@ import { getNextLinkOrder } from './link-order'
 import { getLocalIconId } from './link-icons'
 import { getChangedLinks } from './deck-collection'
 import { createUserFacingError, normalizeRequiredName } from './deck-validation'
+import { normalizeLinkUrl } from './link-url'
 import type { SavedLinkIcon } from './icon-types'
 import type { Category, SavedLink } from './types'
-import { normalizeLinkUrl } from '@/lib/url'
 
 export type UpsertLinkInput = {
   id?: string

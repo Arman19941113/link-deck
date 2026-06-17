@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 
 import type { StoredIconFile, SavedLink } from '@/domain/deck/types'
-import { getAutoFaviconUrl } from '@/lib/url'
+import { getAutoFaviconUrl } from '@/domain/deck/link-url'
 import { BuiltinIconPreview } from '@/components/builtin-icon/builtin-icon-preview'
 import { getBuiltinIconMetadata, resolveBuiltinIconRenderModel } from '@/components/builtin-icon/builtin-icon-registry'
 import { cn } from '@/lib/utils'

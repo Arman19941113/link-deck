@@ -1,12 +1,13 @@
 // Provides deck-level persistence operations over IndexedDB and portable backup files.
 
-import { createDeckBackupPayload, type DeckBackupPayload } from '@/domain/deck/deck-transfer'
+import type { DeckBackupPayload } from '@/domain/deck/deck-backup'
 import { persistCategoryDeleteChanges, saveCategories, saveCategory } from '@/repositories/category'
 import { loadDeck, replaceDeck } from '@/repositories/deck'
 import { deleteIconFile, getIconFile, saveIconFileRecord } from '@/repositories/icon'
 import { deleteLink, saveLink, saveLinks } from '@/repositories/link'
 import type { AppLanguage } from '@/domain/settings/language'
 import { DEFAULT_LANGUAGE } from '@/domain/settings/language'
+import { createDeckBackupPayload } from '@/services/deck-backup'
 import { localAppCacheService } from '@/services/local-app-cache'
 
 /** Public deck persistence operations used by the React store. */

@@ -1,4 +1,4 @@
-// Provides link URL normalization, origin extraction, and favicon URL helpers.
+// Provides deck link URL normalization, origin extraction, and favicon URL helpers.
 
 const HTTP_PROTOCOLS = new Set(['http:', 'https:'])
 const EXPLICIT_HTTP_SCHEME = /^https?:\/\//i

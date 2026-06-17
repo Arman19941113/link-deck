@@ -1,4 +1,4 @@
-// Provides lightweight search text normalization for the initial app bundle.
+// Provides lightweight deck search text normalization for the initial app bundle.
 
 const SEPARATORS = /[\s\-_/\\.:;,+?&#=|~`!@#$%^*()[\]{}'"<>\u3000-\u303f\uff00-\uffef]+/g
 
