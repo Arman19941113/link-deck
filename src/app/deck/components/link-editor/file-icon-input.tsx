@@ -39,7 +39,7 @@ export function FileIconInput({
       </Label>
       <Input
         id="link-editor-icon-file"
-        className="peer sr-only"
+        className="peer sr-only size-px w-px"
         type="file"
         accept={ICON_FILE_ACCEPT}
         disabled={disabled}

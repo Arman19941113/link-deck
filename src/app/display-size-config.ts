@@ -102,7 +102,7 @@ const DISPLAY_SIZE_CONFIG: Record<DisplaySize, DisplaySizeConfig> = {
       descriptionClassName: 'text-xs text-muted-foreground',
       formClassName: 'flex flex-col gap-3',
       fieldClassName: 'flex flex-col gap-1.5',
-      gridClassName: 'grid gap-3 sm:grid-cols-2',
+      gridClassName: 'grid gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]',
       footerClassName: 'gap-1.5',
     },
     card: {
@@ -155,7 +155,7 @@ const DISPLAY_SIZE_CONFIG: Record<DisplaySize, DisplaySizeConfig> = {
       descriptionClassName: 'text-sm text-muted-foreground',
       formClassName: 'flex flex-col gap-4',
       fieldClassName: 'flex flex-col gap-2',
-      gridClassName: 'grid gap-4 sm:grid-cols-2',
+      gridClassName: 'grid gap-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]',
       footerClassName: 'gap-2',
     },
     card: {
@@ -208,7 +208,7 @@ const DISPLAY_SIZE_CONFIG: Record<DisplaySize, DisplaySizeConfig> = {
       descriptionClassName: 'text-base text-muted-foreground',
       formClassName: 'flex flex-col gap-5',
       fieldClassName: 'flex flex-col gap-2.5',
-      gridClassName: 'grid gap-5 sm:grid-cols-2',
+      gridClassName: 'grid gap-5 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]',
       footerClassName: 'gap-2.5',
     },
     card: {
