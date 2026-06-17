@@ -4,6 +4,4 @@ export type DestructiveDataAction = 'reset' | 'clear'
 
 export type DataBusyAction = DestructiveDataAction | 'export' | 'import'
 
-export type SettingsLanguage = 'en'
-
 export type SettingsTab = 'general' | 'data' | 'categories' | 'shortcuts'

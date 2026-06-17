@@ -1,0 +1,200 @@
+{
+  "app": {
+    "name": "Link Deck",
+    "pwa": {
+      "offlineReady": "Link Deck 已可离线使用。",
+      "updateReady": "Link Deck 有新版本可用。",
+      "refresh": "刷新",
+      "later": "稍后"
+    }
+  },
+  "common": {
+    "cancel": "取消",
+    "choose": "选择",
+    "close": "关闭",
+    "delete": "删除",
+    "save": "保存",
+    "saving": "保存中...",
+    "reset": "重置"
+  },
+  "deck": {
+    "toolbar": {
+      "openRepository": "打开 Link Deck GitHub 仓库",
+      "openSettings": "打开设置",
+      "settings": "设置",
+      "addLink": "添加链接"
+    },
+    "search": {
+      "label": "搜索链接",
+      "placeholder": "搜索链接、备注或 URL...",
+      "clear": "清空搜索"
+    },
+    "empty": {
+      "noMatchesTitle": "没有找到匹配链接",
+      "noMatchesDescription": "试试其他关键词。",
+      "noLinksTitle": "还没有链接",
+      "noLinksDescription": "使用“添加链接”保存第一个链接。"
+    },
+    "linkCard": {
+      "open": "打开 {{name}}",
+      "moreActions": "{{name}} 的更多操作",
+      "noNotes": "无备注",
+      "edit": "编辑",
+      "copyLink": "复制链接",
+      "delete": "删除",
+      "deleteTitle": "删除链接",
+      "deleteDescription": "删除“{{name}}”？这会从你的链接面板中移除该链接。",
+      "deleting": "删除中..."
+    },
+    "addCard": {
+      "title": "添加链接",
+      "description": "保存链接到 {{categoryName}}"
+    },
+    "errors": {
+      "actionFailed": "操作失败，请稍后重试。",
+      "iconCleanupFailed": "图标文件清理失败：{{message}}",
+      "chooseExistingMoveCategory": "请选择已有分类来移动链接"
+    }
+  },
+  "linkEditor": {
+    "addTitle": "添加链接",
+    "editTitle": "编辑链接",
+    "description": "保存链接详情，并选择图标显示方式。",
+    "url": "链接 URL",
+    "name": "标题",
+    "namePlaceholder": "留空时使用链接地址",
+    "category": "分类",
+    "categoryPlaceholder": "选择分类",
+    "notes": "备注",
+    "save": "保存链接",
+    "icon": {
+      "source": "图标来源",
+      "auto": "自动",
+      "builtin": "内置图标",
+      "url": "图片 URL",
+      "file": "本地文件",
+      "autoDescription": "自动使用网站 favicon；不可用时显示标题首字母。",
+      "iconUrl": "图标 URL",
+      "chooseFile": "选择图标文件",
+      "noIconSelected": "未选择图标",
+      "random": "随机内置图标",
+      "chooseBuiltinTitle": "选择内置图标",
+      "chooseBuiltinDescription": "搜索内置品牌图标，并确认为该链接使用。",
+      "searchLabel": "搜索内置图标",
+      "searchPlaceholder": "搜索品牌，例如 GitHub",
+      "noMatches": "没有匹配的内置图标。",
+      "useIcon": "使用图标"
+    },
+    "errors": {
+      "chooseIconFileType": "请选择 PNG、JPEG、WebP 或 SVG 图标",
+      "iconFileTooLarge": "图标文件不能超过 1024KB",
+      "enterLinkUrl": "请输入链接 URL",
+      "selectCategory": "请选择分类",
+      "chooseBuiltinIcon": "请选择内置图标",
+      "enterIconUrl": "请输入图标 URL",
+      "chooseLocalIconFile": "请选择本地图标文件",
+      "saveFailed": "保存失败，请稍后重试。"
+    }
+  },
+  "settings": {
+    "title": "设置",
+    "navigation": "设置导航",
+    "tabs": {
+      "general": "通用",
+      "data": "数据",
+      "categories": "分类",
+      "shortcuts": "快捷键"
+    },
+    "general": {
+      "theme": "主题",
+      "themes": {
+        "auto": "跟随系统",
+        "light": "浅色",
+        "dark": "深色"
+      },
+      "style": "风格",
+      "styles": {
+        "editorial": "Editorial",
+        "prism": "Prism"
+      },
+      "displaySize": "显示尺寸",
+      "displaySizes": {
+        "compact": "紧凑",
+        "normal": "正常",
+        "spacious": "宽松"
+      },
+      "linkOrder": "链接排序",
+      "linkOrderPlaceholder": "选择链接排序",
+      "sortModes": {
+        "manual": "手动排序",
+        "name": "标题（A-Z）"
+      },
+      "language": "语言",
+      "languagePlaceholder": "选择语言",
+      "languages": {
+        "en": "English",
+        "zh": "中文"
+      }
+    },
+    "data": {
+      "importBackup": "导入备份",
+      "exportBackup": "导出备份",
+      "resetDefaults": "重置为默认",
+      "clearData": "清空数据",
+      "import": "导入",
+      "importing": "导入中...",
+      "export": "导出",
+      "clear": "清空数据"
+    },
+    "categories": {
+      "newCategoryName": "新分类名称",
+      "newCategoryPlaceholder": "新分类名称，按 Enter 添加",
+      "categoryName": "分类名称",
+      "cancelRename": "取消重命名",
+      "saveCategory": "保存 {{name}}",
+      "deleteCategory": "删除 {{name}}",
+      "lastCategoryCannotBeDeleted": "最后一个分类不能删除",
+      "renameCategory": "重命名 {{name}}",
+      "dragCategory": "拖拽分类 {{name}}"
+    },
+    "confirm": {
+      "resetTitle": "重置为默认数据？",
+      "clearTitle": "清空所有数据？",
+      "resetDescription": "这会用内置默认数据替换当前所有链接、分类、本地图标和设置。",
+      "clearDescription": "这会删除所有链接、本地图标和自定义分类，并保留一个默认分类。",
+      "resetting": "重置中...",
+      "clearing": "清空中...",
+      "deleteCategoryTitle": "删除“{{name}}”？",
+      "deleteCategoryWithLinks": "该分类包含 {{count}} 个链接。删除前请选择如何处理这些链接。",
+      "deleteCategoryEmpty": "该分类会立即移除。",
+      "deleteAction": "操作",
+      "moveLinks": "移动到其他分类",
+      "deleteLinksToo": "同时删除链接",
+      "moveLinksTo": "移动链接到",
+      "selectCategory": "选择分类"
+    },
+    "toasts": {
+      "backupExported": "备份已导出。",
+      "backupImported": "备份已导入。",
+      "defaultDataRestored": "默认数据已恢复。",
+      "dataCleared": "数据已清空。"
+    },
+    "errors": {
+      "actionFailed": "操作失败，请稍后重试。",
+      "enterCategoryName": "请输入分类名称",
+      "defaultCategoryCannotBeDeleted": "默认分类不能删除",
+      "keepAtLeastOneCategory": "至少保留一个分类",
+      "selectMoveTarget": "请选择链接要移动到的分类",
+      "chooseBackupFile": "请选择 Link Deck 备份文件。",
+      "invalidBackupFile": "备份文件无效。",
+      "importFailed": "导入失败，请检查备份文件。"
+    }
+  },
+  "shortcuts": {
+    "search": "搜索",
+    "openLink": "打开选中链接",
+    "createLink": "新建链接",
+    "deleteLink": "删除选中链接",
+    "keyboardShortcuts": "显示快捷键"
+  }
+}

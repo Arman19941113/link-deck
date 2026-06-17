@@ -2,6 +2,7 @@
 
 import { useMemo, useState, type KeyboardEvent } from 'react'
 import { Check } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 import {
   createBuiltinIconRef,
@@ -33,6 +34,7 @@ export function BuiltinIconPicker({
   onChange,
   onConfirm,
 }: BuiltinIconPickerProps) {
+  const { t } = useTranslation()
   const [query, setQuery] = useState('')
   const selectedIcon = useMemo(() => (value ? getBuiltinIconMetadata(value) : null), [value])
   const results = useMemo(() => searchBuiltinIcons(query), [query])
@@ -90,13 +92,13 @@ export function BuiltinIconPicker({
 
       <div className={displaySizeConfig.dialog.fieldClassName}>
         <Label htmlFor="link-editor-builtin-icon-search" className={displaySizeConfig.control.labelClassName}>
-          Search built-in icons
+          {t('linkEditor.icon.searchLabel')}
         </Label>
         <Input
           id="link-editor-builtin-icon-search"
           className={displaySizeConfig.control.inputClassName}
           value={query}
-          placeholder="Search brands, for example GitHub"
+          placeholder={t('linkEditor.icon.searchPlaceholder')}
           disabled={disabled}
           onChange={event => setQuery(event.target.value)}
           onKeyDown={handleSearchKeyDown}
@@ -137,7 +139,7 @@ export function BuiltinIconPicker({
       ) : (
         <div data-result-list className="mt-3 min-h-0 flex-1 overflow-y-auto p-1">
           <p className="rounded-md bg-background px-3 py-2 text-sm text-muted-foreground">
-            No built-in icons match this search.
+            {t('linkEditor.icon.noMatches')}
           </p>
         </div>
       )}

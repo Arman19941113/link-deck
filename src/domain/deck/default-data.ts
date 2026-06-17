@@ -3,6 +3,7 @@
 import type { SavedLinkIcon } from './icon-types'
 import type { Category, DeckDocument, PersistedAppState, SavedLink } from './types'
 import { createDefaultCategory } from './categories'
+import type { AppLanguage } from '@/domain/settings/language'
 
 const DEFAULT_LINK_BUILTIN_ICONS: Record<string, Extract<SavedLinkIcon, { type: 'builtin' }>> = {
   bilibili: {
@@ -91,148 +92,295 @@ const DEFAULT_LINK_BUILTIN_ICONS: Record<string, Extract<SavedLinkIcon, { type: 
   },
 }
 
+type DefaultCategorySeed = {
+  id: string
+  name: string
+  order: number
+}
+
+type DefaultLinkSeed = {
+  id: string
+  categoryId: string
+  name: string
+  url: string
+  note: string
+  order: number
+}
+
+type DefaultDeckSeed = {
+  deckName: string
+  defaultCategoryName: string
+  emptyDeckName: string
+  categories: DefaultCategorySeed[]
+  links: DefaultLinkSeed[]
+}
+
+const DEFAULT_DECK_SEEDS: Record<AppLanguage, DefaultDeckSeed> = {
+  en: {
+    deckName: 'Default Deck',
+    defaultCategoryName: 'Default',
+    emptyDeckName: 'Local Deck',
+    categories: [
+      { id: 'tools', name: 'Tools', order: 2 },
+      { id: 'social', name: 'Social', order: 3 },
+      { id: 'video', name: 'Video', order: 4 },
+      { id: 'discovery', name: 'Discovery', order: 5 },
+    ],
+    links: [
+      {
+        id: 'google',
+        categoryId: 'default',
+        name: 'Google',
+        url: 'https://www.google.com/',
+        note: 'Search and everyday web access',
+        order: 1,
+      },
+      {
+        id: 'chatgpt',
+        categoryId: 'default',
+        name: 'ChatGPT',
+        url: 'https://chatgpt.com/',
+        note: 'AI assistant and research',
+        order: 2,
+      },
+      {
+        id: 'github',
+        categoryId: 'default',
+        name: 'GitHub',
+        url: 'https://github.com/',
+        note: 'Code hosting and collaboration',
+        order: 3,
+      },
+      {
+        id: 'notion',
+        categoryId: 'tools',
+        name: 'Notion',
+        url: 'https://www.notion.so/',
+        note: 'Notes, docs, and workspace',
+        order: 1,
+      },
+      {
+        id: 'excalidraw',
+        categoryId: 'tools',
+        name: 'Excalidraw',
+        url: 'https://excalidraw.com/',
+        note: 'Sketches, diagrams, and visual thinking',
+        order: 2,
+      },
+      {
+        id: 'x',
+        categoryId: 'social',
+        name: 'X.com',
+        url: 'https://x.com/',
+        note: 'Real-time social updates',
+        order: 1,
+      },
+      {
+        id: 'instagram',
+        categoryId: 'social',
+        name: 'Instagram',
+        url: 'https://www.instagram.com/',
+        note: 'Photos, creators, and social feeds',
+        order: 2,
+      },
+      {
+        id: 'xiaohongshu',
+        categoryId: 'social',
+        name: 'Xiaohongshu',
+        url: 'https://www.xiaohongshu.com/',
+        note: 'Lifestyle search and community posts',
+        order: 3,
+      },
+      {
+        id: 'youtube',
+        categoryId: 'video',
+        name: 'YouTube',
+        url: 'https://www.youtube.com/',
+        note: 'Long-form video and learning',
+        order: 1,
+      },
+      {
+        id: 'douyin',
+        categoryId: 'video',
+        name: 'Douyin',
+        url: 'https://www.douyin.com/',
+        note: 'Short-form video and trends',
+        order: 2,
+      },
+      {
+        id: 'bilibili',
+        categoryId: 'video',
+        name: 'Bilibili',
+        url: 'https://www.bilibili.com/',
+        note: 'Videos, creators, and tech content',
+        order: 3,
+      },
+      {
+        id: 'hacker-news',
+        categoryId: 'discovery',
+        name: 'Hacker News',
+        url: 'https://news.ycombinator.com/',
+        note: 'Startup and engineering news',
+        order: 1,
+      },
+      {
+        id: 'product-hunt',
+        categoryId: 'discovery',
+        name: 'Product Hunt',
+        url: 'https://www.producthunt.com/',
+        note: 'New products and launches',
+        order: 2,
+      },
+      {
+        id: 'sspai',
+        categoryId: 'discovery',
+        name: 'Sspai',
+        url: 'https://sspai.com/',
+        note: 'Digital tools and productivity writing',
+        order: 3,
+      },
+    ],
+  },
+  zh: {
+    deckName: '默认链接面板',
+    defaultCategoryName: '默认',
+    emptyDeckName: '本地链接面板',
+    categories: [
+      { id: 'tools', name: '工具', order: 2 },
+      { id: 'social', name: '社交', order: 3 },
+      { id: 'video', name: '视频', order: 4 },
+      { id: 'discovery', name: '发现', order: 5 },
+    ],
+    links: [
+      {
+        id: 'google',
+        categoryId: 'default',
+        name: 'Google',
+        url: 'https://www.google.com/',
+        note: '搜索与日常网页访问',
+        order: 1,
+      },
+      {
+        id: 'chatgpt',
+        categoryId: 'default',
+        name: 'ChatGPT',
+        url: 'https://chatgpt.com/',
+        note: 'AI 助手与资料研究',
+        order: 2,
+      },
+      {
+        id: 'github',
+        categoryId: 'default',
+        name: 'GitHub',
+        url: 'https://github.com/',
+        note: '代码托管与协作',
+        order: 3,
+      },
+      {
+        id: 'notion',
+        categoryId: 'tools',
+        name: 'Notion',
+        url: 'https://www.notion.so/',
+        note: '笔记、文档与工作区',
+        order: 1,
+      },
+      {
+        id: 'excalidraw',
+        categoryId: 'tools',
+        name: 'Excalidraw',
+        url: 'https://excalidraw.com/',
+        note: '草图、图表与视觉思考',
+        order: 2,
+      },
+      {
+        id: 'x',
+        categoryId: 'social',
+        name: 'X.com',
+        url: 'https://x.com/',
+        note: '实时社交动态',
+        order: 1,
+      },
+      {
+        id: 'instagram',
+        categoryId: 'social',
+        name: 'Instagram',
+        url: 'https://www.instagram.com/',
+        note: '图片、创作者与社交动态',
+        order: 2,
+      },
+      {
+        id: 'xiaohongshu',
+        categoryId: 'social',
+        name: '小红书',
+        url: 'https://www.xiaohongshu.com/',
+        note: '生活方式搜索与社区内容',
+        order: 3,
+      },
+      {
+        id: 'youtube',
+        categoryId: 'video',
+        name: 'YouTube',
+        url: 'https://www.youtube.com/',
+        note: '长视频与学习内容',
+        order: 1,
+      },
+      {
+        id: 'douyin',
+        categoryId: 'video',
+        name: '抖音',
+        url: 'https://www.douyin.com/',
+        note: '短视频与趋势内容',
+        order: 2,
+      },
+      {
+        id: 'bilibili',
+        categoryId: 'video',
+        name: 'Bilibili',
+        url: 'https://www.bilibili.com/',
+        note: '视频、创作者与科技内容',
+        order: 3,
+      },
+      {
+        id: 'hacker-news',
+        categoryId: 'discovery',
+        name: 'Hacker News',
+        url: 'https://news.ycombinator.com/',
+        note: '创业与工程新闻',
+        order: 1,
+      },
+      {
+        id: 'product-hunt',
+        categoryId: 'discovery',
+        name: 'Product Hunt',
+        url: 'https://www.producthunt.com/',
+        note: '新产品与发布动态',
+        order: 2,
+      },
+      {
+        id: 'sspai',
+        categoryId: 'discovery',
+        name: '少数派',
+        url: 'https://sspai.com/',
+        note: '数字工具与效率写作',
+        order: 3,
+      },
+    ],
+  },
+}
+
 /** Creates a default deck document with a fresh timestamp on every call. */
-export function createDefaultDeck(): DeckDocument {
+export function createDefaultDeck(language: AppLanguage = 'en'): DeckDocument {
   const now = new Date().toISOString()
+  const seed = DEFAULT_DECK_SEEDS[language]
   const categories: Category[] = [
-    createDefaultCategory(now, 1),
-    createCategory('tools', 'Tools', 2, now),
-    createCategory('social', 'Social', 3, now),
-    createCategory('video', 'Video', 4, now),
-    createCategory('discovery', 'Discovery', 5, now),
+    createDefaultCategory(now, 1, seed.defaultCategoryName),
+    ...seed.categories.map(category => createCategory(category.id, category.name, category.order, now)),
   ]
-  const links: SavedLink[] = [
-    createLink({
-      id: 'google',
-      categoryId: 'default',
-      name: 'Google',
-      url: 'https://www.google.com/',
-      note: 'Search and everyday web access',
-      order: 1,
-      now,
-    }),
-    createLink({
-      id: 'chatgpt',
-      categoryId: 'default',
-      name: 'ChatGPT',
-      url: 'https://chatgpt.com/',
-      note: 'AI assistant and research',
-      order: 2,
-      now,
-    }),
-    createLink({
-      id: 'notion',
-      categoryId: 'tools',
-      name: 'Notion',
-      url: 'https://www.notion.so/',
-      note: 'Notes, docs, and workspace',
-      order: 1,
-      now,
-    }),
-    createLink({
-      id: 'github',
-      categoryId: 'default',
-      name: 'GitHub',
-      url: 'https://github.com/',
-      note: 'Code hosting and collaboration',
-      order: 3,
-      now,
-    }),
-    createLink({
-      id: 'excalidraw',
-      categoryId: 'tools',
-      name: 'Excalidraw',
-      url: 'https://excalidraw.com/',
-      note: 'Sketches, diagrams, and visual thinking',
-      order: 2,
-      now,
-    }),
-    createLink({
-      id: 'x',
-      categoryId: 'social',
-      name: 'X.com',
-      url: 'https://x.com/',
-      note: 'Real-time social updates',
-      order: 1,
-      now,
-    }),
-    createLink({
-      id: 'instagram',
-      categoryId: 'social',
-      name: 'Instagram',
-      url: 'https://www.instagram.com/',
-      note: 'Photos, creators, and social feeds',
-      order: 2,
-      now,
-    }),
-    createLink({
-      id: 'xiaohongshu',
-      categoryId: 'social',
-      name: 'Xiaohongshu',
-      url: 'https://www.xiaohongshu.com/',
-      note: 'Lifestyle search and community posts',
-      order: 3,
-      now,
-    }),
-    createLink({
-      id: 'youtube',
-      categoryId: 'video',
-      name: 'YouTube',
-      url: 'https://www.youtube.com/',
-      note: 'Long-form video and learning',
-      order: 1,
-      now,
-    }),
-    createLink({
-      id: 'douyin',
-      categoryId: 'video',
-      name: 'Douyin',
-      url: 'https://www.douyin.com/',
-      note: 'Short-form video and trends',
-      order: 2,
-      now,
-    }),
-    createLink({
-      id: 'bilibili',
-      categoryId: 'video',
-      name: 'Bilibili',
-      url: 'https://www.bilibili.com/',
-      note: 'Videos, creators, and tech content',
-      order: 3,
-      now,
-    }),
-    createLink({
-      id: 'hacker-news',
-      categoryId: 'discovery',
-      name: 'Hacker News',
-      url: 'https://news.ycombinator.com/',
-      note: 'Startup and engineering news',
-      order: 1,
-      now,
-    }),
-    createLink({
-      id: 'product-hunt',
-      categoryId: 'discovery',
-      name: 'Product Hunt',
-      url: 'https://www.producthunt.com/',
-      note: 'New products and launches',
-      order: 2,
-      now,
-    }),
-    createLink({
-      id: 'sspai',
-      categoryId: 'discovery',
-      name: 'Sspai',
-      url: 'https://sspai.com/',
-      note: 'Digital tools and productivity writing',
-      order: 3,
-      now,
-    }),
-  ]
+  const links = seed.links.map(link => createLink({ ...link, now }))
 
   return {
     id: 'default',
-    name: 'Default Deck',
+    name: seed.deckName,
     categories,
     links,
     iconFiles: [],
@@ -242,16 +390,21 @@ export function createDefaultDeck(): DeckDocument {
 }
 
 /** Creates the default persisted deck state. */
-export function createDefaultPersistedDeck(): PersistedAppState {
-  return createDefaultDeck()
+export function createDefaultPersistedDeck(language: AppLanguage = 'en'): PersistedAppState {
+  return createDefaultDeck(language)
 }
 
 /** Creates an empty persisted deck with one usable default category. */
-export function createEmptyPersistedDeck(now = new Date().toISOString()): PersistedAppState {
+export function createEmptyPersistedDeck(
+  language: AppLanguage = 'en',
+  now = new Date().toISOString(),
+): PersistedAppState {
+  const seed = DEFAULT_DECK_SEEDS[language]
+
   return {
     id: 'local',
-    name: 'Local Deck',
-    categories: [createDefaultCategory(now)],
+    name: seed.emptyDeckName,
+    categories: [createDefaultCategory(now, 1, seed.defaultCategoryName)],
     links: [],
     iconFiles: [],
     createdAt: now,

@@ -2,6 +2,7 @@
 
 import type { KeyboardEvent, MouseEvent, PointerEvent } from 'react'
 import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import type { SavedLink } from '@/domain/deck/types'
 import {
@@ -33,6 +34,7 @@ export function DeleteLinkDialog({
   onOpenChange,
   onConfirmDelete,
 }: DeleteLinkDialogProps) {
+  const { t } = useTranslation()
   const [isDeleting, setIsDeleting] = useState(false)
   const deleteActionRef = useRef<HTMLButtonElement>(null)
 
@@ -80,14 +82,16 @@ export function DeleteLinkDialog({
         }}
       >
         <AlertDialogHeader className={displaySizeConfig.dialog.headerClassName}>
-          <AlertDialogTitle className={displaySizeConfig.dialog.titleClassName}>Delete link</AlertDialogTitle>
+          <AlertDialogTitle className={displaySizeConfig.dialog.titleClassName}>
+            {t('deck.linkCard.deleteTitle')}
+          </AlertDialogTitle>
           <AlertDialogDescription className={cn('wrap-break-word', displaySizeConfig.dialog.descriptionClassName)}>
-            Delete "{link?.name}"? This removes the link from your deck.
+            {t('deck.linkCard.deleteDescription', { name: link?.name ?? '' })}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className={displaySizeConfig.dialog.footerClassName}>
           <AlertDialogCancel size={displaySizeConfig.control.buttonSize} disabled={isDeleting}>
-            Cancel
+            {t('common.cancel')}
           </AlertDialogCancel>
           <AlertDialogAction
             ref={deleteActionRef}
@@ -99,7 +103,7 @@ export function DeleteLinkDialog({
               void handleConfirmDelete()
             }}
           >
-            {isDeleting ? 'Deleting...' : 'Delete'}
+            {isDeleting ? t('deck.linkCard.deleting') : t('common.delete')}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

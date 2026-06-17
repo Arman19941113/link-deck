@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils'
 export const CATEGORY_PANEL_CONTROL_TAB_INDEX = -1
 
 type SortableCategoryRowProps = {
+  dragLabel: string
   actions: ReactNode
   category: Category
   disabled: boolean
@@ -18,7 +19,7 @@ type SortableCategoryRowProps = {
 }
 
 /** Adds a full-row drag area to category rows while keeping right-side action buttons independent. */
-export function SortableCategoryRow({ actions, category, disabled, dragContent }: SortableCategoryRowProps) {
+export function SortableCategoryRow({ actions, category, disabled, dragContent, dragLabel }: SortableCategoryRowProps) {
   const { attributes, isDragging, listeners, setActivatorNodeRef, setNodeRef, transform, transition } = useSortable({
     id: category.id,
     data: {
@@ -35,7 +36,7 @@ export function SortableCategoryRow({ actions, category, disabled, dragContent }
     : {
         ...attributes,
         ...listeners,
-        'aria-label': `Drag category ${category.name}`,
+        'aria-label': dragLabel,
         tabIndex: CATEGORY_PANEL_CONTROL_TAB_INDEX,
       }
 

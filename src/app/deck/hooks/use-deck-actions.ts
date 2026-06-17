@@ -13,6 +13,7 @@ import type { DeleteCategoryLinksStrategy } from '@/domain/deck/category-delete-
 import type { DeckBackupPayload } from '@/domain/deck/deck-transfer'
 import type { UpsertLinkInput } from '@/domain/deck/link-upsert-plan'
 import type { Category, SavedLink, SortMode, StoredIconFile } from '@/domain/deck/types'
+import type { AppLanguage } from '@/domain/settings/language'
 import type { DisplaySize } from '@/domain/settings/types'
 import { deckPersistenceService } from '@/services/deck-persistence'
 
@@ -38,8 +39,8 @@ export type DeckActions = {
   loadStoredIconFile: (id: string) => Promise<StoredIconFile | undefined>
   exportDeck: () => Promise<DeckBackupPayload>
   importDeck: (json: string) => Promise<void>
-  resetDeckToDefaults: () => Promise<void>
-  clearDeckData: () => Promise<void>
+  resetDeckToDefaults: (language: AppLanguage) => Promise<void>
+  clearDeckData: (language: AppLanguage) => Promise<void>
 }
 
 /** Creates deck actions that operate against the latest deck state refs. */

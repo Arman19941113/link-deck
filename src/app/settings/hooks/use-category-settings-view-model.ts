@@ -2,6 +2,7 @@
 
 import { type FormEvent, type KeyboardEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { type DragEndEvent, type DragStartEvent } from '@dnd-kit/core'
+import { useTranslation } from 'react-i18next'
 
 import {
   applyCategoryEditingName,
@@ -38,6 +39,7 @@ export function useCategorySettingsViewModel({
   reorderCategoryList,
   settingsError,
 }: UseCategorySettingsViewModelParams) {
+  const { t } = useTranslation()
   const newCategoryNameInputRef = useRef<HTMLInputElement>(null)
   const editingCategoryNameInputRef = useRef<HTMLInputElement>(null)
   const categoryListRef = useRef<HTMLDivElement>(null)
@@ -95,7 +97,7 @@ export function useCategorySettingsViewModel({
     const name = newCategoryName.trim()
 
     if (!name) {
-      settingsError.showError('Enter a category name')
+      settingsError.showError(t('settings.errors.enterCategoryName'))
       newCategoryNameInputRef.current?.focus()
       return
     }
@@ -161,7 +163,7 @@ export function useCategorySettingsViewModel({
     const name = editingCategoryName.trim()
 
     if (!name) {
-      settingsError.showError('Enter a category name')
+      settingsError.showError(t('settings.errors.enterCategoryName'))
       return
     }
 
@@ -179,7 +181,7 @@ export function useCategorySettingsViewModel({
     }
 
     if (isDefaultCategory(category.id)) {
-      settingsError.showError('The default category cannot be deleted')
+      settingsError.showError(t('settings.errors.defaultCategoryCannotBeDeleted'))
       return
     }
 
@@ -201,12 +203,12 @@ export function useCategorySettingsViewModel({
     }
 
     if (categoryRows.length <= 1) {
-      settingsError.showError('Keep at least one category')
+      settingsError.showError(t('settings.errors.keepAtLeastOneCategory'))
       return false
     }
 
     if (pendingDeleteLinkCount > 0 && deleteMode === 'move-links' && !effectiveDeleteTargetCategoryId) {
-      settingsError.showError('Select the category to move links to')
+      settingsError.showError(t('settings.errors.selectMoveTarget'))
       return false
     }
 
@@ -282,7 +284,7 @@ export function useCategorySettingsViewModel({
       settingsError.clearError()
       return true
     } catch (actionError) {
-      settingsError.showError(getSettingsDialogErrorMessage(actionError))
+      settingsError.showError(getSettingsDialogErrorMessage(actionError, t))
       return false
     }
   }

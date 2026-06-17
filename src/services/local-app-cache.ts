@@ -10,12 +10,14 @@ import {
 } from '@/domain/settings/design-style'
 import type { DisplaySize } from '@/domain/settings/types'
 import { DEFAULT_THEME_PREFERENCE, isThemePreference, type ThemePreference } from '@/domain/settings/theme'
+import { isAppLanguage, type AppLanguage } from '@/domain/settings/language'
 import { isCategory, isRecord, isSavedLink } from '@/domain/deck/deck-guards'
 import { readLocalStorageJsonOrString, writeLocalStorageJson } from '@/lib/local-storage'
 
 const LOCAL_STORAGE_KEY_THEME = 'link-deck.theme'
 const LOCAL_STORAGE_KEY_DESIGN_STYLE = 'link-deck.design-style'
 const LOCAL_STORAGE_KEY_DISPLAY_SIZE = 'link-deck.display-size'
+const LOCAL_STORAGE_KEY_LANGUAGE = 'link-deck.language'
 const LOCAL_STORAGE_KEY_SORT_MODE = 'link-deck.sort-mode'
 const LOCAL_STORAGE_KEY_STARTUP_DECK_SNAPSHOT = 'link-deck.deck-snapshot'
 const STARTUP_DECK_SNAPSHOT_VERSION = 1
@@ -34,11 +36,13 @@ export const localAppCacheService = {
   getStartupDeckSnapshot,
   getDesignStylePreference,
   getDisplaySize,
+  getLanguagePreference,
   getSortMode,
   getThemePreference,
   setStartupDeckSnapshot,
   setDesignStylePreference,
   setDisplaySize,
+  setLanguagePreference,
   setSortMode,
   setThemePreference,
 }
@@ -71,6 +75,13 @@ function getDesignStylePreference(): DesignStylePreference {
     : DEFAULT_DESIGN_STYLE_PREFERENCE
 }
 
+/** Reads the saved interface language from localStorage. */
+function getLanguagePreference(): AppLanguage | null {
+  const storedLanguagePreference = readLocalStorageJsonOrString<unknown>(LOCAL_STORAGE_KEY_LANGUAGE)
+
+  return isAppLanguage(storedLanguagePreference) ? storedLanguagePreference : null
+}
+
 /** Saves the selected theme preference to localStorage. */
 function setThemePreference(themePreference: ThemePreference): void {
   writeLocalStorageJson(LOCAL_STORAGE_KEY_THEME, themePreference)
@@ -79,6 +90,11 @@ function setThemePreference(themePreference: ThemePreference): void {
 /** Saves the selected design style preference to localStorage. */
 function setDesignStylePreference(designStylePreference: DesignStylePreference): void {
   writeLocalStorageJson(LOCAL_STORAGE_KEY_DESIGN_STYLE, designStylePreference)
+}
+
+/** Saves the selected interface language to localStorage. */
+function setLanguagePreference(language: AppLanguage): void {
+  writeLocalStorageJson(LOCAL_STORAGE_KEY_LANGUAGE, language)
 }
 
 /** Reads the synchronous deck snapshot used to avoid a blank first render on refresh. */

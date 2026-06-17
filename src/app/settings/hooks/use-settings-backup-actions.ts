@@ -2,9 +2,11 @@
 
 import { type ChangeEvent, useRef, useState } from 'react'
 import { toast } from 'sonner'
+import { useTranslation } from 'react-i18next'
 
 import { getImportErrorToastMessage, getSettingsDialogErrorMessage } from '../utils/settings-errors'
 import type { DataBusyAction, DestructiveDataAction } from '../types'
+import type { AppLanguage } from '@/domain/settings/language'
 
 type UseSettingsBackupActionsParams = {
   busyAction: DataBusyAction | null
@@ -13,8 +15,9 @@ type UseSettingsBackupActionsParams = {
   setBusyAction: (action: DataBusyAction | null) => void
   exportDeck: () => Promise<unknown>
   importDeck: (json: string) => Promise<void>
-  resetDeckToDefaults: () => Promise<void>
-  clearDeckData: () => Promise<void>
+  resetDeckToDefaults: (language: AppLanguage) => Promise<void>
+  clearDeckData: (language: AppLanguage) => Promise<void>
+  language: AppLanguage
   onClose: () => void
 }
 
@@ -28,8 +31,10 @@ export function useSettingsBackupActions({
   importDeck,
   resetDeckToDefaults,
   clearDeckData,
+  language,
   onClose,
 }: UseSettingsBackupActionsParams) {
+  const { t } = useTranslation()
   const importFileInputRef = useRef<HTMLInputElement>(null)
   const [pendingDestructiveDataAction, setPendingDestructiveDataAction] = useState<DestructiveDataAction | null>(null)
   const isBusy = busyAction !== null
@@ -60,9 +65,9 @@ export function useSettingsBackupActions({
       link.remove()
       URL.revokeObjectURL(objectUrl)
       clearError()
-      toast.success('Backup exported.')
+      toast.success(t('settings.toasts.backupExported'))
     } catch (exportError) {
-      showError(getSettingsDialogErrorMessage(exportError))
+      showError(getSettingsDialogErrorMessage(exportError, t))
     } finally {
       setBusyAction(null)
     }
@@ -92,11 +97,11 @@ export function useSettingsBackupActions({
 
     try {
       await importDeck(await file.text())
-      toast.success('Backup imported.')
+      toast.success(t('settings.toasts.backupImported'))
       setBusyAction(null)
       onClose()
     } catch (importError) {
-      toast.error(getImportErrorToastMessage(importError), { id: 'backup-import-error' })
+      toast.error(getImportErrorToastMessage(importError, t), { id: 'backup-import-error' })
       setBusyAction(null)
     }
   }
@@ -122,18 +127,18 @@ export function useSettingsBackupActions({
 
     try {
       if (pendingDestructiveDataAction === 'reset') {
-        await resetDeckToDefaults()
-        toast.success('Default data restored.')
+        await resetDeckToDefaults(language)
+        toast.success(t('settings.toasts.defaultDataRestored'))
       } else {
-        await clearDeckData()
-        toast.success('Data cleared.')
+        await clearDeckData(language)
+        toast.success(t('settings.toasts.dataCleared'))
       }
 
       setPendingDestructiveDataAction(null)
       setBusyAction(null)
       onClose()
     } catch (dataError) {
-      showError(getSettingsDialogErrorMessage(dataError))
+      showError(getSettingsDialogErrorMessage(dataError, t))
       setBusyAction(null)
     }
   }

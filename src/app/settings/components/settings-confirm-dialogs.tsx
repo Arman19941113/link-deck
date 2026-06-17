@@ -10,6 +10,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
+import { useTranslation } from 'react-i18next'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import type { DeleteCategoryLinksStrategy } from '@/domain/deck/category-delete-changes'
@@ -40,22 +41,26 @@ export function DestructiveDataActionConfirmDialog({
   onOpenChange,
   pendingDestructiveDataAction,
 }: DestructiveDataActionConfirmDialogProps) {
+  const { t } = useTranslation()
+
   return (
     <AlertDialog open={pendingDestructiveDataAction !== null} onOpenChange={onOpenChange}>
       <AlertDialogContent size="default" className="max-h-[calc(100svh-2rem)] gap-4 p-6 sm:max-w-xl">
         <AlertDialogHeader className="gap-2">
           <AlertDialogTitle className="text-lg leading-none font-semibold">
-            {pendingDestructiveDataAction === 'reset' ? 'Reset to default data?' : 'Clear all data?'}
+            {pendingDestructiveDataAction === 'reset'
+              ? t('settings.confirm.resetTitle')
+              : t('settings.confirm.clearTitle')}
           </AlertDialogTitle>
           <AlertDialogDescription className="text-sm text-muted-foreground">
             {pendingDestructiveDataAction === 'reset'
-              ? 'This will replace all current links, categories, local icons, and settings with the built-in default data.'
-              : 'This will delete all links, local icons, and custom categories. One default category will remain.'}
+              ? t('settings.confirm.resetDescription')
+              : t('settings.confirm.clearDescription')}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="gap-2">
           <AlertDialogCancel size="default" disabled={isBusy}>
-            Cancel
+            {t('common.cancel')}
           </AlertDialogCancel>
           <AlertDialogAction
             variant="destructive"
@@ -67,12 +72,12 @@ export function DestructiveDataActionConfirmDialog({
             }}
           >
             {busyAction === 'reset'
-              ? 'Resetting…'
+              ? t('settings.confirm.resetting')
               : busyAction === 'clear'
-                ? 'Clearing…'
+                ? t('settings.confirm.clearing')
                 : pendingDestructiveDataAction === 'reset'
-                  ? 'Reset'
-                  : 'Clear data'}
+                  ? t('common.reset')
+                  : t('settings.data.clear')}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
@@ -82,6 +87,8 @@ export function DestructiveDataActionConfirmDialog({
 
 /** Renders the category deletion dialog and optional link-handling controls. */
 export function CategoryDeleteConfirmDialog({ categorySettingsViewModel }: CategoryDeleteConfirmDialogProps) {
+  const { t } = useTranslation()
+
   return (
     <AlertDialog
       open={categorySettingsViewModel.pendingDeleteCategory !== null}
@@ -94,12 +101,16 @@ export function CategoryDeleteConfirmDialog({ categorySettingsViewModel }: Categ
       <AlertDialogContent size="default" className="max-h-[calc(100svh-2rem)] gap-4 p-6 sm:max-w-xl">
         <AlertDialogHeader className="gap-2">
           <AlertDialogTitle className="text-lg leading-none font-semibold">
-            Delete "{categorySettingsViewModel.pendingDeleteCategory?.name}"?
+            {t('settings.confirm.deleteCategoryTitle', {
+              name: categorySettingsViewModel.pendingDeleteCategory?.name ?? '',
+            })}
           </AlertDialogTitle>
           <AlertDialogDescription className="text-sm text-muted-foreground">
             {categorySettingsViewModel.pendingDeleteLinkCount > 0
-              ? `This category contains ${categorySettingsViewModel.pendingDeleteLinkCount} links. Choose what should happen to them before deleting.`
-              : 'This category will be removed immediately.'}
+              ? t('settings.confirm.deleteCategoryWithLinks', {
+                  count: categorySettingsViewModel.pendingDeleteLinkCount,
+                })
+              : t('settings.confirm.deleteCategoryEmpty')}
           </AlertDialogDescription>
         </AlertDialogHeader>
 
@@ -107,7 +118,7 @@ export function CategoryDeleteConfirmDialog({ categorySettingsViewModel }: Categ
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="flex flex-col gap-2">
               <Label htmlFor="settings-category-delete-mode" className="text-sm">
-                Action
+                {t('settings.confirm.deleteAction')}
               </Label>
               <Select
                 value={categorySettingsViewModel.deleteMode}
@@ -121,8 +132,8 @@ export function CategoryDeleteConfirmDialog({ categorySettingsViewModel }: Categ
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    <SelectItem value="move-links">Move to another category</SelectItem>
-                    <SelectItem value="delete-links">Delete links too</SelectItem>
+                    <SelectItem value="move-links">{t('settings.confirm.moveLinks')}</SelectItem>
+                    <SelectItem value="delete-links">{t('settings.confirm.deleteLinksToo')}</SelectItem>
                   </SelectGroup>
                 </SelectContent>
               </Select>
@@ -131,7 +142,7 @@ export function CategoryDeleteConfirmDialog({ categorySettingsViewModel }: Categ
             {categorySettingsViewModel.deleteMode === 'move-links' ? (
               <div className="flex flex-col gap-2">
                 <Label htmlFor="settings-category-delete-target" className="text-sm">
-                  Move links to
+                  {t('settings.confirm.moveLinksTo')}
                 </Label>
                 <Select
                   value={categorySettingsViewModel.effectiveDeleteTargetCategoryId}
@@ -144,7 +155,7 @@ export function CategoryDeleteConfirmDialog({ categorySettingsViewModel }: Categ
                       !categorySettingsViewModel.deleteTargetCategoryId && Boolean(categorySettingsViewModel.error)
                     }
                   >
-                    <SelectValue placeholder="Select a category" />
+                    <SelectValue placeholder={t('settings.confirm.selectCategory')} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
@@ -162,7 +173,7 @@ export function CategoryDeleteConfirmDialog({ categorySettingsViewModel }: Categ
         ) : null}
 
         <AlertDialogFooter className="gap-2">
-          <AlertDialogCancel size="default">Cancel</AlertDialogCancel>
+          <AlertDialogCancel size="default">{t('common.cancel')}</AlertDialogCancel>
           <AlertDialogAction
             variant="destructive"
             size="default"
@@ -171,7 +182,7 @@ export function CategoryDeleteConfirmDialog({ categorySettingsViewModel }: Categ
               void categorySettingsViewModel.confirmPendingDelete()
             }}
           >
-            Delete
+            {t('common.delete')}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

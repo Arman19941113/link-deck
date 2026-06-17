@@ -1,11 +1,13 @@
 // Registers the PWA service worker and surfaces offline/update state through app toasts.
 
 import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { useRegisterSW } from 'virtual:pwa-register/react'
 
 /** Shows install lifecycle feedback for the generated service worker. */
 export function PwaUpdateToaster() {
+  const { t } = useTranslation()
   const {
     offlineReady: [offlineReady, setOfflineReady],
     needRefresh: [needRefresh, setNeedRefresh],
@@ -21,31 +23,31 @@ export function PwaUpdateToaster() {
       return
     }
 
-    toast.success('Link Deck is ready for offline use.', {
+    toast.success(t('app.pwa.offlineReady'), {
       id: 'pwa-offline-ready',
       onDismiss: () => setOfflineReady(false),
     })
-  }, [offlineReady, setOfflineReady])
+  }, [offlineReady, setOfflineReady, t])
 
   useEffect(() => {
     if (!needRefresh) {
       return
     }
 
-    toast.info('A new version of Link Deck is available.', {
+    toast.info(t('app.pwa.updateReady'), {
       id: 'pwa-update-ready',
       action: {
-        label: 'Refresh',
+        label: t('app.pwa.refresh'),
         onClick: () => updateServiceWorker(true),
       },
       cancel: {
-        label: 'Later',
+        label: t('app.pwa.later'),
         onClick: () => setNeedRefresh(false),
       },
       duration: Infinity,
       onDismiss: () => setNeedRefresh(false),
     })
-  }, [needRefresh, setNeedRefresh, updateServiceWorker])
+  }, [needRefresh, setNeedRefresh, t, updateServiceWorker])
 
   return null
 }

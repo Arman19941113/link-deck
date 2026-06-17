@@ -15,7 +15,6 @@ type KeyboardShortcutKeys = {
 
 type KeyboardShortcut = {
   id: KeyboardShortcutId
-  label: string
   key: string
   shiftKey?: boolean
   keys: KeyboardShortcutKeys
@@ -36,7 +35,6 @@ type KeyboardShortcutEvent = {
 const KEYBOARD_SHORTCUT_DEFINITIONS: KeyboardShortcutDefinition[] = [
   {
     id: 'search',
-    label: 'Search',
     key: 'k',
     keys: {
       apple: 'Cmd + K',
@@ -45,7 +43,6 @@ const KEYBOARD_SHORTCUT_DEFINITIONS: KeyboardShortcutDefinition[] = [
   },
   {
     id: 'openLink',
-    label: 'Open selected link',
     key: 'Enter',
     keys: {
       apple: 'Cmd + Enter',
@@ -54,7 +51,6 @@ const KEYBOARD_SHORTCUT_DEFINITIONS: KeyboardShortcutDefinition[] = [
   },
   {
     id: 'createLink',
-    label: 'New link',
     key: 'o',
     shiftKey: true,
     keys: {
@@ -64,7 +60,6 @@ const KEYBOARD_SHORTCUT_DEFINITIONS: KeyboardShortcutDefinition[] = [
   },
   {
     id: 'deleteLink',
-    label: 'Delete selected link',
     key: 'Backspace',
     shiftKey: true,
     keys: {
@@ -74,7 +69,6 @@ const KEYBOARD_SHORTCUT_DEFINITIONS: KeyboardShortcutDefinition[] = [
   },
   {
     id: 'keyboardShortcuts',
-    label: 'Show shortcuts',
     key: '/',
     keys: {
       apple: 'Cmd + /',

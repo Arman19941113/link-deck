@@ -26,10 +26,10 @@ export function isDefaultCategory(categoryId: string): boolean {
 }
 
 /** Creates the built-in default category record. */
-export function createDefaultCategory(now: string, order = 1): Category {
+export function createDefaultCategory(now: string, order = 1, name = DEFAULT_CATEGORY_NAME): Category {
   return {
     id: DEFAULT_CATEGORY_ID,
-    name: DEFAULT_CATEGORY_NAME,
+    name,
     order,
     createdAt: now,
     updatedAt: now,

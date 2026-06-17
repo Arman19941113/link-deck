@@ -2,6 +2,7 @@
 
 import { IconSourceFields } from './icon-source-fields'
 import { useLinkEditorForm } from './use-link-editor-form'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -72,6 +73,7 @@ function LinkEditorForm({
   onOpenChange,
   upsertLink,
 }: LinkEditorFormProps) {
+  const { t } = useTranslation()
   const form = useLinkEditorForm({
     link,
     defaultCategoryId,
@@ -92,14 +94,14 @@ function LinkEditorForm({
       <DialogHeader className={displaySizeConfig.dialog.headerClassName}>
         <DialogTitle className={displaySizeConfig.dialog.titleClassName}>{form.editorTitle}</DialogTitle>
         <DialogDescription className={displaySizeConfig.dialog.descriptionClassName}>
-          Save the link details and choose how its icon should appear.
+          {t('linkEditor.description')}
         </DialogDescription>
       </DialogHeader>
 
       <form className={displaySizeConfig.dialog.formClassName} onSubmit={event => void form.handleSubmit(event)}>
         <div className={displaySizeConfig.dialog.fieldClassName}>
           <Label htmlFor="link-editor-url" className={displaySizeConfig.control.labelClassName}>
-            Link URL
+            {t('linkEditor.url')}
           </Label>
           <Input
             id="link-editor-url"
@@ -123,13 +125,13 @@ function LinkEditorForm({
         >
           <div className={displaySizeConfig.dialog.fieldClassName}>
             <Label htmlFor="link-editor-name" className={displaySizeConfig.control.labelClassName}>
-              Title
+              {t('linkEditor.name')}
             </Label>
             <Input
               id="link-editor-name"
               className={displaySizeConfig.control.inputClassName}
               value={form.name}
-              placeholder="Use link address if empty"
+              placeholder={t('linkEditor.namePlaceholder')}
               disabled={form.isSaving}
               onChange={event => form.setName(event.target.value)}
             />
@@ -138,7 +140,7 @@ function LinkEditorForm({
           {form.shouldShowCategorySelect ? (
             <div className={displaySizeConfig.dialog.fieldClassName}>
               <Label htmlFor="link-editor-category" className={displaySizeConfig.control.labelClassName}>
-                Category
+                {t('linkEditor.category')}
               </Label>
               <Select
                 value={form.selectedCategoryId}
@@ -150,7 +152,7 @@ function LinkEditorForm({
                   className={cn('w-full', displaySizeConfig.control.inputClassName)}
                   aria-invalid={!form.selectedCategoryId && Boolean(form.error)}
                 >
-                  <SelectValue placeholder="Select a category" />
+                  <SelectValue placeholder={t('linkEditor.categoryPlaceholder')} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
@@ -168,7 +170,7 @@ function LinkEditorForm({
 
         <div className={displaySizeConfig.dialog.fieldClassName}>
           <Label htmlFor="link-editor-note" className={displaySizeConfig.control.labelClassName}>
-            Notes
+            {t('linkEditor.notes')}
           </Label>
           <Textarea
             id="link-editor-note"
@@ -208,14 +210,14 @@ function LinkEditorForm({
             disabled={form.isSaving}
             onClick={() => onOpenChange(false)}
           >
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button
             type="submit"
             size={displaySizeConfig.control.buttonSize}
             disabled={form.isSaving || !form.hasCategories}
           >
-            {form.isSaving ? 'Saving...' : 'Save link'}
+            {form.isSaving ? t('common.saving') : t('linkEditor.save')}
           </Button>
         </DialogFooter>
       </form>

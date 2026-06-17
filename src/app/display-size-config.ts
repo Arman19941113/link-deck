@@ -64,7 +64,7 @@ export type DisplaySizeConfig = {
 
 export const DISPLAY_SIZE_OPTIONS: DisplaySizeOption[] = [
   { value: 'compact', label: 'Compact', description: 'Dense layout across the app' },
-  { value: 'comfortable', label: 'Comfortable', description: 'Balanced spacing and reading' },
+  { value: 'normal', label: 'Normal', description: 'Balanced spacing and reading' },
   { value: 'spacious', label: 'Spacious', description: 'Larger controls and more reading room' },
 ]
 
@@ -122,7 +122,7 @@ const DISPLAY_SIZE_CONFIG: Record<DisplaySize, DisplaySizeConfig> = {
       addNoteClassName: 'line-clamp-1 text-xs leading-5 text-muted-foreground/85',
     },
   },
-  comfortable: {
+  normal: {
     page: {
       className: 'mx-auto flex w-full max-w-7xl flex-col px-4 py-4 sm:px-6 sm:py-6',
       stackClassName: 'flex flex-col gap-4',

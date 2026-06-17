@@ -1,6 +1,7 @@
 // App top bar with branding and global actions.
 
 import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Plus, Settings2 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -21,6 +22,8 @@ type DeckToolbarProps = {
 
 /** Shows the app brand and global action area. */
 export function DeckToolbar({ designStylePreference, displaySizeConfig, onAddLink, onOpenSettings }: DeckToolbarProps) {
+  const { t } = useTranslation()
+
   useEffect(() => {
     function handleTopBarShortcut(event: KeyboardEvent): void {
       if (isModalOpen()) {
@@ -54,7 +57,7 @@ export function DeckToolbar({ designStylePreference, displaySizeConfig, onAddLin
         href={GITHUB_REPOSITORY_URL}
         target="_blank"
         rel="noreferrer"
-        aria-label="Open Link Deck GitHub repository"
+        aria-label={t('deck.toolbar.openRepository')}
         className="flex min-w-0 items-center gap-3 rounded-md outline-none transition-opacity duration-200 ease-app-hover hover:opacity-80 focus-visible:ring-[3px] focus-visible:ring-ring/50 motion-reduce:transition-none"
       >
         <img
@@ -63,7 +66,7 @@ export function DeckToolbar({ designStylePreference, displaySizeConfig, onAddLin
           aria-hidden="true"
           className={cn('shrink-0', displaySizeConfig.topBar.iconClassName)}
         />
-        <h1 className={displaySizeConfig.topBar.titleClassName}>Link Deck</h1>
+        <h1 className={displaySizeConfig.topBar.titleClassName}>{t('app.name')}</h1>
       </a>
 
       <div className={displaySizeConfig.topBar.actionsClassName}>
@@ -71,24 +74,24 @@ export function DeckToolbar({ designStylePreference, displaySizeConfig, onAddLin
           type="button"
           variant="outline"
           size={displaySizeConfig.control.buttonSize}
-          aria-label="Open settings"
+          aria-label={t('deck.toolbar.openSettings')}
           onClick={() => {
             onOpenSettings()
           }}
         >
           <Settings2 data-icon="inline-start" aria-hidden="true" />
-          Settings
+          {t('deck.toolbar.settings')}
         </Button>
         <Button
           type="button"
           size={displaySizeConfig.control.buttonSize}
-          aria-label="Add link"
+          aria-label={t('deck.toolbar.addLink')}
           onClick={() => {
             onAddLink()
           }}
         >
           <Plus data-icon="inline-start" aria-hidden="true" />
-          Add link
+          {t('deck.toolbar.addLink')}
         </Button>
       </div>
     </header>

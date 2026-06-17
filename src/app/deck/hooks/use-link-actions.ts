@@ -1,6 +1,7 @@
 // Creates optimistic link mutation, opening, movement, and icon cleanup actions.
 
 import { useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { createDeckRecordId, getDeckActionErrorMessage } from './deck-action-utils'
 import type { DeckActionDeps } from './deck-action-deps'
@@ -24,6 +25,7 @@ export function useLinkActions({
   linksRef,
   setError,
 }: LinkActionContext) {
+  const { t } = useTranslation()
   const cleanupIconIfUnused = useCallback(
     async (iconId: string, nextLinks: SavedLink[]) => {
       if (isIconReferenced(nextLinks, iconId)) {
@@ -33,10 +35,10 @@ export function useLinkActions({
       try {
         await deckPersistenceService.deleteIconFile(iconId)
       } catch (cleanupError) {
-        setError(`Icon file cleanup failed: ${getDeckActionErrorMessage(cleanupError)}`)
+        setError(t('deck.errors.iconCleanupFailed', { message: getDeckActionErrorMessage(cleanupError) }))
       }
     },
-    [setError],
+    [setError, t],
   )
 
   const upsertLink = useCallback(
@@ -126,7 +128,7 @@ export function useLinkActions({
       const latestLinks = linksRef.current
 
       if (!latestCategories.some(category => category.id === categoryId)) {
-        const missingCategoryError = createUserFacingError('Choose an existing category to move links to')
+        const missingCategoryError = createUserFacingError(t('deck.errors.chooseExistingMoveCategory'))
 
         setError(missingCategoryError.message)
         throw missingCategoryError
@@ -137,7 +139,7 @@ export function useLinkActions({
 
       commitOptimisticDeckDataPatch({ links: nextLinks }, () => deckPersistenceService.saveLinks(changedLinks))
     },
-    [categoriesRef, commitOptimisticDeckDataPatch, linksRef, setError],
+    [categoriesRef, commitOptimisticDeckDataPatch, linksRef, setError, t],
   )
 
   return {

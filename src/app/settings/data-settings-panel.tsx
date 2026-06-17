@@ -1,6 +1,7 @@
 // Data settings panel for backup import/export and destructive replacement actions.
 
 import type { ChangeEvent, ReactNode, RefObject } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Download, Eraser, RotateCcw, Upload } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -26,6 +27,8 @@ export function DataSettingsPanel({
   onExportDeck,
   onDestructiveDataActionRequest,
 }: DataSettingsPanelProps) {
+  const { t } = useTranslation()
+
   return (
     <div className="flex max-w-xl flex-col gap-4">
       <input
@@ -36,7 +39,7 @@ export function DataSettingsPanel({
         onChange={onImportFileChange}
       />
 
-      <DataSettingsActionRow title="Import backup">
+      <DataSettingsActionRow title={t('settings.data.importBackup')}>
         <Button
           type="button"
           variant="outline"
@@ -46,11 +49,11 @@ export function DataSettingsPanel({
           onClick={onImportRequest}
         >
           <Upload data-icon="inline-start" aria-hidden="true" />
-          {busyAction === 'import' ? 'Importing…' : 'Import'}
+          {busyAction === 'import' ? t('settings.data.importing') : t('settings.data.import')}
         </Button>
       </DataSettingsActionRow>
 
-      <DataSettingsActionRow title="Export backup">
+      <DataSettingsActionRow title={t('settings.data.exportBackup')}>
         <Button
           type="button"
           variant="outline"
@@ -61,11 +64,11 @@ export function DataSettingsPanel({
           onClick={onExportDeck}
         >
           <Download data-icon="inline-start" aria-hidden="true" />
-          Export
+          {t('settings.data.export')}
         </Button>
       </DataSettingsActionRow>
 
-      <DataSettingsActionRow title="Reset to defaults">
+      <DataSettingsActionRow title={t('settings.data.resetDefaults')}>
         <Button
           type="button"
           variant="outline"
@@ -75,11 +78,11 @@ export function DataSettingsPanel({
           onClick={() => onDestructiveDataActionRequest('reset')}
         >
           <RotateCcw data-icon="inline-start" aria-hidden="true" />
-          Reset
+          {t('common.reset')}
         </Button>
       </DataSettingsActionRow>
 
-      <DataSettingsActionRow title="Clear data">
+      <DataSettingsActionRow title={t('settings.data.clearData')}>
         <Button
           type="button"
           variant="outline"
@@ -89,7 +92,7 @@ export function DataSettingsPanel({
           onClick={() => onDestructiveDataActionRequest('clear')}
         >
           <Eraser data-icon="inline-start" aria-hidden="true" />
-          Clear data
+          {t('settings.data.clear')}
         </Button>
       </DataSettingsActionRow>
     </div>

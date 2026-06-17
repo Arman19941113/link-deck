@@ -1,0 +1,200 @@
+{
+  "app": {
+    "name": "Link Deck",
+    "pwa": {
+      "offlineReady": "Link Deck is ready for offline use.",
+      "updateReady": "A new version of Link Deck is available.",
+      "refresh": "Refresh",
+      "later": "Later"
+    }
+  },
+  "common": {
+    "cancel": "Cancel",
+    "choose": "Choose",
+    "close": "Close",
+    "delete": "Delete",
+    "save": "Save",
+    "saving": "Saving...",
+    "reset": "Reset"
+  },
+  "deck": {
+    "toolbar": {
+      "openRepository": "Open Link Deck GitHub repository",
+      "openSettings": "Open settings",
+      "settings": "Settings",
+      "addLink": "Add link"
+    },
+    "search": {
+      "label": "Search links",
+      "placeholder": "Search links, notes, or URLs...",
+      "clear": "Clear search"
+    },
+    "empty": {
+      "noMatchesTitle": "No matching links found",
+      "noMatchesDescription": "Try another keyword.",
+      "noLinksTitle": "No links yet",
+      "noLinksDescription": "Use Add link to save your first link."
+    },
+    "linkCard": {
+      "open": "Open {{name}}",
+      "moreActions": "More actions for {{name}}",
+      "noNotes": "No notes",
+      "edit": "Edit",
+      "copyLink": "Copy link",
+      "delete": "Delete",
+      "deleteTitle": "Delete link",
+      "deleteDescription": "Delete \"{{name}}\"? This removes the link from your deck.",
+      "deleting": "Deleting..."
+    },
+    "addCard": {
+      "title": "Add link",
+      "description": "Save a link in {{categoryName}}"
+    },
+    "errors": {
+      "actionFailed": "Action failed. Please try again later.",
+      "iconCleanupFailed": "Icon file cleanup failed: {{message}}",
+      "chooseExistingMoveCategory": "Choose an existing category to move links to"
+    }
+  },
+  "linkEditor": {
+    "addTitle": "Add link",
+    "editTitle": "Edit link",
+    "description": "Save the link details and choose how its icon should appear.",
+    "url": "Link URL",
+    "name": "Title",
+    "namePlaceholder": "Use link address if empty",
+    "category": "Category",
+    "categoryPlaceholder": "Select a category",
+    "notes": "Notes",
+    "save": "Save link",
+    "icon": {
+      "source": "Icon source",
+      "auto": "Auto",
+      "builtin": "Built-in icon",
+      "url": "Image URL",
+      "file": "Local file",
+      "autoDescription": "Use the website favicon automatically. If it is unavailable, show the title initial.",
+      "iconUrl": "Icon URL",
+      "chooseFile": "Choose an icon file",
+      "noIconSelected": "No icon selected",
+      "random": "Random built-in icon",
+      "chooseBuiltinTitle": "Choose built-in icon",
+      "chooseBuiltinDescription": "Search built-in brand icons and confirm the icon for this link.",
+      "searchLabel": "Search built-in icons",
+      "searchPlaceholder": "Search brands, for example GitHub",
+      "noMatches": "No built-in icons match this search.",
+      "useIcon": "Use icon"
+    },
+    "errors": {
+      "chooseIconFileType": "Choose a PNG, JPEG, WebP, or SVG icon",
+      "iconFileTooLarge": "Icon files cannot exceed 1024KB",
+      "enterLinkUrl": "Enter a link URL",
+      "selectCategory": "Select a category",
+      "chooseBuiltinIcon": "Choose a built-in icon",
+      "enterIconUrl": "Enter an icon URL",
+      "chooseLocalIconFile": "Choose a local icon file",
+      "saveFailed": "Save failed. Please try again later."
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "navigation": "Settings navigation",
+    "tabs": {
+      "general": "General",
+      "data": "Data",
+      "categories": "Categories",
+      "shortcuts": "Shortcuts"
+    },
+    "general": {
+      "theme": "Theme",
+      "themes": {
+        "auto": "Auto",
+        "light": "Light",
+        "dark": "Dark"
+      },
+      "style": "Style",
+      "styles": {
+        "editorial": "Editorial",
+        "prism": "Prism"
+      },
+      "displaySize": "Display size",
+      "displaySizes": {
+        "compact": "Compact",
+        "normal": "Normal",
+        "spacious": "Spacious"
+      },
+      "linkOrder": "Link order",
+      "linkOrderPlaceholder": "Select a link order",
+      "sortModes": {
+        "manual": "Manual",
+        "name": "Title (A-Z)"
+      },
+      "language": "Language",
+      "languagePlaceholder": "Select a language",
+      "languages": {
+        "en": "English",
+        "zh": "中文"
+      }
+    },
+    "data": {
+      "importBackup": "Import backup",
+      "exportBackup": "Export backup",
+      "resetDefaults": "Reset to defaults",
+      "clearData": "Clear data",
+      "import": "Import",
+      "importing": "Importing...",
+      "export": "Export",
+      "clear": "Clear data"
+    },
+    "categories": {
+      "newCategoryName": "New category name",
+      "newCategoryPlaceholder": "New category name, press Enter to add",
+      "categoryName": "Category name",
+      "cancelRename": "Cancel rename",
+      "saveCategory": "Save {{name}}",
+      "deleteCategory": "Delete {{name}}",
+      "lastCategoryCannotBeDeleted": "The last category cannot be deleted",
+      "renameCategory": "Rename {{name}}",
+      "dragCategory": "Drag category {{name}}"
+    },
+    "confirm": {
+      "resetTitle": "Reset to default data?",
+      "clearTitle": "Clear all data?",
+      "resetDescription": "This will replace all current links, categories, local icons, and settings with the built-in default data.",
+      "clearDescription": "This will delete all links, local icons, and custom categories. One default category will remain.",
+      "resetting": "Resetting...",
+      "clearing": "Clearing...",
+      "deleteCategoryTitle": "Delete \"{{name}}\"?",
+      "deleteCategoryWithLinks": "This category contains {{count}} links. Choose what should happen to them before deleting.",
+      "deleteCategoryEmpty": "This category will be removed immediately.",
+      "deleteAction": "Action",
+      "moveLinks": "Move to another category",
+      "deleteLinksToo": "Delete links too",
+      "moveLinksTo": "Move links to",
+      "selectCategory": "Select a category"
+    },
+    "toasts": {
+      "backupExported": "Backup exported.",
+      "backupImported": "Backup imported.",
+      "defaultDataRestored": "Default data restored.",
+      "dataCleared": "Data cleared."
+    },
+    "errors": {
+      "actionFailed": "Action failed. Please try again later.",
+      "enterCategoryName": "Enter a category name",
+      "defaultCategoryCannotBeDeleted": "The default category cannot be deleted",
+      "keepAtLeastOneCategory": "Keep at least one category",
+      "selectMoveTarget": "Select the category to move links to",
+      "chooseBackupFile": "Choose a Link Deck backup file.",
+      "invalidBackupFile": "Invalid backup file.",
+      "importFailed": "Import failed. Check the backup file."
+    }
+  },
+  "shortcuts": {
+    "search": "Search",
+    "openLink": "Open selected link",
+    "createLink": "New link",
+    "deleteLink": "Delete selected link",
+    "keyboardShortcuts": "Show shortcuts"
+  }
+}

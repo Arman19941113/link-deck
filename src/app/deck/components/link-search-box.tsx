@@ -1,6 +1,7 @@
 // SavedLink search box that filters by saved link title, note, and URL.
 
 import { useEffect, useRef, type KeyboardEvent } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Search, X } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -20,6 +21,7 @@ type LinkSearchBoxProps = {
 
 /** Provides link search input with an icon and clear action. */
 export function LinkSearchBox({ value, onChange, onFocus, displaySizeConfig }: LinkSearchBoxProps) {
+  const { t } = useTranslation()
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -55,7 +57,7 @@ export function LinkSearchBox({ value, onChange, onFocus, displaySizeConfig }: L
   return (
     <div className="flex flex-col gap-2">
       <label htmlFor="link-search" className="sr-only">
-        Search links
+        {t('deck.search.label')}
       </label>
       <div className="relative">
         <Search className={displaySizeConfig.control.searchIconClassName} aria-hidden="true" />
@@ -69,7 +71,7 @@ export function LinkSearchBox({ value, onChange, onFocus, displaySizeConfig }: L
           onFocus={onFocus}
           autoFocus
           aria-keyshortcuts={`${getKeyboardShortcutAriaKeys('search')} ${getKeyboardShortcutAriaKeys('createLink')}`}
-          placeholder="Search links, notes, or URLs..."
+          placeholder={t('deck.search.placeholder')}
           className={cn(
             '!bg-[var(--app-search-bg)] shadow-none',
             displaySizeConfig.control.inputClassName,
@@ -83,7 +85,7 @@ export function LinkSearchBox({ value, onChange, onFocus, displaySizeConfig }: L
             size={displaySizeConfig.control.iconButtonSize}
             className={displaySizeConfig.control.searchClearButtonClassName}
             tabIndex={-1}
-            aria-label="Clear search"
+            aria-label={t('deck.search.clear')}
             onClick={() => onChange('')}
           >
             <X aria-hidden="true" />

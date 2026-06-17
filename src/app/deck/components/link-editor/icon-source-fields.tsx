@@ -1,6 +1,7 @@
 // Renders the icon source controls for the link editor form.
 
 import type { ChangeEvent } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { FileIconInput } from './file-icon-input'
 import type { IconMode } from './constants'
@@ -48,11 +49,13 @@ export function IconSourceFields({
   onIconModeChange,
   onIconUrlChange,
 }: IconSourceFieldsProps) {
+  const { t } = useTranslation()
+
   return (
     <div className={displaySizeConfig.dialog.gridClassName}>
       <div className={displaySizeConfig.dialog.fieldClassName}>
         <Label htmlFor="link-editor-icon-mode" className={displaySizeConfig.control.labelClassName}>
-          Icon source
+          {t('linkEditor.icon.source')}
         </Label>
         <Select value={iconMode} disabled={isSaving} onValueChange={value => onIconModeChange(value as IconMode)}>
           <SelectTrigger id="link-editor-icon-mode" className={cn('w-full', displaySizeConfig.control.inputClassName)}>
@@ -60,19 +63,17 @@ export function IconSourceFields({
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
-              <SelectItem value="auto">Auto</SelectItem>
-              <SelectItem value="builtin">Built-in icon</SelectItem>
-              <SelectItem value="url">Image URL</SelectItem>
-              <SelectItem value="file">Local file</SelectItem>
+              <SelectItem value="auto">{t('linkEditor.icon.auto')}</SelectItem>
+              <SelectItem value="builtin">{t('linkEditor.icon.builtin')}</SelectItem>
+              <SelectItem value="url">{t('linkEditor.icon.url')}</SelectItem>
+              <SelectItem value="file">{t('linkEditor.icon.file')}</SelectItem>
             </SelectGroup>
           </SelectContent>
         </Select>
       </div>
 
       {iconMode === 'auto' ? (
-        <p className="self-end text-xs leading-5 text-muted-foreground">
-          Use the website favicon automatically. If it is unavailable, show the title initial.
-        </p>
+        <p className="self-end text-xs leading-5 text-muted-foreground">{t('linkEditor.icon.autoDescription')}</p>
       ) : null}
 
       {iconMode === 'builtin' ? (
@@ -87,7 +88,7 @@ export function IconSourceFields({
       {iconMode === 'url' ? (
         <div className={displaySizeConfig.dialog.fieldClassName}>
           <Label htmlFor="link-editor-icon-url" className={displaySizeConfig.control.labelClassName}>
-            Icon URL
+            {t('linkEditor.icon.iconUrl')}
           </Label>
           <Input
             id="link-editor-icon-url"

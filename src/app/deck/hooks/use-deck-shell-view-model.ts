@@ -6,6 +6,7 @@ import { useDeckLifecycle } from './use-deck-lifecycle'
 import { useVisibleDeckSections } from './use-visible-deck-sections'
 import type { Category, VisibleCategorySection, SavedLink, SortMode } from '@/domain/deck/types'
 import type { DisplaySize } from '@/domain/settings/types'
+import type { AppLanguage } from '@/domain/settings/language'
 
 /** State, derived data, and deck actions consumed by the shell. */
 type DeckShellViewModel = {
@@ -21,11 +22,12 @@ type DeckShellViewModel = {
 } & DeckActions
 
 /** Creates the deck model consumed directly by the app shell. */
-export function useDeckShellViewModel(): DeckShellViewModel {
+export function useDeckShellViewModel(language: AppLanguage): DeckShellViewModel {
   const runtimeState = useDeckRuntimeState()
 
   useDeckLifecycle({
     applyLoadedDeckSnapshot: runtimeState.applyLoadedDeckSnapshot,
+    language,
     setError: runtimeState.setError,
     setInitialized: runtimeState.setInitialized,
   })

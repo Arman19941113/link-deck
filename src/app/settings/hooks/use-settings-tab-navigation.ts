@@ -4,12 +4,7 @@ import { type KeyboardEvent, useRef, useState } from 'react'
 
 import type { SettingsTab } from '../types'
 
-export const SETTINGS_TABS: Array<{ value: SettingsTab; label: string }> = [
-  { value: 'general', label: 'General' },
-  { value: 'categories', label: 'Categories' },
-  { value: 'data', label: 'Data' },
-  { value: 'shortcuts', label: 'Shortcuts' },
-]
+export const SETTINGS_TABS: SettingsTab[] = ['general', 'categories', 'data', 'shortcuts']
 
 /** Manages tab selection and keyboard focus for the settings navigation. */
 export function useSettingsTabNavigation(initialTab: SettingsTab) {
@@ -70,7 +65,7 @@ export function useSettingsTabNavigation(initialTab: SettingsTab) {
 }
 
 function getNextSettingsTab(tab: SettingsTab, direction: 1 | -1): SettingsTab | null {
-  const currentIndex = SETTINGS_TABS.findIndex(settingsTab => settingsTab.value === tab)
+  const currentIndex = SETTINGS_TABS.findIndex(settingsTab => settingsTab === tab)
 
   if (currentIndex < 0) {
     return null
@@ -78,5 +73,5 @@ function getNextSettingsTab(tab: SettingsTab, direction: 1 | -1): SettingsTab | 
 
   const nextIndex = (currentIndex + direction + SETTINGS_TABS.length) % SETTINGS_TABS.length
 
-  return SETTINGS_TABS[nextIndex]?.value ?? null
+  return SETTINGS_TABS[nextIndex] ?? null
 }

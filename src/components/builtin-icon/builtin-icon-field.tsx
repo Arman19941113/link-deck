@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import { Shuffle } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 import { getBuiltinIconMetadata, getRandomDefaultBuiltinIcon, type BuiltinIconValue } from './builtin-icon-registry'
 import { Button } from '@/components/ui/button'
@@ -29,6 +30,7 @@ type BuiltinIconFieldProps = {
 
 /** Shows the current built-in icon and opens the secondary chooser dialog. */
 export function BuiltinIconField({ value, disabled = false, displaySizeConfig, onChange }: BuiltinIconFieldProps) {
+  const { t } = useTranslation()
   const [pickerOpen, setPickerOpen] = useState(false)
   const [draftIcon, setDraftIcon] = useState<BuiltinIconValue | null>(value)
   const selectedIcon = useMemo(() => (value ? getBuiltinIconMetadata(value) : null), [value])
@@ -61,7 +63,7 @@ export function BuiltinIconField({ value, disabled = false, displaySizeConfig, o
   return (
     <>
       <div className={displaySizeConfig.dialog.fieldClassName}>
-        <Label className={displaySizeConfig.control.labelClassName}>Built-in icon</Label>
+        <Label className={displaySizeConfig.control.labelClassName}>{t('linkEditor.icon.builtin')}</Label>
         <div
           className={cn(
             displaySizeConfig.control.inputClassName,
@@ -76,7 +78,9 @@ export function BuiltinIconField({ value, disabled = false, displaySizeConfig, o
               <span className="size-5 rounded-sm bg-muted" aria-hidden="true" />
             )}
             <span className="min-w-0">
-              <span className="block truncate text-sm font-medium">{value?.title ?? 'No icon selected'}</span>
+              <span className="block truncate text-sm font-medium">
+                {value?.title ?? t('linkEditor.icon.noIconSelected')}
+              </span>
             </span>
           </span>
           <div className="flex shrink-0 items-center gap-1">
@@ -86,7 +90,7 @@ export function BuiltinIconField({ value, disabled = false, displaySizeConfig, o
               size={displaySizeConfig.control.iconButtonSize}
               disabled={disabled}
               className="bg-background"
-              aria-label="Random built-in icon"
+              aria-label={t('linkEditor.icon.random')}
               onClick={() => void handleRandomIcon()}
             >
               <Shuffle aria-hidden="true" />
@@ -99,7 +103,7 @@ export function BuiltinIconField({ value, disabled = false, displaySizeConfig, o
               className="bg-background"
               onClick={openPicker}
             >
-              Choose
+              {t('common.choose')}
             </Button>
           </div>
         </div>
@@ -113,9 +117,11 @@ export function BuiltinIconField({ value, disabled = false, displaySizeConfig, o
           )}
         >
           <DialogHeader className={displaySizeConfig.dialog.headerClassName}>
-            <DialogTitle className={displaySizeConfig.dialog.titleClassName}>Choose built-in icon</DialogTitle>
+            <DialogTitle className={displaySizeConfig.dialog.titleClassName}>
+              {t('linkEditor.icon.chooseBuiltinTitle')}
+            </DialogTitle>
             <DialogDescription className={displaySizeConfig.dialog.descriptionClassName}>
-              Search built-in brand icons and confirm the icon for this link.
+              {t('linkEditor.icon.chooseBuiltinDescription')}
             </DialogDescription>
           </DialogHeader>
 
@@ -136,7 +142,7 @@ export function BuiltinIconField({ value, disabled = false, displaySizeConfig, o
               size={displaySizeConfig.control.buttonSize}
               onClick={() => setPickerOpen(false)}
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button
               type="button"
@@ -144,7 +150,7 @@ export function BuiltinIconField({ value, disabled = false, displaySizeConfig, o
               disabled={!draftIcon}
               onClick={() => handleUseIcon()}
             >
-              Use icon
+              {t('linkEditor.icon.useIcon')}
             </Button>
           </DialogFooter>
         </DialogContent>

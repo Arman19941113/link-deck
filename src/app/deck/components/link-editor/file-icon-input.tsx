@@ -1,6 +1,7 @@
 // Renders the local file chooser used by the link editor icon source fields.
 
 import type { ChangeEvent } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Upload } from 'lucide-react'
 
 import { ICON_FILE_ACCEPT } from './constants'
@@ -29,10 +30,12 @@ export function FileIconInput({
   isInvalid,
   onChange,
 }: FileIconInputProps) {
+  const { t } = useTranslation()
+
   return (
     <div className={displaySizeConfig.dialog.fieldClassName}>
       <Label htmlFor="link-editor-icon-file" className={displaySizeConfig.control.labelClassName}>
-        Local file
+        {t('linkEditor.icon.file')}
       </Label>
       <Input
         id="link-editor-icon-file"
@@ -68,7 +71,7 @@ export function FileIconInput({
             ) : null}
           </div>
         ) : (
-          <p className="min-w-0 flex-1 truncate text-sm leading-tight font-medium">Choose an icon file</p>
+          <p className="min-w-0 flex-1 truncate text-sm leading-tight font-medium">{t('linkEditor.icon.chooseFile')}</p>
         )}
       </Label>
     </div>

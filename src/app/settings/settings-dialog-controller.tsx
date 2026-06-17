@@ -1,6 +1,7 @@
 // Settings dialog shell, tab navigation, and secondary confirmation dialogs.
 
 import { type KeyboardEvent, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { CategoriesSettingsPanel } from './categories-settings-panel'
 import { DataSettingsPanel } from './data-settings-panel'
@@ -12,12 +13,13 @@ import { useSettingsError } from './hooks/use-settings-error'
 import { useSettingsBackupActions } from './hooks/use-settings-backup-actions'
 import { CategoryDeleteConfirmDialog, DestructiveDataActionConfirmDialog } from './components/settings-confirm-dialogs'
 import { ShortcutsSettingsPanel } from './shortcuts-settings-panel'
-import type { DataBusyAction, SettingsLanguage, SettingsTab } from './types'
+import type { DataBusyAction, SettingsTab } from './types'
 import { Button } from '@/components/ui/button'
 import { DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import type { DeleteCategoryLinksStrategy } from '@/domain/deck/category-delete-changes'
 import type { Category, SavedLink, SortMode } from '@/domain/deck/types'
 import type { DesignStylePreference } from '@/domain/settings/design-style'
+import type { AppLanguage } from '@/domain/settings/language'
 import type { ThemePreference } from '@/domain/settings/theme'
 import type { DisplaySize } from '@/domain/settings/types'
 
@@ -29,9 +31,11 @@ export type SettingsDialogControllerProps = {
   designStylePreference: DesignStylePreference
   sortMode: SortMode
   themePreference: ThemePreference
+  language: AppLanguage
   onOpenChange: (open: boolean) => void
   onDisplaySizeChange: (displaySize: DisplaySize) => void
   onDesignStylePreferenceChange: (designStylePreference: DesignStylePreference) => void
+  onLanguageChange: (language: AppLanguage) => void
   onSortModeChange: (sortMode: SortMode) => void
   onThemePreferenceChange: (themePreference: ThemePreference) => void
   addCategory: (name: string) => Promise<Category>
@@ -40,8 +44,8 @@ export type SettingsDialogControllerProps = {
   reorderCategoryList: (activeCategoryId: string, overCategoryId: string) => Promise<void>
   exportDeck: () => Promise<unknown>
   importDeck: (json: string) => Promise<void>
-  resetDeckToDefaults: () => Promise<void>
-  clearDeckData: () => Promise<void>
+  resetDeckToDefaults: (language: AppLanguage) => Promise<void>
+  clearDeckData: (language: AppLanguage) => Promise<void>
 }
 
 /** Settings dialog content that keeps local control state responsive while global updates persist. */
@@ -53,9 +57,11 @@ export function SettingsDialogController({
   designStylePreference,
   sortMode,
   themePreference,
+  language,
   onOpenChange,
   onDisplaySizeChange,
   onDesignStylePreferenceChange,
+  onLanguageChange,
   onSortModeChange,
   onThemePreferenceChange,
   addCategory,
@@ -67,6 +73,7 @@ export function SettingsDialogController({
   resetDeckToDefaults,
   clearDeckData,
 }: SettingsDialogControllerProps) {
+  const { t } = useTranslation()
   const [busyAction, setBusyAction] = useState<DataBusyAction | null>(null)
   const {
     activeTab,
@@ -75,7 +82,6 @@ export function SettingsDialogController({
     registerSettingsTabButton,
     requestSettingsTabChange,
   } = useSettingsTabNavigation(initialTab)
-  const [language, setLanguage] = useState<SettingsLanguage>('en')
   const [localDisplaySize, handleDisplaySizeChange] = useImmediateSetting(displaySize, onDisplaySizeChange)
   const [localDesignStylePreference, handleDesignStylePreferenceChange] = useImmediateSetting(
     designStylePreference,
@@ -106,6 +112,7 @@ export function SettingsDialogController({
     importDeck,
     resetDeckToDefaults,
     clearDeckData,
+    language,
     onClose: () => onOpenChange(false),
   })
   const hasSecondaryDialogOpen =
@@ -133,7 +140,7 @@ export function SettingsDialogController({
           onDesignStylePreferenceChange={handleDesignStylePreferenceChange}
           onSortModeChange={handleSortModeChange}
           onThemePreferenceChange={handleThemePreferenceChange}
-          onLanguageChange={setLanguage}
+          onLanguageChange={onLanguageChange}
         />
       )
     }
@@ -189,7 +196,7 @@ export function SettingsDialogController({
         }}
       >
         <DialogHeader className="gap-2 border-b px-4 py-4 sm:px-6">
-          <DialogTitle className="text-lg leading-none font-semibold">Settings</DialogTitle>
+          <DialogTitle className="text-lg leading-none font-semibold">{t('settings.title')}</DialogTitle>
         </DialogHeader>
 
         <div className="grid min-h-0 grid-cols-1 grid-rows-[auto_minmax(0,1fr)] sm:grid-cols-[10rem_minmax(0,1fr)] sm:grid-rows-[minmax(0,1fr)]">
@@ -205,7 +212,7 @@ export function SettingsDialogController({
 
         <DialogFooter className="gap-2 border-t px-4 py-2 sm:px-6">
           <Button type="button" variant="outline" size="default" disabled={isBusy} onClick={requestClose}>
-            Close
+            {t('common.close')}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -235,24 +242,26 @@ type SettingsNavigationProps = {
 }
 
 function SettingsNavigation({ activeTab, onTabButtonRef, onTabChange, onTabKeyDown }: SettingsNavigationProps) {
+  const { t } = useTranslation()
+
   return (
     <nav
       className="settings-nav flex gap-1 overflow-x-auto border-b p-2 sm:flex-col sm:border-r sm:border-b-0"
-      aria-label="Settings navigation"
+      aria-label={t('settings.navigation')}
     >
       {SETTINGS_TABS.map(tab => (
         <Button
-          key={tab.value}
-          ref={node => onTabButtonRef(tab.value, node)}
+          key={tab}
+          ref={node => onTabButtonRef(tab, node)}
           type="button"
           variant="ghost"
           size="default"
           className="settings-nav-item justify-start"
-          aria-current={activeTab === tab.value ? 'page' : undefined}
-          onClick={() => onTabChange(tab.value)}
-          onKeyDown={event => onTabKeyDown(event, tab.value)}
+          aria-current={activeTab === tab ? 'page' : undefined}
+          onClick={() => onTabChange(tab)}
+          onKeyDown={event => onTabKeyDown(event, tab)}
         >
-          {tab.label}
+          {t(`settings.tabs.${tab}`)}
         </Button>
       ))}
     </nav>

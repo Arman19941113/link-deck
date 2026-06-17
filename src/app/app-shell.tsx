@@ -1,11 +1,13 @@
 // Start page app shell that connects the deck view model and composes the main page regions.
 
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
 import { LinkEditor } from '@/app/deck/components/link-editor'
 import { DeckContainer } from '@/app/deck/deck-container'
 import { useDeckShellViewModel } from '@/app/deck/hooks/use-deck-shell-view-model'
+import { useLanguagePreference } from '@/app/hooks/use-language-preference'
 import { useThemePreference } from '@/app/hooks/use-theme-preference'
 import { preloadPinyinSearchModule } from '@/domain/deck/pinyin-search-loader'
 import type { SavedLink } from '@/domain/deck/types'
@@ -15,11 +17,13 @@ import { getDisplaySizeConfig } from '@/app/display-size-config'
 
 /** Composes start page data, status messages, and navigation display regions. */
 export function AppShell() {
+  const { t } = useTranslation()
   const [linkEditorOpen, setLinkEditorOpen] = useState(false)
   const [editingLink, setEditingLink] = useState<SavedLink | null>(null)
   const [newLinkDefaultCategoryId, setNewLinkDefaultCategoryId] = useState<string | null>(null)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [settingsInitialTab, setSettingsInitialTab] = useState<SettingsTab>('general')
+  const { language, setLanguage } = useLanguagePreference()
   const { designStylePreference, setDesignStylePreference, setThemePreference, themePreference } = useThemePreference()
   const {
     categories,
@@ -46,7 +50,7 @@ export function AppShell() {
     importDeck,
     resetDeckToDefaults,
     clearDeckData,
-  } = useDeckShellViewModel()
+  } = useDeckShellViewModel(language)
   const displaySizeConfig = getDisplaySizeConfig(displaySize)
 
   useEffect(() => {
@@ -72,9 +76,9 @@ export function AppShell() {
 
   useEffect(() => {
     if (error) {
-      toast.error(error, { id: 'deck-error' })
+      toast.error(error || t('deck.errors.actionFailed'), { id: 'deck-error' })
     }
-  }, [error])
+  }, [error, t])
 
   /** Opens a blank form for adding a link from the global action. */
   function handleCreateLink(): void {
@@ -156,9 +160,11 @@ export function AppShell() {
         designStylePreference={designStylePreference}
         sortMode={sortMode}
         themePreference={themePreference}
+        language={language}
         onOpenChange={setSettingsOpen}
         onDisplaySizeChange={setDisplaySize}
         onDesignStylePreferenceChange={setDesignStylePreference}
+        onLanguageChange={setLanguage}
         onSortModeChange={setSortMode}
         onThemePreferenceChange={setThemePreference}
         addCategory={addCategory}

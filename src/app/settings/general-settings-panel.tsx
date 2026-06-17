@@ -1,5 +1,8 @@
 // General settings panel for display, theme, and language preferences.
 
+import { useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
+
 import { DisplaySizePicker } from './components/display-size-picker'
 import { StylePicker } from './components/style-picker'
 import { ThemePicker } from './components/theme-picker'
@@ -7,9 +10,9 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import type { SortMode } from '@/domain/deck/types'
 import type { DesignStylePreference } from '@/domain/settings/design-style'
+import { SUPPORTED_LANGUAGES, type AppLanguage } from '@/domain/settings/language'
 import type { ThemePreference } from '@/domain/settings/theme'
 import type { DisplaySize } from '@/domain/settings/types'
-import type { SettingsLanguage } from './types'
 import { cn } from '@/lib/utils'
 
 type GeneralSettingsPanelProps = {
@@ -17,21 +20,12 @@ type GeneralSettingsPanelProps = {
   designStylePreference: DesignStylePreference
   sortMode: SortMode
   themePreference: ThemePreference
-  language: SettingsLanguage
+  language: AppLanguage
   onDisplaySizeChange: (displaySize: DisplaySize) => void
   onDesignStylePreferenceChange: (designStylePreference: DesignStylePreference) => void
   onSortModeChange: (sortMode: SortMode) => void
   onThemePreferenceChange: (themePreference: ThemePreference) => void
-  onLanguageChange: (language: SettingsLanguage) => void
-}
-
-const SORT_LABELS: Record<SortMode, string> = {
-  manual: 'Manual order',
-  name: 'Title (A-Z)',
-}
-
-const LANGUAGE_LABELS: Record<SettingsLanguage, string> = {
-  en: 'English',
+  onLanguageChange: (language: AppLanguage) => void
 }
 
 /** Renders general preferences that apply immediately. */
@@ -47,6 +41,16 @@ export function GeneralSettingsPanel({
   onThemePreferenceChange,
   onLanguageChange,
 }: GeneralSettingsPanelProps) {
+  const { t } = useTranslation()
+  const sortLabels = useMemo(
+    () =>
+      ({
+        manual: t('settings.general.sortModes.manual'),
+        name: t('settings.general.sortModes.name'),
+      }) satisfies Record<SortMode, string>,
+    [t],
+  )
+
   return (
     <div className="flex max-w-none flex-col gap-4">
       <div className="flex flex-col gap-2">
@@ -63,7 +67,7 @@ export function GeneralSettingsPanel({
 
       <div className="flex flex-col gap-2">
         <Label htmlFor="settings-link-order" className="text-sm">
-          Link order
+          {t('settings.general.linkOrder')}
         </Label>
         <Select
           value={sortMode}
@@ -75,11 +79,11 @@ export function GeneralSettingsPanel({
             id="settings-link-order"
             className={cn('h-11 w-full rounded-md bg-card px-3 text-base md:text-sm')}
           >
-            <SelectValue placeholder="Select a link order">{SORT_LABELS[sortMode]}</SelectValue>
+            <SelectValue placeholder={t('settings.general.linkOrderPlaceholder')}>{sortLabels[sortMode]}</SelectValue>
           </SelectTrigger>
           <SelectContent align="start">
             <SelectGroup>
-              {Object.entries(SORT_LABELS).map(([value, label]) => (
+              {Object.entries(sortLabels).map(([value, label]) => (
                 <SelectItem key={value} value={value}>
                   {label}
                 </SelectItem>
@@ -91,26 +95,27 @@ export function GeneralSettingsPanel({
 
       <div className="flex flex-col gap-2">
         <Label htmlFor="settings-language" className="text-sm">
-          Language
+          {t('settings.general.language')}
         </Label>
-        <Select value={language} disabled onValueChange={value => onLanguageChange(value as SettingsLanguage)}>
+        <Select value={language} onValueChange={value => onLanguageChange(value as AppLanguage)}>
           <SelectTrigger
             id="settings-language"
             className={cn('h-11 w-full rounded-md bg-card px-3 text-base md:text-sm')}
           >
-            <SelectValue placeholder="Select a language">{LANGUAGE_LABELS[language]}</SelectValue>
+            <SelectValue placeholder={t('settings.general.languagePlaceholder')}>
+              {t(`settings.general.languages.${language}`)}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent align="start">
             <SelectGroup>
-              {Object.entries(LANGUAGE_LABELS).map(([value, label]) => (
+              {SUPPORTED_LANGUAGES.map(value => (
                 <SelectItem key={value} value={value}>
-                  {label}
+                  {t(`settings.general.languages.${value}`)}
                 </SelectItem>
               ))}
             </SelectGroup>
           </SelectContent>
         </Select>
-        <p className="text-xs leading-5 text-muted-foreground">English is currently the only display language.</p>
       </div>
     </div>
   )

@@ -1,6 +1,7 @@
 // Categories settings panel for immediate category editing and ordering.
 
 import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
 import {
   closestCenter,
   DndContext,
@@ -54,6 +55,7 @@ type CategoriesSettingsPanelProps = {
 
 /** Renders the local category editor with drag sorting and immediate deletion. */
 export function CategoriesSettingsPanel({ viewModel }: CategoriesSettingsPanelProps) {
+  const { t } = useTranslation()
   const {
     categoryRows,
     canDeleteCategory,
@@ -113,14 +115,14 @@ export function CategoriesSettingsPanel({ viewModel }: CategoriesSettingsPanelPr
       <form onSubmit={handleAddCategory}>
         <div className="min-w-0 flex-1">
           <Label className="sr-only text-sm" htmlFor="settings-category-new-name">
-            New category name
+            {t('settings.categories.newCategoryName')}
           </Label>
           <Input
             ref={newCategoryNameInputRef}
             id="settings-category-new-name"
             className="h-11 rounded-md px-3 text-base md:text-sm"
             value={newCategoryName}
-            placeholder="New category name, press Enter to add"
+            placeholder={t('settings.categories.newCategoryPlaceholder')}
             onChange={event => setNewCategoryName(event.target.value)}
             onKeyDown={handleNewCategoryKeyDown}
           />
@@ -147,11 +149,12 @@ export function CategoriesSettingsPanel({ viewModel }: CategoriesSettingsPanelPr
                     key={category.id}
                     category={category}
                     disabled={isEditing}
+                    dragLabel={t('settings.categories.dragCategory', { name: category.name })}
                     dragContent={
                       <div className="min-w-0 flex-1">
                         {isEditing ? (
                           <Label className="sr-only text-sm" htmlFor={`settings-category-edit-${category.id}`}>
-                            Category name
+                            {t('settings.categories.categoryName')}
                           </Label>
                         ) : null}
                         {isEditing ? (
@@ -178,7 +181,7 @@ export function CategoriesSettingsPanel({ viewModel }: CategoriesSettingsPanelPr
                             variant="ghost"
                             size="icon-sm"
                             tabIndex={CATEGORY_PANEL_CONTROL_TAB_INDEX}
-                            aria-label="Cancel rename"
+                            aria-label={t('settings.categories.cancelRename')}
                             onClick={cancelRename}
                           >
                             <X aria-hidden="true" />
@@ -188,7 +191,7 @@ export function CategoriesSettingsPanel({ viewModel }: CategoriesSettingsPanelPr
                             variant="ghost"
                             size="icon-sm"
                             tabIndex={CATEGORY_PANEL_CONTROL_TAB_INDEX}
-                            aria-label={`Save ${category.name}`}
+                            aria-label={t('settings.categories.saveCategory', { name: category.name })}
                             onClick={() => handleRename(category.id)}
                           >
                             <Check aria-hidden="true" />
@@ -204,7 +207,9 @@ export function CategoriesSettingsPanel({ viewModel }: CategoriesSettingsPanelPr
                               disabled={!canDeleteCategory}
                               tabIndex={CATEGORY_PANEL_CONTROL_TAB_INDEX}
                               aria-label={
-                                canDeleteCategory ? `Delete ${category.name}` : 'The last category cannot be deleted'
+                                canDeleteCategory
+                                  ? t('settings.categories.deleteCategory', { name: category.name })
+                                  : t('settings.categories.lastCategoryCannotBeDeleted')
                               }
                               onClick={() => requestDelete(category)}
                             >
@@ -216,7 +221,7 @@ export function CategoriesSettingsPanel({ viewModel }: CategoriesSettingsPanelPr
                             variant="ghost"
                             size="icon-sm"
                             tabIndex={CATEGORY_PANEL_CONTROL_TAB_INDEX}
-                            aria-label={`Rename ${category.name}`}
+                            aria-label={t('settings.categories.renameCategory', { name: category.name })}
                             onClick={() => startRename(category)}
                           >
                             <Pencil aria-hidden="true" />

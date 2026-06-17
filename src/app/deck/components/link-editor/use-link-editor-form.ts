@@ -2,6 +2,7 @@
 
 import type { ChangeEvent, FormEvent } from 'react'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
 import {
@@ -44,6 +45,7 @@ export function useLinkEditorForm({
   onOpenChange,
   upsertLink,
 }: UseLinkEditorFormParams) {
+  const { t } = useTranslation()
   const sortedCategories = useMemo(() => sortCategoriesByOrder(categories), [categories])
   const fallbackCategoryId =
     sortedCategories.find(category => category.id === DEFAULT_CATEGORY_ID)?.id ?? sortedCategories[0]?.id ?? ''
@@ -63,7 +65,7 @@ export function useLinkEditorForm({
   const [existingFileIconPreview, setExistingFileIconPreview] = useState<SavedIconPreview | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
-  const editorTitle = link ? 'Edit link' : 'Add link'
+  const editorTitle = link ? t('linkEditor.editTitle') : t('linkEditor.addTitle')
   const selectedCategoryId = categoryId || preferredCategoryId
   const hasCategories = categories.length > 0
   const shouldShowCategorySelect = Boolean(link) || !defaultCategoryId
@@ -172,7 +174,7 @@ export function useLinkEditorForm({
     setIconFile(file)
 
     if (!ACCEPTED_ICON_MIME_TYPES.has(file.type)) {
-      showError('Choose a PNG, JPEG, WebP, or SVG icon')
+      showError(t('linkEditor.errors.chooseIconFileType'))
       return
     }
 
@@ -182,7 +184,7 @@ export function useLinkEditorForm({
     setPendingFileIconPreviewUrl(previewUrl)
 
     if (file.size > MAX_ICON_FILE_SIZE) {
-      showError('Icon files cannot exceed 1024KB')
+      showError(t('linkEditor.errors.iconFileTooLarge'))
       return
     }
 
@@ -202,37 +204,37 @@ export function useLinkEditorForm({
     const trimmedIconUrl = iconUrl.trim()
 
     if (!trimmedUrl) {
-      showError('Enter a link URL')
+      showError(t('linkEditor.errors.enterLinkUrl'))
       return
     }
 
     if (!selectedCategoryId) {
-      showError('Select a category')
+      showError(t('linkEditor.errors.selectCategory'))
       return
     }
 
     if (iconMode === 'builtin' && !builtinIcon) {
-      showError('Choose a built-in icon')
+      showError(t('linkEditor.errors.chooseBuiltinIcon'))
       return
     }
 
     if (iconMode === 'url' && !trimmedIconUrl) {
-      showError('Enter an icon URL')
+      showError(t('linkEditor.errors.enterIconUrl'))
       return
     }
 
     if (iconMode === 'file' && iconFile && !ACCEPTED_ICON_MIME_TYPES.has(iconFile.type)) {
-      showError('Choose a PNG, JPEG, WebP, or SVG icon')
+      showError(t('linkEditor.errors.chooseIconFileType'))
       return
     }
 
     if (iconMode === 'file' && iconFile && iconFile.size > MAX_ICON_FILE_SIZE) {
-      showError('Icon files cannot exceed 1024KB')
+      showError(t('linkEditor.errors.iconFileTooLarge'))
       return
     }
 
     if (iconMode === 'file' && !iconFile && link?.icon.type !== 'file') {
-      showError('Choose a local icon file')
+      showError(t('linkEditor.errors.chooseLocalIconFile'))
       return
     }
 
@@ -253,7 +255,7 @@ export function useLinkEditorForm({
       })
       onOpenChange(false)
     } catch (saveError) {
-      showError(getEditorErrorMessage(saveError))
+      showError(getEditorErrorMessage(saveError, t('linkEditor.errors.saveFailed')))
     } finally {
       setIsSaving(false)
     }
@@ -316,6 +318,6 @@ function createSubmittedIcon(
   return undefined
 }
 
-function getEditorErrorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : 'Save failed. Please try again later.'
+function getEditorErrorMessage(error: unknown, fallbackMessage: string): string {
+  return error instanceof Error ? error.message : fallbackMessage
 }

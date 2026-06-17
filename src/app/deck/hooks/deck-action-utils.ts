@@ -6,6 +6,9 @@ export function createDeckRecordId(prefix: string): string {
 }
 
 /** Converts unknown errors into messages that can be shown directly to users. */
-export function getDeckActionErrorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : 'Action failed. Please try again later.'
+export function getDeckActionErrorMessage(
+  error: unknown,
+  fallbackMessage = 'Action failed. Please try again later.',
+): string {
+  return error instanceof Error ? error.message : fallbackMessage
 }

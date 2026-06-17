@@ -2,11 +2,12 @@
 
 import { createDefaultDeck } from '@/domain/deck/default-data'
 import type { Category, PersistedAppState, SavedLink, StoredIconFile } from '@/domain/deck/types'
+import type { AppLanguage } from '@/domain/settings/language'
 import { dbPromise, queueClearStores, queuePutRecords } from './schema'
 
 /** Reads the full persisted deck state, seeding default data first when the database is empty. */
-export async function loadDeck(): Promise<PersistedAppState> {
-  await seedIfEmpty()
+export async function loadDeck(language: AppLanguage): Promise<PersistedAppState> {
+  await seedIfEmpty(language)
 
   const db = await dbPromise
   const [categories, links, iconFiles] = await Promise.all([
@@ -47,7 +48,7 @@ export async function replaceDeck(deck: PersistedAppState): Promise<PersistedApp
 }
 
 /** Writes default categories and links only before the deck has been initialized. */
-async function seedIfEmpty(): Promise<void> {
+async function seedIfEmpty(language: AppLanguage): Promise<void> {
   const db = await dbPromise
   const tx = db.transaction(['categories', 'links'], 'readwrite')
   const categoryStore = tx.objectStore('categories')
@@ -59,7 +60,7 @@ async function seedIfEmpty(): Promise<void> {
     return
   }
 
-  const deck = createDefaultDeck()
+  const deck = createDefaultDeck(language)
 
   await Promise.all([
     ...queuePutRecords(categoryStore, deck.categories),

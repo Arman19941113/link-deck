@@ -2,6 +2,7 @@
 
 import type { HTMLAttributes, KeyboardEvent, MouseEvent, PointerEvent, Ref } from 'react'
 import { useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Copy, Edit3, MoreHorizontal, Trash2 } from 'lucide-react'
 
 import { LinkCardIcon } from './link-icon'
@@ -49,6 +50,7 @@ export function LinkCard({
   canOpenLink,
   isDragging = false,
 }: LinkCardProps) {
+  const { t } = useTranslation()
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const linkActionRef = useRef<HTMLAnchorElement>(null)
   const cardConfig = displaySizeConfig.card
@@ -158,7 +160,7 @@ export function LinkCard({
         href={link.url}
         data-link-card-action="true"
         {...{ [LINK_CARD_ID_ATTRIBUTE]: link.id }}
-        aria-label={`Open ${link.name}`}
+        aria-label={t('deck.linkCard.open', { name: link.name })}
         aria-keyshortcuts={`${getKeyboardShortcutAriaKeys('openLink')} ${getKeyboardShortcutAriaKeys('deleteLink')}`}
         onClick={handleLinkClick}
         onAuxClick={handleLinkAuxClick}
@@ -178,7 +180,7 @@ export function LinkCard({
         />
         <span className={cn('flex min-w-0 flex-1 flex-col', cardConfig.textGapClassName)}>
           <span className={cn('truncate', cardConfig.titleClassName)}>{link.name}</span>
-          <span className={cardConfig.noteClassName}>{link.note || 'No notes'}</span>
+          <span className={cardConfig.noteClassName}>{link.note || t('deck.linkCard.noNotes')}</span>
         </span>
       </a>
 
@@ -194,7 +196,7 @@ export function LinkCard({
               type="button"
               variant="ghost"
               size={displaySizeConfig.control.iconButtonSize}
-              aria-label={`More actions for ${link.name}`}
+              aria-label={t('deck.linkCard.moreActions', { name: link.name })}
               tabIndex={-1}
               onClick={stopMenuEvent}
               onKeyDown={stopMenuEvent}
@@ -212,7 +214,7 @@ export function LinkCard({
             <DropdownMenuGroup>
               <DropdownMenuItem onSelect={() => onEditLink(link)}>
                 <Edit3 aria-hidden="true" />
-                Edit
+                {t('deck.linkCard.edit')}
               </DropdownMenuItem>
               <DropdownMenuItem
                 onSelect={() => {
@@ -222,7 +224,7 @@ export function LinkCard({
                 }}
               >
                 <Copy aria-hidden="true" />
-                Copy link
+                {t('deck.linkCard.copyLink')}
               </DropdownMenuItem>
               <DropdownMenuItem
                 variant="destructive"
@@ -231,7 +233,7 @@ export function LinkCard({
                 }}
               >
                 <Trash2 aria-hidden="true" />
-                Delete
+                {t('deck.linkCard.delete')}
               </DropdownMenuItem>
             </DropdownMenuGroup>
           </DropdownMenuContent>
