@@ -1,4 +1,9 @@
 {
+  "editor.defaultFormatter": "oxc.oxc-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.oxc": "explicit"
+  },
+  "oxc.fmt.configPath": "./vite.config.ts",
   "i18n-ally.localesPaths": ["src/locales"],
   "i18n-ally.keystyle": "nested"
 }
