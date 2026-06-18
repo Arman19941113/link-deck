@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { defineConfig } from 'vite'
+import { defineConfig, lazyPlugins } from 'vite-plus'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
@@ -11,8 +11,57 @@ const appThemeColor = '#f5f1ec'
 
 // https://vite.dev/config/
 export default defineConfig({
+  staged: {
+    '*': 'vp check --fix',
+  },
+  fmt: {
+    semi: false,
+    singleQuote: true,
+    arrowParens: 'avoid',
+    printWidth: 120,
+    overrides: [
+      {
+        files: ['*.css', '**/*.css'],
+        options: {
+          singleQuote: false,
+        },
+      },
+    ],
+    ignorePatterns: ['README.md', 'DESIGN.md', 'docs/**', 'src/components/ui/**'],
+  },
+  lint: {
+    plugins: ['react', 'import'],
+    ignorePatterns: ['dist/**'],
+    rules: {
+      'react/exhaustive-deps': 'error',
+      'react/rules-of-hooks': 'error',
+      'vite-plus/prefer-vite-plus-imports': 'error',
+    },
+    options: {
+      typeAware: true,
+      typeCheck: true,
+    },
+    jsPlugins: [
+      {
+        name: 'vite-plus',
+        specifier: 'vite-plus/oxlint-plugin',
+      },
+    ],
+  },
+  test: {
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'html'],
+      reportsDirectory: 'coverage',
+    },
+    css: true,
+    environment: 'jsdom',
+    exclude: ['e2e/**', 'node_modules/**', 'dist/**'],
+    globals: true,
+    setupFiles: ['./src/test/setup.ts'],
+  },
   base: siteBasePath,
-  plugins: [
+  plugins: lazyPlugins(() => [
     react(),
     tailwindcss(),
     VitePWA({
@@ -50,7 +99,7 @@ export default defineConfig({
         globPatterns: ['index.html', 'assets/**/*.{js,css,html,ico,png,svg,webmanifest,woff,woff2}'],
       },
     }),
-  ],
+  ]),
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

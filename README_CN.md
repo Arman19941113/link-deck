@@ -59,7 +59,7 @@ Link Deck 默认不需要后端服务，也不需要账号。链接、分类、�
 
 ## 开发
 
-Link Deck 使用 React、TypeScript、Vite、Tailwind CSS、Radix UI、dnd-kit、i18next、IndexedDB 和 Vite PWA 构建。
+Link Deck 使用 React、TypeScript、Vite+、Tailwind CSS、Radix UI、dnd-kit、i18next、IndexedDB 和 Vite PWA 构建。
 
 ```bash
 pnpm install
@@ -69,10 +69,8 @@ pnpm dev
 常用检查：
 
 ```bash
-pnpm format
-pnpm lint
+pnpm check
 pnpm tailwind:lint
-pnpm typecheck
 ```
 
 生产构建：

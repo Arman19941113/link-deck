@@ -59,7 +59,7 @@ Clearing browser site data, switching browsers, or using private browsing can re
 
 ## Development
 
-Link Deck is built with React, TypeScript, Vite, Tailwind CSS, Radix UI, dnd-kit, i18next, IndexedDB, and Vite PWA.
+Link Deck is built with React, TypeScript, Vite+, Tailwind CSS, Radix UI, dnd-kit, i18next, IndexedDB, and Vite PWA.
 
 ```bash
 pnpm install
@@ -69,10 +69,8 @@ pnpm dev
 Useful checks:
 
 ```bash
-pnpm format
-pnpm lint
+pnpm check
 pnpm tailwind:lint
-pnpm typecheck
 ```
 
 Production build:

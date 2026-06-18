@@ -1,9 +1,0 @@
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "import"],
-  "ignorePatterns": ["dist/**"],
-  "rules": {
-    "react/exhaustive-deps": "error",
-    "react/rules-of-hooks": "error"
-  }
-}

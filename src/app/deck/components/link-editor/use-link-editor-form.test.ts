@@ -1,7 +1,7 @@
 // Verifies link editor form state, validation, and submit payloads.
 
 import { act, renderHook } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 
 import i18n from '@/i18n'
 import { useLinkEditorForm } from './use-link-editor-form'

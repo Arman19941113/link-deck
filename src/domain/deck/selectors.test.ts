@@ -1,6 +1,6 @@
 // Verifies deck display selectors that drive the visible page sections.
 
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vite-plus/test'
 
 import { selectRenderableSections, selectSearchMatchedSections, sortLinks } from './selectors'
 import type { Category, SavedLink, VisibleCategorySection } from './types'

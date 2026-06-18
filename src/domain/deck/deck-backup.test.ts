@@ -1,6 +1,6 @@
 // Verifies portable deck backup payload creation and import validation.
 
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vite-plus/test'
 
 import { createDeckBackupPayload, parseDeckBackupPayload } from './deck-backup'
 import type { Category, PersistedAppState, SavedLink, StoredIconFile } from './types'

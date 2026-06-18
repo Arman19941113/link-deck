@@ -3,7 +3,7 @@
 import { createRef, type ChangeEvent } from 'react'
 import userEvent from '@testing-library/user-event'
 import { render, screen } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 
 import i18n from '@/i18n'
 import { DataSettingsPanel } from './data-settings-panel'

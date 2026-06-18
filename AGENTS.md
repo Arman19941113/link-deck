@@ -33,8 +33,8 @@ Durable project context for coding agents working on Link Deck. Keep this file l
 
 ## Verification
 
-- Use `pnpm` for package operations.
+- Use `pnpm` for package operations and project commands.
 - Add or update the closest relevant test for domain rules, persistence/import/export behavior, user-visible workflows, or regressions.
-- Use Vitest for domain, hooks, and components. Use Playwright only for browser-backed flows such as IndexedDB workflows, dialogs, and screenshots.
-- After edits, run `pnpm run format`, `pnpm run lint`, `pnpm run tailwind:lint`, and `pnpm run typecheck`.
-- For behavior changes, also run `pnpm test` or `pnpm run test:e2e` when relevant.
+- Use Vite+ test for domain, hooks, and components. Use Playwright only for browser-backed flows such as IndexedDB workflows, dialogs, and screenshots.
+- After edits, run `pnpm check` and `pnpm tailwind:lint`.
+- For behavior changes, also run `pnpm test` or `pnpm test:e2e` when relevant.
