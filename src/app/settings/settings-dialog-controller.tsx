@@ -33,6 +33,7 @@ export type SettingsDialogControllerProps = {
   sortMode: SortMode
   themeColorPreference: ThemeColorPreference
   language: AppLanguage
+  onCloseAutoFocus?: () => void
   onOpenChange: (open: boolean) => void
   onDisplaySizeChange: (displaySize: DisplaySize) => void
   onDesignStylePreferenceChange: (designStylePreference: DesignStylePreference) => void
@@ -59,6 +60,7 @@ export function SettingsDialogController({
   sortMode,
   themeColorPreference,
   language,
+  onCloseAutoFocus,
   onOpenChange,
   onDisplaySizeChange,
   onDesignStylePreferenceChange,
@@ -176,6 +178,10 @@ export function SettingsDialogController({
         onOpenAutoFocus={event => {
           event.preventDefault()
           focusActiveSettingsTab()
+        }}
+        onCloseAutoFocus={event => {
+          event.preventDefault()
+          onCloseAutoFocus?.()
         }}
         onEscapeKeyDown={event => {
           event.preventDefault()

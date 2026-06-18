@@ -29,6 +29,7 @@ type DeckBoardViewProps = {
   onLinkDragEnd: (event: DragEndEvent) => void
   onLinkDragOver: (event: DragOverEvent) => void
   onLinkDragStart: (event: DragStartEvent) => void
+  onDialogTriggerPointerDown?: () => void
   onOpenSettings: (tab?: SettingsTab) => void
   onSearchChange: (query: string) => void
   onSearchFocus: () => void
@@ -60,6 +61,7 @@ export function DeckBoardView({
   onAddLinkToCategory,
   onCreateLinkFromToolbar,
   onDeleteLink,
+  onDialogTriggerPointerDown,
   onEditLink,
   onLinkDragEnd,
   onLinkDragOver,
@@ -80,6 +82,7 @@ export function DeckBoardView({
           isDragEnabled={isLinkDragEnabled}
           showAddLinkCard={!hasQuery && section.links.length === 0}
           onOpenLinkInNewWindow={onOpenLinkInNewWindow}
+          onDialogTriggerPointerDown={onDialogTriggerPointerDown}
           onAddLink={onAddLinkToCategory}
           onEditLink={onEditLink}
           onDeleteLink={onDeleteLink}
@@ -97,6 +100,7 @@ export function DeckBoardView({
             designStylePreference={designStylePreference}
             displaySizeConfig={displaySizeConfig}
             onAddLink={onCreateLinkFromToolbar}
+            onDialogTriggerPointerDown={onDialogTriggerPointerDown}
             onOpenSettings={onOpenSettings}
           />
 

@@ -7,6 +7,7 @@ import { toast } from 'sonner'
 import { LinkEditor } from '@/app/deck/components/link-editor'
 import { DeckContainer } from '@/app/deck/deck-container'
 import { useDeckShellViewModel } from '@/app/deck/hooks/use-deck-shell-view-model'
+import { useHomeFocusRestore } from '@/app/hooks/use-home-focus-restore'
 import { useLanguagePreference } from '@/app/hooks/use-language-preference'
 import { useThemeColorPreference } from '@/app/hooks/use-theme-color-preference'
 import { preloadPinyinSearchModule } from '@/domain/deck/pinyin-search-loader'
@@ -53,6 +54,12 @@ export function AppShell() {
     clearDeckData,
   } = useDeckShellViewModel(language)
   const displaySizeConfig = getDisplaySizeConfig(displaySize)
+  const {
+    rememberCurrentHomeFocus,
+    rememberPointerDownHomeFocus,
+    requestNewLinkFocus,
+    restoreHomeFocusAfterDialogClose,
+  } = useHomeFocusRestore()
 
   useEffect(() => {
     const idleWindow = window as Window & {
@@ -83,6 +90,7 @@ export function AppShell() {
 
   /** Opens a blank form for adding a link from the global action. */
   function handleCreateLink(): void {
+    rememberCurrentHomeFocus()
     setEditingLink(null)
     setNewLinkDefaultCategoryId(null)
     setLinkEditorOpen(true)
@@ -90,12 +98,14 @@ export function AppShell() {
 
   /** Opens settings to a specific tab. */
   function openSettings(tab: SettingsTab = 'general'): void {
+    rememberCurrentHomeFocus()
     setSettingsInitialTab(tab)
     setSettingsOpen(true)
   }
 
   /** Opens a blank form for adding a link. */
   function handleAddLink(categoryId: string): void {
+    rememberCurrentHomeFocus()
     setEditingLink(null)
     setNewLinkDefaultCategoryId(categoryId)
     setLinkEditorOpen(true)
@@ -103,6 +113,7 @@ export function AppShell() {
 
   /** Opens the edit form with the current link data. */
   function handleEditLink(link: SavedLink): void {
+    rememberCurrentHomeFocus()
     setEditingLink(link)
     setNewLinkDefaultCategoryId(null)
     setLinkEditorOpen(true)
@@ -115,6 +126,14 @@ export function AppShell() {
     if (!open) {
       setEditingLink(null)
       setNewLinkDefaultCategoryId(null)
+    }
+  }
+
+  /** Overrides normal focus restoration after adding a new link. */
+  function handleSavedLink(savedLink: SavedLink, mode: 'add' | 'edit'): void {
+    if (mode === 'add') {
+      setQuery('')
+      requestNewLinkFocus(savedLink.id)
     }
   }
 
@@ -134,6 +153,7 @@ export function AppShell() {
         onAddLinkToCategory={handleAddLink}
         onCreateLinkFromToolbar={handleCreateLink}
         onDeleteLink={deleteLink}
+        onDialogTriggerPointerDown={rememberPointerDownHomeFocus}
         onEditLink={handleEditLink}
         onMoveLinkToCategory={moveLinkToCategory}
         onOpenLinkInNewWindow={openLinkInNewWindow}
@@ -149,7 +169,9 @@ export function AppShell() {
         categories={categories}
         displaySizeConfig={displaySizeConfig}
         loadStoredIconFile={loadStoredIconFile}
+        onCloseAutoFocus={restoreHomeFocusAfterDialogClose}
         onOpenChange={handleLinkEditorOpenChange}
+        onSavedLink={handleSavedLink}
         upsertLink={upsertLink}
       />
       <SettingsDialog
@@ -162,6 +184,7 @@ export function AppShell() {
         sortMode={sortMode}
         themeColorPreference={themeColorPreference}
         language={language}
+        onCloseAutoFocus={restoreHomeFocusAfterDialogClose}
         onOpenChange={setSettingsOpen}
         onDisplaySizeChange={setDisplaySize}
         onDesignStylePreferenceChange={setDesignStylePreference}

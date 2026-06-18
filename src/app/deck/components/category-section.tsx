@@ -30,6 +30,7 @@ export function CategorySection({
   onAddLink,
   onEditLink,
   onDeleteLink,
+  onDialogTriggerPointerDown,
   onOpenLinkInNewWindow,
   loadStoredIconFile,
 }: CategorySectionProps) {
@@ -54,6 +55,7 @@ export function CategorySection({
     <AddLinkCard
       displaySizeConfig={displaySizeConfig}
       categoryName={section.category.name}
+      onDialogTriggerPointerDown={onDialogTriggerPointerDown}
       onAddLink={() => onAddLink(section.category.id)}
     />
   )
@@ -83,6 +85,7 @@ export function CategorySection({
               categoryId={section.category.id}
               index={index}
               onOpenLinkInNewWindow={onOpenLinkInNewWindow}
+              onDialogTriggerPointerDown={onDialogTriggerPointerDown}
               onEditLink={onEditLink}
               onDeleteLink={onDeleteLink}
               loadStoredIconFile={loadStoredIconFile}
@@ -98,6 +101,7 @@ export function CategorySection({
               key={link.id}
               link={link}
               onOpenLinkInNewWindow={onOpenLinkInNewWindow}
+              onDialogTriggerPointerDown={onDialogTriggerPointerDown}
               onEditLink={onEditLink}
               onDeleteLink={onDeleteLink}
               loadStoredIconFile={loadStoredIconFile}

@@ -17,11 +17,18 @@ type DeckToolbarProps = {
   designStylePreference: DesignStylePreference
   displaySizeConfig: DisplaySizeConfig
   onAddLink: () => void
+  onDialogTriggerPointerDown?: () => void
   onOpenSettings: (tab?: SettingsTab) => void
 }
 
 /** Shows the app brand and global action area. */
-export function DeckToolbar({ designStylePreference, displaySizeConfig, onAddLink, onOpenSettings }: DeckToolbarProps) {
+export function DeckToolbar({
+  designStylePreference,
+  displaySizeConfig,
+  onAddLink,
+  onDialogTriggerPointerDown,
+  onOpenSettings,
+}: DeckToolbarProps) {
   const { t } = useTranslation()
 
   useEffect(() => {
@@ -75,6 +82,7 @@ export function DeckToolbar({ designStylePreference, displaySizeConfig, onAddLin
           variant="outline"
           size={displaySizeConfig.control.buttonSize}
           aria-label={t('deck.toolbar.openSettings')}
+          onPointerDown={onDialogTriggerPointerDown}
           onClick={() => {
             onOpenSettings()
           }}
@@ -86,6 +94,7 @@ export function DeckToolbar({ designStylePreference, displaySizeConfig, onAddLin
           type="button"
           size={displaySizeConfig.control.buttonSize}
           aria-label={t('deck.toolbar.addLink')}
+          onPointerDown={onDialogTriggerPointerDown}
           onClick={() => {
             onAddLink()
           }}

@@ -10,10 +10,16 @@ type AddLinkCardProps = {
   displaySizeConfig: DisplaySizeConfig
   categoryName: string
   onAddLink: () => void
+  onDialogTriggerPointerDown?: () => void
 }
 
 /** Shows a fixed-size card that starts a new link in the current category. */
-export function AddLinkCard({ displaySizeConfig, categoryName, onAddLink }: AddLinkCardProps) {
+export function AddLinkCard({
+  displaySizeConfig,
+  categoryName,
+  onAddLink,
+  onDialogTriggerPointerDown,
+}: AddLinkCardProps) {
   const { t } = useTranslation()
   const cardConfig = displaySizeConfig.card
 
@@ -27,6 +33,7 @@ export function AddLinkCard({ displaySizeConfig, categoryName, onAddLink }: AddL
         cardConfig.paddingClassName,
         cardConfig.contentGapClassName,
       )}
+      onPointerDown={onDialogTriggerPointerDown}
       onClick={onAddLink}
     >
       <span

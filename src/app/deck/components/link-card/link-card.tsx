@@ -42,6 +42,7 @@ type LinkCardProps = {
 export function LinkCard({
   link,
   onOpenLinkInNewWindow,
+  onDialogTriggerPointerDown,
   onEditLink,
   onDeleteLink,
   loadStoredIconFile,
@@ -209,7 +210,10 @@ export function LinkCard({
               tabIndex={-1}
               onClick={stopMenuEvent}
               onKeyDown={stopMenuEvent}
-              onPointerDown={stopMenuEvent}
+              onPointerDown={event => {
+                onDialogTriggerPointerDown?.()
+                stopMenuEvent(event)
+              }}
             >
               <MoreHorizontal aria-hidden="true" />
             </Button>

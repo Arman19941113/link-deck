@@ -8,4 +8,5 @@ export type DeckLinkHandlers = {
   onOpenLinkInNewWindow: (link: SavedLink) => void
   onEditLink: (link: SavedLink) => void
   onDeleteLink: (link: SavedLink) => Promise<void>
+  onDialogTriggerPointerDown?: () => void
 }

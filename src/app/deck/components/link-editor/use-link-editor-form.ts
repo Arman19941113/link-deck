@@ -26,6 +26,7 @@ type UseLinkEditorFormParams = {
   defaultCategoryId?: string | null
   categories: Category[]
   loadStoredIconFile: (id: string) => Promise<StoredIconFile | undefined>
+  onSavedLink?: (savedLink: SavedLink, mode: 'add' | 'edit') => void
   onOpenChange: (open: boolean) => void
   upsertLink: (input: UpsertLinkInput) => Promise<SavedLink>
 }
@@ -42,6 +43,7 @@ export function useLinkEditorForm({
   defaultCategoryId,
   categories,
   loadStoredIconFile,
+  onSavedLink,
   onOpenChange,
   upsertLink,
 }: UseLinkEditorFormParams) {
@@ -244,7 +246,7 @@ export function useLinkEditorForm({
     setError(null)
 
     try {
-      await upsertLink({
+      const savedLink = await upsertLink({
         id: link?.id,
         categoryId: selectedCategoryId,
         name: trimmedName,
@@ -253,6 +255,7 @@ export function useLinkEditorForm({
         icon,
         iconFile: iconMode === 'file' ? iconFile : null,
       })
+      onSavedLink?.(savedLink, link ? 'edit' : 'add')
       onOpenChange(false)
     } catch (saveError) {
       showError(getEditorErrorMessage(saveError, t('linkEditor.errors.saveFailed')))

@@ -46,6 +46,7 @@ export function DeckContainer({
   onAddLinkToCategory,
   onCreateLinkFromToolbar,
   onDeleteLink,
+  onDialogTriggerPointerDown,
   onEditLink,
   onMoveLinkToCategory,
   onOpenLinkInNewWindow,
@@ -86,6 +87,7 @@ export function DeckContainer({
       onAddLinkToCategory={onAddLinkToCategory}
       onCreateLinkFromToolbar={onCreateLinkFromToolbar}
       onDeleteLink={onDeleteLink}
+      onDialogTriggerPointerDown={onDialogTriggerPointerDown}
       onEditLink={onEditLink}
       onLinkDragStart={handleLinkDragStart}
       onLinkDragOver={handleLinkDragOver}

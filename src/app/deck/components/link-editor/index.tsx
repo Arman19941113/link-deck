@@ -28,7 +28,9 @@ type LinkEditorProps = {
   categories: Category[]
   displaySizeConfig: DisplaySizeConfig
   loadStoredIconFile: (id: string) => Promise<StoredIconFile | undefined>
+  onCloseAutoFocus?: () => void
   onOpenChange: (open: boolean) => void
+  onSavedLink?: (savedLink: SavedLink, mode: 'add' | 'edit') => void
   upsertLink: (input: UpsertLinkInput) => Promise<SavedLink>
 }
 
@@ -42,7 +44,9 @@ export function LinkEditor({
   categories,
   displaySizeConfig,
   loadStoredIconFile,
+  onCloseAutoFocus,
   onOpenChange,
+  onSavedLink,
   upsertLink,
 }: LinkEditorProps) {
   return (
@@ -56,7 +60,9 @@ export function LinkEditor({
         categories={categories}
         displaySizeConfig={displaySizeConfig}
         loadStoredIconFile={loadStoredIconFile}
+        onCloseAutoFocus={onCloseAutoFocus}
         onOpenChange={onOpenChange}
+        onSavedLink={onSavedLink}
         upsertLink={upsertLink}
       />
     </Dialog>
@@ -70,7 +76,9 @@ function LinkEditorForm({
   categories,
   displaySizeConfig,
   loadStoredIconFile,
+  onCloseAutoFocus,
   onOpenChange,
+  onSavedLink,
   upsertLink,
 }: LinkEditorFormProps) {
   const { t } = useTranslation()
@@ -79,6 +87,7 @@ function LinkEditorForm({
     defaultCategoryId,
     categories,
     loadStoredIconFile,
+    onSavedLink,
     onOpenChange,
     upsertLink,
   })
@@ -90,6 +99,10 @@ function LinkEditorForm({
         displaySizeConfig.dialog.surfaceClassName,
         'h-auto! max-h-[calc(100svh-2rem)]!',
       )}
+      onCloseAutoFocus={event => {
+        event.preventDefault()
+        onCloseAutoFocus?.()
+      }}
     >
       <DialogHeader className={displaySizeConfig.dialog.headerClassName}>
         <DialogTitle className={displaySizeConfig.dialog.titleClassName}>{form.editorTitle}</DialogTitle>

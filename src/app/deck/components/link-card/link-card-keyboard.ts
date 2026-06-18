@@ -16,6 +16,18 @@ export function focusFirstLinkCard(): boolean {
   return focusLinkCardAtIndex(0)
 }
 
+/** Focuses a visible link card by its persisted link id. */
+export function focusLinkCardById(linkId: string): boolean {
+  const card = getLinkCardById(linkId)
+
+  if (!card) {
+    return false
+  }
+
+  card.focus({ preventScroll: true })
+  return true
+}
+
 /** Moves focus between visible link cards, optionally wrapping at the ends. */
 export function focusSiblingLinkCard(currentTarget: HTMLElement, direction: 1 | -1, wrap = false): void {
   const cards = getFocusableLinkCards()
@@ -41,9 +53,7 @@ export function createPostDeleteLinkCardFocus(currentTarget: HTMLElement): () =>
 
   return () => {
     requestAnimationFrame(() => {
-      const card = fallbackLinkId
-        ? document.querySelector<HTMLElement>(`[${LINK_CARD_ID_ATTRIBUTE}="${CSS.escape(fallbackLinkId)}"]`)
-        : null
+      const card = fallbackLinkId ? getLinkCardById(fallbackLinkId) : null
 
       card?.focus({ preventScroll: true })
     })
@@ -84,6 +94,16 @@ export function focusVerticalLinkCard(currentTarget: HTMLElement, direction: 1 |
 /** Returns the currently rendered link cards in document tab order. */
 function getFocusableLinkCards(): HTMLElement[] {
   return Array.from(document.querySelectorAll<HTMLElement>(LINK_CARD_ACTION_SELECTOR))
+}
+
+function getLinkCardById(linkId: string): HTMLElement | null {
+  return document.querySelector<HTMLElement>(`[${LINK_CARD_ID_ATTRIBUTE}="${escapeAttributeSelectorValue(linkId)}"]`)
+}
+
+function escapeAttributeSelectorValue(value: string): string {
+  return typeof CSS !== 'undefined' && typeof CSS.escape === 'function'
+    ? CSS.escape(value)
+    : value.replace(/["\\]/g, '\\$&')
 }
 
 function focusLinkCardAtIndex(index: number): boolean {
