@@ -71,7 +71,6 @@ Useful checks:
 
 ```bash
 pnpm check
-pnpm tailwind:lint
 ```
 
 Production build:

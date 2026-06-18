@@ -71,7 +71,6 @@ pnpm dev
 
 ```bash
 pnpm check
-pnpm tailwind:lint
 ```
 
 生产构建：

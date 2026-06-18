@@ -317,9 +317,6 @@ importers:
       jsdom:
         specifier: ^29.1.1
         version: 29.1.1
-      tailwint:
-        specifier: ^1.1.13
-        version: 1.1.13(@tailwindcss/language-server@0.14.29)
       typescript:
         specifier: ~6.0.2
         version: 6.0.3
@@ -2914,10 +2911,6 @@ packages:
     deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
     hasBin: true
 
-  glob@13.0.6:
-    resolution: {integrity: sha512-Wjlyrolmm8uDpm/ogGyXZXb1Z+Ca2B8NbJwqBVg0axK9GbBeoS7yGV6vjXnYdGm6X53iehEuxxbyiKp8QmN4Vw==}
-    engines: {node: 18 || 20 || >=22}
-
   globalthis@1.0.4:
     resolution: {integrity: sha512-DpLKbNU4WylpxJykQujfCcwYWiV/Jhm50Goo0wrVILAv5jOr9d+H+UR3PhSCD2rCCEIg0uc+G+muBTwD54JhDQ==}
     engines: {node: '>= 0.4'}
@@ -3709,13 +3702,6 @@ packages:
 
   tailwindcss@4.3.0:
     resolution: {integrity: sha512-y6nxMGB1nMW9R6k96e5gdIFzcfL/gTJRNaqGes1YvkLnPVXzWgbqFF2yLC0T8G774n24cx3Pe8XrKoniCOAH+Q==}
-
-  tailwint@1.1.13:
-    resolution: {integrity: sha512-6hQvsIoFkDaoL5xghuTARxYN+PzJw45cyGW2ulflGiSEzR041I8NYCqz2kLyfbTImkqhicenbDPjSuxoo4lQwg==}
-    engines: {node: '>=18'}
-    hasBin: true
-    peerDependencies:
-      '@tailwindcss/language-server': '>=0.14.0'
 
   tapable@2.3.3:
     resolution: {integrity: sha512-uxc/zpqFg6x7C8vOE7lh6Lbda8eEL9zmVm/PLeTPBRhh1xCgdWaQ+J1CUieGpIfm2HdtsUpRv+HshiasBMcc6A==}
@@ -6609,12 +6595,6 @@ snapshots:
       package-json-from-dist: 1.0.1
       path-scurry: 2.0.2
 
-  glob@13.0.6:
-    dependencies:
-      minimatch: 10.2.5
-      minipass: 7.1.3
-      path-scurry: 2.0.2
-
   globalthis@1.0.4:
     dependencies:
       define-properties: 1.2.1
@@ -7487,11 +7467,6 @@ snapshots:
   tailwind-merge@3.6.0: {}
 
   tailwindcss@4.3.0: {}
-
-  tailwint@1.1.13(@tailwindcss/language-server@0.14.29):
-    dependencies:
-      '@tailwindcss/language-server': 0.14.29
-      glob: 13.0.6
 
   tapable@2.3.3: {}
 
