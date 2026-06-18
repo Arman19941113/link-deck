@@ -193,6 +193,7 @@
   "shortcuts": {
     "search": "搜索",
     "openLink": "打开选中链接",
+    "editLink": "编辑选中链接",
     "createLink": "新建链接",
     "deleteLink": "删除选中链接",
     "keyboardShortcuts": "显示快捷键"

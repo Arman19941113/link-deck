@@ -44,6 +44,8 @@ test('opens settings from the toolbar and switches to the shortcuts tab', async 
   await page.getByRole('button', { name: 'Shortcuts' }).click()
 
   await expect(page.getByText('New link')).toBeVisible()
+  await expect(page.getByText('Edit selected link')).toBeVisible()
+  await expect(page.getByText('Ctrl + Shift + E')).toBeVisible()
   await expect(page.getByText('Ctrl + Shift + O')).toBeVisible()
 })
 

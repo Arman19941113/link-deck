@@ -74,12 +74,19 @@ export function LinkCard({
     }
   }
 
-  /** Handles Command/Ctrl+Enter before drag sensors or nested controls can consume it. */
+  /** Handles card action shortcuts before drag sensors or nested controls can consume them. */
   function handleOpenKeyDownCapture(event: KeyboardEvent<HTMLElement>): void {
     if (isNewWindowShortcut(event)) {
       event.preventDefault()
       event.stopPropagation()
       onOpenLinkInNewWindow(link)
+      return
+    }
+
+    if (isEditLinkShortcut(event)) {
+      event.preventDefault()
+      event.stopPropagation()
+      onEditLink(link)
       return
     }
 
@@ -163,7 +170,7 @@ export function LinkCard({
         data-link-card-action="true"
         {...{ [LINK_CARD_ID_ATTRIBUTE]: link.id }}
         aria-label={t('deck.linkCard.open', { name: link.name })}
-        aria-keyshortcuts={`${getKeyboardShortcutAriaKeys('openLink')} ${getKeyboardShortcutAriaKeys('deleteLink')}`}
+        aria-keyshortcuts={`${getKeyboardShortcutAriaKeys('openLink')} ${getKeyboardShortcutAriaKeys('editLink')} ${getKeyboardShortcutAriaKeys('deleteLink')}`}
         onClick={handleLinkClick}
         onAuxClick={handleLinkAuxClick}
         onKeyDownCapture={handleOpenKeyDownCapture}
@@ -256,6 +263,11 @@ export function LinkCard({
 /** Checks the platform shortcut that opens the focused card in a new window. */
 function isNewWindowShortcut(event: KeyboardEvent<HTMLElement>): boolean {
   return matchesKeyboardShortcut(event, 'openLink')
+}
+
+/** Checks the platform shortcut that edits the focused card. */
+function isEditLinkShortcut(event: KeyboardEvent<HTMLElement>): boolean {
+  return matchesKeyboardShortcut(event, 'editLink')
 }
 
 /** Checks the platform shortcut that requests deletion for the focused card. */

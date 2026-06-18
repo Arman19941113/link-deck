@@ -53,6 +53,7 @@ Link Deck 默认不需要后端服务，也不需要账号。链接、分类、�
 | ------------ | ------------------------- | -------------------------- |
 | 搜索         | `Cmd + K`                 | `Ctrl + K`                 |
 | 打开选中链接 | `Cmd + Enter`             | `Ctrl + Enter`             |
+| 编辑选中链接 | `Cmd + Shift + E`         | `Ctrl + Shift + E`         |
 | 新建链接     | `Cmd + Shift + O`         | `Ctrl + Shift + O`         |
 | 删除选中链接 | `Cmd + Shift + Backspace` | `Ctrl + Shift + Backspace` |
 | 显示快捷键   | `Cmd + /`                 | `Ctrl + /`                 |

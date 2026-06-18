@@ -53,6 +53,7 @@ Clearing browser site data, switching browsers, or using private browsing can re
 | --- | --- | --- |
 | Search | `Cmd + K` | `Ctrl + K` |
 | Open selected link | `Cmd + Enter` | `Ctrl + Enter` |
+| Edit selected link | `Cmd + Shift + E` | `Ctrl + Shift + E` |
 | Create link | `Cmd + Shift + O` | `Ctrl + Shift + O` |
 | Delete selected link | `Cmd + Shift + Backspace` | `Ctrl + Shift + Backspace` |
 | Show shortcuts | `Cmd + /` | `Ctrl + /` |

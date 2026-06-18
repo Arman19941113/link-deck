@@ -107,6 +107,17 @@ describe('DeckContainer', () => {
     expect(actions.onOpenLinkInNewWindow).toHaveBeenCalledWith(links[0])
   })
 
+  it('edits the focused link through the keyboard shortcut', async () => {
+    const user = userEvent.setup()
+    const { actions, links } = renderDeck()
+    const githubLink = screen.getByRole('link', { name: '打开 GitHub' })
+
+    githubLink.focus()
+    await user.keyboard('{Control>}{Shift>}e{/Shift}{/Control}')
+
+    expect(actions.onEditLink).toHaveBeenCalledWith(links[0])
+  })
+
   it('renders the empty deck state after initialization when there are no sections', () => {
     renderDeck({
       categories: [],

@@ -193,6 +193,7 @@
   "shortcuts": {
     "search": "Search",
     "openLink": "Open selected link",
+    "editLink": "Edit selected link",
     "createLink": "New link",
     "deleteLink": "Delete selected link",
     "keyboardShortcuts": "Show shortcuts"

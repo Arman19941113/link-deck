@@ -1,6 +1,6 @@
 // Keyboard shortcut definitions, display helpers, and event matchers.
 
-type KeyboardShortcutId = 'search' | 'createLink' | 'openLink' | 'deleteLink' | 'keyboardShortcuts'
+type KeyboardShortcutId = 'search' | 'createLink' | 'openLink' | 'editLink' | 'deleteLink' | 'keyboardShortcuts'
 
 type NavigatorWithUserAgentData = Navigator & {
   userAgentData?: {
@@ -47,6 +47,15 @@ const KEYBOARD_SHORTCUT_DEFINITIONS: KeyboardShortcutDefinition[] = [
     keys: {
       apple: 'Cmd + Enter',
       default: 'Ctrl + Enter',
+    },
+  },
+  {
+    id: 'editLink',
+    key: 'e',
+    shiftKey: true,
+    keys: {
+      apple: 'Cmd + Shift + E',
+      default: 'Ctrl + Shift + E',
     },
   },
   {
