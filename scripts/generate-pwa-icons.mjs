@@ -24,8 +24,8 @@ function parseLogoSvg(svg) {
     shadowRect: rects[0],
     cardRect: rects[1],
     lines: [
-      { x1: 24, y1: 27, x2: 40, y2: 27, strokeWidth: 4 },
-      { x1: 24, y1: 37, x2: 37, y2: 37, strokeWidth: 4 },
+      { x1: 23, y1: 24.5, x2: 41, y2: 24.5, strokeWidth: 4 },
+      { x1: 23, y1: 35.5, x2: 35, y2: 35.5, strokeWidth: 4 },
     ],
     circle,
   }
