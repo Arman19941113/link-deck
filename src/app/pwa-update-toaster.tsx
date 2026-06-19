@@ -36,6 +36,10 @@ export function PwaUpdateToaster() {
 
     toast.info(t('app.pwa.updateReady'), {
       id: 'pwa-update-ready',
+      className: 'pwa-update-toast',
+      closeButton: false,
+      icon: null,
+      richColors: false,
       action: {
         label: t('app.pwa.refresh'),
         onClick: () => updateServiceWorker(true),
