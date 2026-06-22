@@ -12,7 +12,6 @@
     "cancel": "Cancel",
     "close": "Close",
     "delete": "Delete",
-    "save": "Save",
     "saving": "Saving...",
     "reset": "Reset"
   },
@@ -122,13 +121,11 @@
         "spacious": "Spacious"
       },
       "linkOrder": "Link order",
-      "linkOrderPlaceholder": "Select a link order",
       "sortModes": {
         "manual": "Manual",
         "name": "Title (A-Z)"
       },
       "language": "Language",
-      "languagePlaceholder": "Select a language",
       "languages": {
         "en": "English",
         "zh": "中文"
