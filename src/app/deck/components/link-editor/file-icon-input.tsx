@@ -1,6 +1,7 @@
 // Renders the local file chooser used by the link editor icon source fields.
 
 import type { ChangeEvent } from 'react'
+import { forwardRef, useImperativeHandle, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Upload } from 'lucide-react'
 
@@ -12,6 +13,7 @@ import { cn } from '@/lib/utils'
 
 type FileIconInputProps = {
   displaySizeConfig: DisplaySizeConfig
+  className?: string
   disabled: boolean
   currentFileLabel: string
   currentFileMeta: string
@@ -20,30 +22,52 @@ type FileIconInputProps = {
   onChange: (event: ChangeEvent<HTMLInputElement>) => void
 }
 
+export type FileIconInputHandle = {
+  openFilePicker: () => void
+}
+
 /** Displays the current file icon preview and forwards file input changes to form state. */
-export function FileIconInput({
-  displaySizeConfig,
-  disabled,
-  currentFileLabel,
-  currentFileMeta,
-  currentFilePreviewUrl,
-  isInvalid,
-  onChange,
-}: FileIconInputProps) {
+export const FileIconInput = forwardRef<FileIconInputHandle, FileIconInputProps>(function FileIconInput(
+  {
+    displaySizeConfig,
+    className,
+    disabled,
+    currentFileLabel,
+    currentFileMeta,
+    currentFilePreviewUrl,
+    isInvalid,
+    onChange,
+  },
+  ref,
+) {
   const { t } = useTranslation()
+  const inputRef = useRef<HTMLInputElement | null>(null)
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      openFilePicker() {
+        if (disabled) {
+          return
+        }
+
+        inputRef.current?.click()
+      },
+    }),
+    [disabled],
+  )
 
   return (
-    <div className={displaySizeConfig.dialog.fieldClassName}>
-      <Label htmlFor="link-editor-icon-file" className={displaySizeConfig.control.labelClassName}>
-        {t('linkEditor.icon.file')}
-      </Label>
+    <>
       <Input
+        ref={inputRef}
         id="link-editor-icon-file"
         className="peer sr-only size-px w-px"
         type="file"
         accept={ICON_FILE_ACCEPT}
         disabled={disabled}
         aria-invalid={isInvalid}
+        aria-label={t('linkEditor.icon.file')}
         onChange={onChange}
       />
       <Label
@@ -54,6 +78,7 @@ export function FileIconInput({
           'peer-focus-visible:border-ring peer-focus-visible:ring-[3px] peer-focus-visible:ring-ring/50',
           disabled && 'cursor-not-allowed opacity-50',
           isInvalid && 'border-destructive ring-[3px] ring-destructive/20 dark:ring-destructive/40',
+          className,
         )}
       >
         <div className="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-sm bg-muted text-muted-foreground">
@@ -74,6 +99,6 @@ export function FileIconInput({
           <p className="min-w-0 flex-1 truncate text-sm leading-tight font-medium">{t('linkEditor.icon.chooseFile')}</p>
         )}
       </Label>
-    </div>
+    </>
   )
-}
+})

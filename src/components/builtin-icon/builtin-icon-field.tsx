@@ -1,10 +1,9 @@
 // Form field that shows the current built-in icon and opens the chooser dialog.
 
-import { useMemo, useState } from 'react'
-import { Shuffle } from 'lucide-react'
+import { forwardRef, useCallback, useImperativeHandle, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { getBuiltinIconMetadata, getRandomDefaultBuiltinIcon, type BuiltinIconValue } from './builtin-icon-registry'
+import { getBuiltinIconMetadata, type BuiltinIconValue } from './builtin-icon-registry'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -14,7 +13,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Label } from '@/components/ui/label'
 import type { DisplaySizeConfig } from '@/app/display-size-config'
 import { cn } from '@/lib/utils'
 
@@ -23,33 +21,43 @@ import { BuiltinIconPreviewTile } from './builtin-icon-preview'
 
 type BuiltinIconFieldProps = {
   value: BuiltinIconValue | null
+  className?: string
   disabled?: boolean
   displaySizeConfig: DisplaySizeConfig
   onChange: (icon: BuiltinIconValue) => void
 }
 
+export type BuiltinIconFieldHandle = {
+  openPicker: () => void
+}
+
 /** Shows the current built-in icon and opens the secondary chooser dialog. */
-export function BuiltinIconField({ value, disabled = false, displaySizeConfig, onChange }: BuiltinIconFieldProps) {
+export const BuiltinIconField = forwardRef<BuiltinIconFieldHandle, BuiltinIconFieldProps>(function BuiltinIconField(
+  { value, className, disabled = false, displaySizeConfig, onChange },
+  ref,
+) {
   const { t } = useTranslation()
   const [pickerOpen, setPickerOpen] = useState(false)
   const [draftIcon, setDraftIcon] = useState<BuiltinIconValue | null>(value)
   const selectedIcon = useMemo(() => (value ? getBuiltinIconMetadata(value) : null), [value])
-  const previewSizeClassNames = getBuiltinIconPreviewSizeClassNames(displaySizeConfig.control.iconButtonSize)
 
   /** Opens the chooser with the current saved draft value. */
-  function openPicker(): void {
-    setDraftIcon(value)
-    setPickerOpen(true)
-  }
-
-  /** Replaces the current icon with a curated random choice. */
-  async function handleRandomIcon(): Promise<void> {
+  const openPicker = useCallback((): void => {
     if (disabled) {
       return
     }
 
-    onChange(getRandomDefaultBuiltinIcon(value?.slug))
-  }
+    setDraftIcon(value)
+    setPickerOpen(true)
+  }, [disabled, value])
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      openPicker,
+    }),
+    [openPicker],
+  )
 
   /** Commits the icon selected inside the chooser dialog. */
   function handleUseIcon(icon = draftIcon): void {
@@ -63,56 +71,32 @@ export function BuiltinIconField({ value, disabled = false, displaySizeConfig, o
 
   return (
     <>
-      <div className={displaySizeConfig.dialog.fieldClassName}>
-        <Label className={displaySizeConfig.control.labelClassName}>{t('linkEditor.icon.builtin')}</Label>
-        <div
-          className={cn(
-            displaySizeConfig.control.inputClassName,
-            'flex items-center gap-3 border border-input bg-card shadow-xs',
-            getBuiltinIconActionInsetClassName(displaySizeConfig.control.buttonSize),
+      <button
+        type="button"
+        className={cn(
+          displaySizeConfig.control.inputClassName,
+          'flex w-full cursor-pointer items-center gap-3 border border-input bg-card text-left shadow-xs transition-[border-color,box-shadow,opacity] outline-none',
+          'focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50',
+          disabled && 'cursor-not-allowed opacity-50',
+          className,
+        )}
+        disabled={disabled}
+        aria-haspopup="dialog"
+        onClick={openPicker}
+      >
+        <span className="flex min-w-0 flex-1 items-center gap-3">
+          {selectedIcon ? (
+            <BuiltinIconPreviewTile icon={selectedIcon} className="size-6 rounded-sm" iconClassName="size-4" />
+          ) : (
+            <span className="app-icon-tile size-6 rounded-sm border" aria-hidden="true" />
           )}
-        >
-          <span className="flex min-w-0 flex-1 items-center gap-3">
-            {selectedIcon ? (
-              <BuiltinIconPreviewTile
-                icon={selectedIcon}
-                className={cn(previewSizeClassNames.tile, 'rounded-md')}
-                iconClassName={previewSizeClassNames.icon}
-              />
-            ) : (
-              <span className={cn('app-icon-tile rounded-md border', previewSizeClassNames.tile)} aria-hidden="true" />
-            )}
-            <span className="min-w-0">
-              <span className="block truncate text-sm font-medium">
-                {value?.title ?? t('linkEditor.icon.noIconSelected')}
-              </span>
+          <span className="min-w-0">
+            <span className="block truncate text-sm font-medium">
+              {value?.title ?? t('linkEditor.icon.noIconSelected')}
             </span>
           </span>
-          <div className="flex shrink-0 items-center gap-1">
-            <Button
-              type="button"
-              variant="outline"
-              size={displaySizeConfig.control.iconButtonSize}
-              disabled={disabled}
-              className="bg-background"
-              aria-label={t('linkEditor.icon.random')}
-              onClick={() => void handleRandomIcon()}
-            >
-              <Shuffle aria-hidden="true" />
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              size={displaySizeConfig.control.buttonSize}
-              disabled={disabled}
-              className="bg-background"
-              onClick={openPicker}
-            >
-              {t('common.choose')}
-            </Button>
-          </div>
-        </div>
-      </div>
+        </span>
+      </button>
 
       <Dialog open={pickerOpen} onOpenChange={setPickerOpen}>
         <DialogContent
@@ -162,29 +146,4 @@ export function BuiltinIconField({ value, disabled = false, displaySizeConfig, o
       </Dialog>
     </>
   )
-}
-
-/** Returns field button spacing that keeps top, bottom, and right inset balanced. */
-function getBuiltinIconActionInsetClassName(buttonSize: DisplaySizeConfig['control']['buttonSize']) {
-  return buttonSize === 'default' ? 'py-1 pr-[3px] pl-3' : 'py-0.5 pr-px pl-3'
-}
-
-function getBuiltinIconPreviewSizeClassNames(iconButtonSize: DisplaySizeConfig['control']['iconButtonSize']) {
-  switch (iconButtonSize) {
-    case 'icon-compact':
-      return {
-        tile: 'size-7',
-        icon: 'size-4',
-      }
-    case 'icon-spacious':
-      return {
-        tile: 'size-10',
-        icon: 'size-6',
-      }
-    case 'icon-sm':
-      return {
-        tile: 'size-8',
-        icon: 'size-5',
-      }
-  }
-}
+})

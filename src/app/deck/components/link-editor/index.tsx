@@ -36,6 +36,8 @@ type LinkEditorProps = {
 
 type LinkEditorFormProps = Omit<LinkEditorProps, 'open'>
 
+const LINK_EDITOR_FIELD_CLASS_NAME = 'h-9'
+
 /** Dialog shell for adding or editing a saved link, using a key to reset internal form state. */
 export function LinkEditor({
   open,
@@ -118,7 +120,7 @@ function LinkEditorForm({
           </Label>
           <Input
             id="link-editor-url"
-            className={displaySizeConfig.control.inputClassName}
+            className={cn(displaySizeConfig.control.inputClassName, LINK_EDITOR_FIELD_CLASS_NAME)}
             value={form.url}
             required
             type="url"
@@ -142,7 +144,7 @@ function LinkEditorForm({
             </Label>
             <Input
               id="link-editor-name"
-              className={displaySizeConfig.control.inputClassName}
+              className={cn(displaySizeConfig.control.inputClassName, LINK_EDITOR_FIELD_CLASS_NAME)}
               value={form.name}
               placeholder={t('linkEditor.namePlaceholder')}
               disabled={form.isSaving}
@@ -162,7 +164,7 @@ function LinkEditorForm({
               >
                 <SelectTrigger
                   id="link-editor-category"
-                  className={cn('w-full', displaySizeConfig.control.inputClassName)}
+                  className={cn('w-full', displaySizeConfig.control.inputClassName, LINK_EDITOR_FIELD_CLASS_NAME)}
                   aria-invalid={!form.selectedCategoryId && Boolean(form.error)}
                 >
                   <SelectValue placeholder={t('linkEditor.categoryPlaceholder')} />
@@ -187,9 +189,13 @@ function LinkEditorForm({
           </Label>
           <Textarea
             id="link-editor-note"
-            className={cn(displaySizeConfig.control.textareaClassName, 'h-auto min-h-0 resize-none')}
+            className={cn(
+              displaySizeConfig.control.textareaClassName,
+              LINK_EDITOR_FIELD_CLASS_NAME,
+              'min-h-0 resize-none overflow-hidden py-1.5 leading-5',
+            )}
             value={form.note}
-            rows={2}
+            rows={1}
             disabled={form.isSaving}
             onChange={event => form.setNote(event.target.value)}
           />
@@ -197,6 +203,7 @@ function LinkEditorForm({
 
         <IconSourceFields
           displaySizeConfig={displaySizeConfig}
+          fieldClassName={LINK_EDITOR_FIELD_CLASS_NAME}
           iconMode={form.iconMode}
           builtinIcon={form.builtinIcon}
           iconUrl={form.iconUrl}

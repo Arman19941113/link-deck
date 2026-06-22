@@ -30,21 +30,6 @@ type SearchIndexEntry = {
   normalizedTitle: string
 }
 
-const DEFAULT_ICON_KEYS = [
-  'material-icon-theme:google',
-  'simple-icons:github',
-  'simple-icons:youtube',
-  'simple-icons:x',
-  'simple-icons:instagram',
-  'logos:openai-icon',
-  'simple-icons:notion',
-  'simple-icons:excalidraw',
-  'simple-icons:bilibili',
-  'simple-icons:discord',
-  'logos:linkedin-icon',
-  'fa6-brands:amazon',
-]
-
 let searchIndex: SearchIndexEntry[] | null = null
 
 const GENERIC_LINK_ICON_KEY = 'lucide:link'
@@ -65,10 +50,6 @@ const GENERIC_LINK_ICON_OPTION: BuiltinIconOption = {
   source: 'lucide',
   sourceLabel: 'Lucide',
 }
-
-const DEFAULT_BUILTIN_ICON_RESULTS = DEFAULT_ICON_KEYS.map(key => builtinIconsByKey.get(key))
-  .filter((icon): icon is BuiltinIconData => Boolean(icon))
-  .map(toSearchResult)
 
 const BUILTIN_ICON_CANDIDATES = builtinIconsData.map(toSearchResult)
 
@@ -164,36 +145,17 @@ export function createBuiltinIconRef(icon: BuiltinIconOption): BuiltinIconValue 
   }
 }
 
-/** Picks a random icon from the curated default set. */
-export function getRandomDefaultBuiltinIcon(excludeKey?: string): BuiltinIconValue {
-  const candidates = getDefaultBuiltinIcons().filter(icon => icon.key !== excludeKey)
-  const fallbackCandidates = candidates.length ? candidates : getDefaultBuiltinIcons()
-  const icon = fallbackCandidates[Math.floor(Math.random() * fallbackCandidates.length)]
-
-  return icon ? createBuiltinIconRef(icon) : DEFAULT_BUILTIN_ICON
-}
-
 /** Searches built-in icons by brand title. */
 export function searchBuiltinIcons(query: string): BuiltinIconOption[] {
   const normalizedQuery = normalizeSearchValue(query)
 
   if (!normalizedQuery) {
-    return getBuiltinIconCandidates()
+    return BUILTIN_ICON_CANDIDATES
   }
 
   return getSearchIndex()
     .filter(({ normalizedTitle }) => normalizedTitle.includes(normalizedQuery))
     .map(({ icon }) => icon)
-}
-
-/** Returns the curated default set shown before the user searches. */
-function getDefaultBuiltinIcons(): BuiltinIconOption[] {
-  return DEFAULT_BUILTIN_ICON_RESULTS
-}
-
-/** Returns the common built-in icon candidates shown by the picker. */
-function getBuiltinIconCandidates(): BuiltinIconOption[] {
-  return BUILTIN_ICON_CANDIDATES
 }
 
 function getSearchIndex(): SearchIndexEntry[] {

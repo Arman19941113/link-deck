@@ -17,6 +17,9 @@ type SegmentedSettingsPickerProps<TValue extends string> = {
   name: string
   options: ReadonlyArray<SegmentedSettingsPickerOption<TValue>>
   value: TValue
+  labelClassName?: string
+  controlClassName?: string
+  disabled?: boolean
   onChange: (value: TValue) => void
   renderOptionContent: (option: SegmentedSettingsPickerOption<TValue>, isSelected: boolean) => ReactNode
 }
@@ -28,6 +31,9 @@ export function SegmentedSettingsPicker<TValue extends string>({
   name,
   options,
   value,
+  labelClassName,
+  controlClassName,
+  disabled = false,
   onChange,
   renderOptionContent,
 }: SegmentedSettingsPickerProps<TValue>) {
@@ -38,9 +44,14 @@ export function SegmentedSettingsPicker<TValue extends string>({
 
   return (
     <div className="flex flex-col gap-2">
-      <Label id={id}>{label}</Label>
+      <Label id={id} className={labelClassName}>
+        {label}
+      </Label>
       <div
-        className="relative grid h-11 overflow-hidden rounded-md border border-input bg-card p-0.5 shadow-xs"
+        className={cn(
+          'relative grid h-11 overflow-hidden rounded-md border border-input bg-card p-0.5 shadow-xs',
+          controlClassName,
+        )}
         style={{
           gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))`,
         }}
@@ -64,6 +75,7 @@ export function SegmentedSettingsPicker<TValue extends string>({
               className={cn(
                 'relative z-10 flex h-full min-w-0 cursor-pointer items-center justify-center gap-2 rounded-sm px-3 text-sm font-medium text-muted-foreground outline-none transition-colors duration-200 ease-app-hover hover:text-foreground has-[input:focus-visible]:ring-[3px] has-[input:focus-visible]:ring-ring/50',
                 isSelected && 'settings-segment-option-selected',
+                disabled && 'cursor-not-allowed opacity-50 hover:text-muted-foreground',
               )}
               title={option.title}
             >
@@ -72,6 +84,7 @@ export function SegmentedSettingsPicker<TValue extends string>({
                 name={name}
                 value={option.value}
                 checked={isSelected}
+                disabled={disabled}
                 className="peer sr-only"
                 onChange={() => onChange(option.value)}
               />

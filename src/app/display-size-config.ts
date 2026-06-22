@@ -95,7 +95,7 @@ const DISPLAY_SIZE_CONFIG: Record<DisplaySize, DisplaySizeConfig> = {
       labelClassName: 'text-xs',
     },
     dialog: {
-      surfaceClassName: 'h-[576px] w-[640px] max-h-none max-w-none sm:max-w-none',
+      surfaceClassName: 'h-[576px] w-[600px] max-h-none max-w-none sm:max-w-none',
       contentClassName: 'max-h-[calc(100svh-1.5rem)] gap-3 p-4 sm:max-w-lg',
       headerClassName: 'gap-1.5',
       titleClassName: 'text-base leading-tight font-semibold',
@@ -148,7 +148,7 @@ const DISPLAY_SIZE_CONFIG: Record<DisplaySize, DisplaySizeConfig> = {
       labelClassName: 'text-sm',
     },
     dialog: {
-      surfaceClassName: 'h-[592px] w-[672px] max-h-none max-w-none sm:max-w-none',
+      surfaceClassName: 'h-[592px] w-[632px] max-h-none max-w-none sm:max-w-none',
       contentClassName: 'max-h-[calc(100svh-2rem)] gap-4 p-6 sm:max-w-xl',
       headerClassName: 'gap-2',
       titleClassName: 'text-lg leading-none font-semibold',
@@ -201,7 +201,7 @@ const DISPLAY_SIZE_CONFIG: Record<DisplaySize, DisplaySizeConfig> = {
       labelClassName: 'text-sm',
     },
     dialog: {
-      surfaceClassName: 'h-[608px] w-[704px] max-h-none max-w-none sm:max-w-none',
+      surfaceClassName: 'h-[608px] w-[664px] max-h-none max-w-none sm:max-w-none',
       contentClassName: 'max-h-[calc(100svh-2.5rem)] gap-5 p-7 sm:max-w-2xl',
       headerClassName: 'gap-2.5',
       titleClassName: 'text-xl leading-tight font-semibold',

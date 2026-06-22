@@ -10,7 +10,6 @@
   },
   "common": {
     "cancel": "Cancel",
-    "choose": "Choose",
     "close": "Close",
     "delete": "Delete",
     "save": "Save",
@@ -76,7 +75,6 @@
       "iconUrl": "Icon URL",
       "chooseFile": "Choose an icon file",
       "noIconSelected": "No icon selected",
-      "random": "Random built-in icon",
       "chooseBuiltinTitle": "Choose built-in icon",
       "chooseBuiltinDescription": "Search built-in brand icons and confirm the icon for this link.",
       "searchLabel": "Search built-in icons",
