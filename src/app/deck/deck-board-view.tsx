@@ -1,5 +1,6 @@
 // Main deck board UI module that composes toolbar, search, and link sections.
 
+import { useRef } from 'react'
 import { PointerActivationConstraints, PointerSensor } from '@dnd-kit/dom'
 import { DragDropProvider, type DragEndEvent, type DragOverEvent, type DragStartEvent } from '@dnd-kit/react'
 
@@ -8,6 +9,7 @@ import { CategorySection } from './components/category-section'
 import { DeckEmptyState } from './components/deck-empty-state'
 import { LinkSearchBox } from './components/link-search-box'
 import type { DeckLinkHandlers, IconFileLoader } from './deck-board-types'
+import { RestrictToElementXAxis } from './link-drag-modifiers'
 import type { DisplaySizeConfig } from '@/app/display-size-config'
 import type { SettingsTab } from '@/app/settings/types'
 import type { VisibleCategorySection } from '@/domain/deck/types'
@@ -71,6 +73,7 @@ export function DeckBoardView({
   onSearchChange,
   onSearchFocus,
 }: DeckBoardViewProps) {
+  const deckContentRef = useRef<HTMLDivElement>(null)
   const sectionList = (
     <div className={displaySizeConfig.page.stackClassName}>
       {sections.map((section, categoryIndex) => (
@@ -114,11 +117,20 @@ export function DeckBoardView({
       </div>
 
       <div className="overflow-x-clip">
-        <div className={cn(displaySizeConfig.page.className, displaySizeConfig.page.stackClassName, 'min-h-0')}>
+        <div
+          ref={deckContentRef}
+          className={cn(displaySizeConfig.page.className, displaySizeConfig.page.stackClassName, 'min-h-0')}
+        >
           {sections.length > 0 ? (
             isLinkDragEnabled ? (
               <DragDropProvider
                 sensors={linkDragSensors}
+                modifiers={defaults => [
+                  ...defaults,
+                  RestrictToElementXAxis.configure({
+                    element: () => deckContentRef.current,
+                  }),
+                ]}
                 onDragStart={onLinkDragStart}
                 onDragOver={onLinkDragOver}
                 onDragEnd={onLinkDragEnd}
