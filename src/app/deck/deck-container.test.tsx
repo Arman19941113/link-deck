@@ -39,6 +39,15 @@ describe('DeckContainer', () => {
     expect(screen.getByRole('button', { name: '保存链接到 稍后阅读' })).toBeInTheDocument()
   })
 
+  it('keeps link grid tracks stable when a category has fewer cards than a full row', () => {
+    renderDeck()
+
+    const githubGrid = screen.getByRole('link', { name: '打开 GitHub' }).closest('article')?.parentElement
+
+    expect(githubGrid).toHaveAttribute('style', expect.stringContaining('repeat(auto-fill'))
+    expect(githubGrid).toHaveAttribute('style', expect.stringContaining('17.75rem'))
+  })
+
   it('emits search changes and hides empty categories while query results are shown', () => {
     const { actions, rerenderDeck } = renderDeck()
 

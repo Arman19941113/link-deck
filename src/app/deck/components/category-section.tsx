@@ -48,7 +48,7 @@ export function CategorySection({
     type: 'category',
   })
   const linkGridStyle: CSSProperties = {
-    gridTemplateColumns: `repeat(auto-fit, minmax(min(100%, ${displaySizeConfig.card.minColumnWidth}), 1fr))`,
+    gridTemplateColumns: `repeat(auto-fill, minmax(min(100%, ${displaySizeConfig.card.minColumnWidth}), 1fr))`,
     gridAutoRows: displaySizeConfig.card.height,
   }
   const addLinkCard = (
