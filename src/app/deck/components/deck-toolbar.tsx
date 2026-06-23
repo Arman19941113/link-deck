@@ -17,7 +17,7 @@ type DeckToolbarProps = {
   designStylePreference: DesignStylePreference
   displaySizeConfig: DisplaySizeConfig
   onAddLink: () => void
-  onDialogTriggerPointerDown?: () => void
+  onHomeFocusCapture?: () => void
   onOpenSettings: (tab?: SettingsTab) => void
 }
 
@@ -26,7 +26,7 @@ export function DeckToolbar({
   designStylePreference,
   displaySizeConfig,
   onAddLink,
-  onDialogTriggerPointerDown,
+  onHomeFocusCapture,
   onOpenSettings,
 }: DeckToolbarProps) {
   const { t } = useTranslation()
@@ -82,7 +82,7 @@ export function DeckToolbar({
           variant="outline"
           size={displaySizeConfig.control.buttonSize}
           aria-label={t('deck.toolbar.openSettings')}
-          onPointerDown={onDialogTriggerPointerDown}
+          onPointerDown={onHomeFocusCapture}
           onClick={() => {
             onOpenSettings()
           }}
@@ -94,7 +94,7 @@ export function DeckToolbar({
           type="button"
           size={displaySizeConfig.control.buttonSize}
           aria-label={t('deck.toolbar.addLink')}
-          onPointerDown={onDialogTriggerPointerDown}
+          onPointerDown={onHomeFocusCapture}
           onClick={() => {
             onAddLink()
           }}

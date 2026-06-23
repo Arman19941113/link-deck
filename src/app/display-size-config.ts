@@ -49,7 +49,6 @@ export type DisplaySizeConfig = {
     height: string
     gridClassName: string
     paddingClassName: string
-    actionPaddingClassName: string
     contentGapClassName: string
     textGapClassName: string
     iconBoxClassName: string
@@ -110,7 +109,6 @@ const DISPLAY_SIZE_CONFIG: Record<DisplaySize, DisplaySizeConfig> = {
       height: '4rem',
       gridClassName: 'grid gap-2',
       paddingClassName: 'py-3 pr-2.5 pl-3',
-      actionPaddingClassName: 'p-1.5',
       contentGapClassName: 'gap-2',
       textGapClassName: 'gap-0.5',
       iconBoxClassName: 'size-10 rounded-md text-xs',
@@ -163,7 +161,6 @@ const DISPLAY_SIZE_CONFIG: Record<DisplaySize, DisplaySizeConfig> = {
       height: '4.5rem',
       gridClassName: 'grid gap-3',
       paddingClassName: 'py-3 pr-3 pl-3.5',
-      actionPaddingClassName: 'p-2',
       contentGapClassName: 'gap-3',
       textGapClassName: 'gap-1',
       iconBoxClassName: 'size-11 rounded-md text-sm',
@@ -216,7 +213,6 @@ const DISPLAY_SIZE_CONFIG: Record<DisplaySize, DisplaySizeConfig> = {
       height: '5rem',
       gridClassName: 'grid gap-4',
       paddingClassName: 'p-4',
-      actionPaddingClassName: 'p-3',
       contentGapClassName: 'gap-4',
       textGapClassName: 'gap-1.5',
       iconBoxClassName: 'size-12 rounded-lg text-base',

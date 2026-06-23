@@ -56,14 +56,14 @@ describe('useHomeFocusRestore', () => {
     expect(newLinkCard).toHaveFocus()
   })
 
-  it('uses pointer-down focus when a toolbar button receives focus before opening a dialog', async () => {
+  it('uses interaction focus when a toolbar button receives focus before opening a dialog', async () => {
     const searchInput = appendSearchInput()
     const toolbarButton = appendToolbarButton()
     const { result } = renderHook(() => useHomeFocusRestore())
 
     searchInput.focus()
     act(() => {
-      result.current.rememberPointerDownHomeFocus()
+      result.current.rememberInteractionHomeFocus()
     })
     toolbarButton.focus()
     act(() => {

@@ -11,26 +11,26 @@ type HomeFocusTarget = { type: 'search' } | { type: 'link-card'; linkId: string 
 /** Captures supported home focus targets and restores them after modal close transitions. */
 export function useHomeFocusRestore() {
   const focusTargetRef = useRef<HomeFocusTarget | null>(null)
-  const pointerDownFocusCaptureRef = useRef<HomeFocusTarget | null>(null)
+  const interactionFocusCaptureRef = useRef<HomeFocusTarget | null>(null)
   const pendingNewLinkFocusIdRef = useRef<string | null>(null)
 
-  const consumeRecentPointerDownFocusCapture = useCallback((): HomeFocusTarget | null => {
-    const capture = pointerDownFocusCaptureRef.current
+  const consumeRecentInteractionFocusCapture = useCallback((): HomeFocusTarget | null => {
+    const capture = interactionFocusCaptureRef.current
 
-    pointerDownFocusCaptureRef.current = null
+    interactionFocusCaptureRef.current = null
 
     return capture
   }, [])
 
   const rememberCurrentHomeFocus = useCallback(() => {
     focusTargetRef.current =
-      getHomeFocusTarget(document.activeElement) ?? consumeRecentPointerDownFocusCapture() ?? focusTargetRef.current
-  }, [consumeRecentPointerDownFocusCapture])
+      getHomeFocusTarget(document.activeElement) ?? consumeRecentInteractionFocusCapture() ?? focusTargetRef.current
+  }, [consumeRecentInteractionFocusCapture])
 
-  const rememberPointerDownHomeFocus = useCallback(() => {
+  const rememberInteractionHomeFocus = useCallback(() => {
     const focusTarget = getHomeFocusTarget(document.activeElement)
 
-    pointerDownFocusCaptureRef.current = focusTarget
+    interactionFocusCaptureRef.current = focusTarget
 
     if (focusTarget) {
       focusTargetRef.current = focusTarget
@@ -59,7 +59,7 @@ export function useHomeFocusRestore() {
 
   return {
     rememberCurrentHomeFocus,
-    rememberPointerDownHomeFocus,
+    rememberInteractionHomeFocus,
     requestNewLinkFocus,
     restoreHomeFocusAfterDialogClose,
   }

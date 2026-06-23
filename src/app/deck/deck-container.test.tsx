@@ -118,6 +118,19 @@ describe('DeckContainer', () => {
     expect(actions.onEditLink).toHaveBeenCalledWith(links[0])
   })
 
+  it('opens link actions from the card context menu without rendering the old more button', async () => {
+    const user = userEvent.setup()
+    const { actions, links } = renderDeck()
+    const githubLink = screen.getByRole('link', { name: '打开 GitHub' })
+
+    expect(screen.queryByRole('button', { name: 'GitHub 的更多操作' })).not.toBeInTheDocument()
+
+    fireEvent.contextMenu(githubLink)
+    await user.click(await screen.findByRole('menuitem', { name: '编辑' }))
+
+    expect(actions.onEditLink).toHaveBeenCalledWith(links[0])
+  })
+
   it('renders the empty deck state after initialization when there are no sections', () => {
     renderDeck({
       categories: [],

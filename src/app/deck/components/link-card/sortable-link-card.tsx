@@ -24,7 +24,7 @@ export function SortableLinkCard({
   categoryId,
   index,
   onOpenLinkInNewWindow,
-  onDialogTriggerPointerDown,
+  onHomeFocusCapture,
   onEditLink,
   onDeleteLink,
   loadStoredIconFile,
@@ -83,7 +83,7 @@ export function SortableLinkCard({
           onOpenLinkInNewWindow(targetLink)
         }}
         canOpenLink={canOpenLink}
-        onDialogTriggerPointerDown={onDialogTriggerPointerDown}
+        onHomeFocusCapture={onHomeFocusCapture}
         onEditLink={onEditLink}
         onDeleteLink={onDeleteLink}
         loadStoredIconFile={loadStoredIconFile}

@@ -11,6 +11,15 @@ const appThemeColor = '#f5f1ec'
 
 // https://vite.dev/config/
 export default defineConfig({
+  run: {
+    tasks: {
+      // Captures the README preview screenshots
+      'capture:readme': {
+        cache: false,
+        command: 'node scripts/capture-readme-previews.mjs',
+      },
+    },
+  },
   staged: {
     '*': 'vp check --fix',
   },

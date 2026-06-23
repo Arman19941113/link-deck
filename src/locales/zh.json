@@ -35,7 +35,6 @@
     },
     "linkCard": {
       "open": "打开 {{name}}",
-      "moreActions": "{{name}} 的更多操作",
       "edit": "编辑",
       "copyLink": "复制链接",
       "delete": "删除",

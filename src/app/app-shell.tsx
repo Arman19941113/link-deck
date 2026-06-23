@@ -56,7 +56,7 @@ export function AppShell() {
   const displaySizeConfig = getDisplaySizeConfig(displaySize)
   const {
     rememberCurrentHomeFocus,
-    rememberPointerDownHomeFocus,
+    rememberInteractionHomeFocus,
     requestNewLinkFocus,
     restoreHomeFocusAfterDialogClose,
   } = useHomeFocusRestore()
@@ -153,7 +153,7 @@ export function AppShell() {
         onAddLinkToCategory={handleAddLink}
         onCreateLinkFromToolbar={handleCreateLink}
         onDeleteLink={deleteLink}
-        onDialogTriggerPointerDown={rememberPointerDownHomeFocus}
+        onHomeFocusCapture={rememberInteractionHomeFocus}
         onEditLink={handleEditLink}
         onMoveLinkToCategory={moveLinkToCategory}
         onOpenLinkInNewWindow={openLinkInNewWindow}
