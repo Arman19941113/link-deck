@@ -1,10 +1,9 @@
 // Coordinates temporary link drag preview state for the deck view.
 
 import { useEffect, useMemo, useRef, useState } from 'react'
-import type { Data, Draggable, Droppable } from '@dnd-kit/abstract'
-import { move as moveSortableItems } from '@dnd-kit/helpers'
 import type { DragEndEvent, DragOverEvent, DragStartEvent } from '@dnd-kit/react'
 
+import { moveLinkIdsForDragEvent } from '../link-drag-groups'
 import {
   areLinkIdsByCategoryIdEqual,
   createLinkDragPreviewSections,
@@ -69,7 +68,7 @@ export function useLinkDragPreview({
     }
 
     const currentGroups = dragLinkIdsByCategoryIdRef.current ?? baseLinkIdsByCategoryId
-    const nextGroups = moveSortableItems(currentGroups, event)
+    const nextGroups = moveLinkIdsForDragEvent(currentGroups, event)
 
     if (areLinkIdsByCategoryIdEqual(currentGroups, nextGroups)) {
       return
@@ -100,7 +99,7 @@ export function useLinkDragPreview({
 
     const finalGroups =
       dragLinkIdsByCategoryIdRef.current ??
-      (event.operation.target ? moveSortableItems(baseLinkIdsByCategoryId, event) : baseLinkIdsByCategoryId)
+      (event.operation.target ? moveLinkIdsForDragEvent(baseLinkIdsByCategoryId, event) : baseLinkIdsByCategoryId)
     const finalTarget = getLinkTargetFromCategoryGroups(finalGroups, activeData.linkId)
 
     if (!finalTarget) {
@@ -143,8 +142,7 @@ export function useLinkDragPreview({
   }
 }
 
-/** Reads link metadata attached to new dnd-kit sortable entities. */
-function getLinkDragData(entity: Draggable<Data> | Droppable<Data> | null | undefined) {
+function getLinkDragData(entity: DragStartEvent['operation']['source']) {
   const data = entity?.data
 
   if (

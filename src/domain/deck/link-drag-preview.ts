@@ -12,9 +12,10 @@ export type LinkTarget = {
 
 /** Builds sortable id groups from persisted link records. */
 export function createLinkIdsByCategoryId(categories: Category[], links: SavedLink[]): LinkIdsByCategoryId {
-  const linkIdsByCategoryId = Object.fromEntries(categories.map(category => [category.id, [] as string[]]))
+  const orderedCategories = sortCategoriesByOrder(categories)
+  const linkIdsByCategoryId = Object.fromEntries(orderedCategories.map(category => [category.id, [] as string[]]))
 
-  for (const category of categories) {
+  for (const category of orderedCategories) {
     linkIdsByCategoryId[category.id] = getManuallySortedLinks(links, category.id).map(link => link.id)
   }
 
