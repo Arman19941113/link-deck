@@ -30,6 +30,12 @@ const DEFAULT_LINK_BUILTIN_ICONS: Record<string, Extract<SavedLinkIcon, { type: 
     title: 'Excalidraw',
     hex: '6965DB',
   },
+  feishu: {
+    type: 'builtin',
+    slug: 'custom:feishu',
+    title: 'Feishu',
+    hex: '3370FF',
+  },
   github: {
     type: 'builtin',
     slug: 'simple-icons:github',
@@ -103,7 +109,6 @@ type DefaultLinkSeed = {
   categoryId: string
   name: string
   url: string
-  note: string
   order: number
 }
 
@@ -132,7 +137,6 @@ const DEFAULT_DECK_SEEDS: Record<AppLanguage, DefaultDeckSeed> = {
         categoryId: 'default',
         name: 'Google',
         url: 'https://www.google.com/',
-        note: 'Search and everyday web access',
         order: 1,
       },
       {
@@ -140,7 +144,6 @@ const DEFAULT_DECK_SEEDS: Record<AppLanguage, DefaultDeckSeed> = {
         categoryId: 'default',
         name: 'ChatGPT',
         url: 'https://chatgpt.com/',
-        note: 'AI assistant and research',
         order: 2,
       },
       {
@@ -148,31 +151,34 @@ const DEFAULT_DECK_SEEDS: Record<AppLanguage, DefaultDeckSeed> = {
         categoryId: 'default',
         name: 'GitHub',
         url: 'https://github.com/',
-        note: 'Code hosting and collaboration',
         order: 3,
+      },
+      {
+        id: 'feishu',
+        categoryId: 'tools',
+        name: 'Feishu',
+        url: 'https://my.feishu.cn/',
+        order: 1,
       },
       {
         id: 'notion',
         categoryId: 'tools',
         name: 'Notion',
         url: 'https://www.notion.so/',
-        note: 'Notes, docs, and workspace',
-        order: 1,
+        order: 2,
       },
       {
         id: 'excalidraw',
         categoryId: 'tools',
         name: 'Excalidraw',
         url: 'https://excalidraw.com/',
-        note: 'Sketches, diagrams, and visual thinking',
-        order: 2,
+        order: 3,
       },
       {
         id: 'x',
         categoryId: 'social',
         name: 'X.com',
         url: 'https://x.com/',
-        note: 'Real-time social updates',
         order: 1,
       },
       {
@@ -180,7 +186,6 @@ const DEFAULT_DECK_SEEDS: Record<AppLanguage, DefaultDeckSeed> = {
         categoryId: 'social',
         name: 'Instagram',
         url: 'https://www.instagram.com/',
-        note: 'Photos, creators, and social feeds',
         order: 2,
       },
       {
@@ -188,7 +193,6 @@ const DEFAULT_DECK_SEEDS: Record<AppLanguage, DefaultDeckSeed> = {
         categoryId: 'social',
         name: 'Xiaohongshu',
         url: 'https://www.xiaohongshu.com/',
-        note: 'Lifestyle search and community posts',
         order: 3,
       },
       {
@@ -196,7 +200,6 @@ const DEFAULT_DECK_SEEDS: Record<AppLanguage, DefaultDeckSeed> = {
         categoryId: 'video',
         name: 'YouTube',
         url: 'https://www.youtube.com/',
-        note: 'Long-form video and learning',
         order: 1,
       },
       {
@@ -204,15 +207,13 @@ const DEFAULT_DECK_SEEDS: Record<AppLanguage, DefaultDeckSeed> = {
         categoryId: 'video',
         name: 'Douyin',
         url: 'https://www.douyin.com/',
-        note: 'Short-form video and trends',
         order: 2,
       },
       {
         id: 'bilibili',
         categoryId: 'video',
-        name: 'Bilibili',
+        name: '哔哩哔哩',
         url: 'https://www.bilibili.com/',
-        note: 'Videos, creators, and tech content',
         order: 3,
       },
       {
@@ -220,7 +221,6 @@ const DEFAULT_DECK_SEEDS: Record<AppLanguage, DefaultDeckSeed> = {
         categoryId: 'discovery',
         name: 'Hacker News',
         url: 'https://news.ycombinator.com/',
-        note: 'Startup and engineering news',
         order: 1,
       },
       {
@@ -228,7 +228,6 @@ const DEFAULT_DECK_SEEDS: Record<AppLanguage, DefaultDeckSeed> = {
         categoryId: 'discovery',
         name: 'Product Hunt',
         url: 'https://www.producthunt.com/',
-        note: 'New products and launches',
         order: 2,
       },
       {
@@ -236,7 +235,6 @@ const DEFAULT_DECK_SEEDS: Record<AppLanguage, DefaultDeckSeed> = {
         categoryId: 'discovery',
         name: 'Sspai',
         url: 'https://sspai.com/',
-        note: 'Digital tools and productivity writing',
         order: 3,
       },
     ],
@@ -257,7 +255,6 @@ const DEFAULT_DECK_SEEDS: Record<AppLanguage, DefaultDeckSeed> = {
         categoryId: 'default',
         name: 'Google',
         url: 'https://www.google.com/',
-        note: '搜索与日常网页访问',
         order: 1,
       },
       {
@@ -265,7 +262,6 @@ const DEFAULT_DECK_SEEDS: Record<AppLanguage, DefaultDeckSeed> = {
         categoryId: 'default',
         name: 'ChatGPT',
         url: 'https://chatgpt.com/',
-        note: 'AI 助手与资料研究',
         order: 2,
       },
       {
@@ -273,31 +269,34 @@ const DEFAULT_DECK_SEEDS: Record<AppLanguage, DefaultDeckSeed> = {
         categoryId: 'default',
         name: 'GitHub',
         url: 'https://github.com/',
-        note: '代码托管与协作',
         order: 3,
+      },
+      {
+        id: 'feishu',
+        categoryId: 'tools',
+        name: '飞书',
+        url: 'https://my.feishu.cn/',
+        order: 1,
       },
       {
         id: 'notion',
         categoryId: 'tools',
         name: 'Notion',
         url: 'https://www.notion.so/',
-        note: '笔记、文档与工作区',
-        order: 1,
+        order: 2,
       },
       {
         id: 'excalidraw',
         categoryId: 'tools',
         name: 'Excalidraw',
         url: 'https://excalidraw.com/',
-        note: '草图、图表与视觉思考',
-        order: 2,
+        order: 3,
       },
       {
         id: 'x',
         categoryId: 'social',
         name: 'X.com',
         url: 'https://x.com/',
-        note: '实时社交动态',
         order: 1,
       },
       {
@@ -305,7 +304,6 @@ const DEFAULT_DECK_SEEDS: Record<AppLanguage, DefaultDeckSeed> = {
         categoryId: 'social',
         name: 'Instagram',
         url: 'https://www.instagram.com/',
-        note: '图片、创作者与社交动态',
         order: 2,
       },
       {
@@ -313,7 +311,6 @@ const DEFAULT_DECK_SEEDS: Record<AppLanguage, DefaultDeckSeed> = {
         categoryId: 'social',
         name: '小红书',
         url: 'https://www.xiaohongshu.com/',
-        note: '生活方式搜索与社区内容',
         order: 3,
       },
       {
@@ -321,7 +318,6 @@ const DEFAULT_DECK_SEEDS: Record<AppLanguage, DefaultDeckSeed> = {
         categoryId: 'video',
         name: 'YouTube',
         url: 'https://www.youtube.com/',
-        note: '长视频与学习内容',
         order: 1,
       },
       {
@@ -329,7 +325,6 @@ const DEFAULT_DECK_SEEDS: Record<AppLanguage, DefaultDeckSeed> = {
         categoryId: 'video',
         name: '抖音',
         url: 'https://www.douyin.com/',
-        note: '短视频与趋势内容',
         order: 2,
       },
       {
@@ -337,7 +332,6 @@ const DEFAULT_DECK_SEEDS: Record<AppLanguage, DefaultDeckSeed> = {
         categoryId: 'video',
         name: 'Bilibili',
         url: 'https://www.bilibili.com/',
-        note: '视频、创作者与科技内容',
         order: 3,
       },
       {
@@ -345,7 +339,6 @@ const DEFAULT_DECK_SEEDS: Record<AppLanguage, DefaultDeckSeed> = {
         categoryId: 'discovery',
         name: 'Hacker News',
         url: 'https://news.ycombinator.com/',
-        note: '创业与工程新闻',
         order: 1,
       },
       {
@@ -353,7 +346,6 @@ const DEFAULT_DECK_SEEDS: Record<AppLanguage, DefaultDeckSeed> = {
         categoryId: 'discovery',
         name: 'Product Hunt',
         url: 'https://www.producthunt.com/',
-        note: '新产品与发布动态',
         order: 2,
       },
       {
@@ -361,7 +353,6 @@ const DEFAULT_DECK_SEEDS: Record<AppLanguage, DefaultDeckSeed> = {
         categoryId: 'discovery',
         name: '少数派',
         url: 'https://sspai.com/',
-        note: '数字工具与效率写作',
         order: 3,
       },
     ],
@@ -429,7 +420,6 @@ function createLink(params: {
   categoryId: string
   name: string
   url: string
-  note: string
   order: number
   now: string
 }): SavedLink {
@@ -438,7 +428,6 @@ function createLink(params: {
     categoryId: params.categoryId,
     name: params.name,
     url: params.url,
-    note: params.note,
     icon: DEFAULT_LINK_BUILTIN_ICONS[params.id] ?? { type: 'auto' },
     order: params.order,
     createdAt: params.now,

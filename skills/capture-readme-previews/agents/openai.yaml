@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Capture README Previews'
+  short_description: 'Regenerate Link Deck README screenshots'
+  default_prompt: 'Use $capture-readme-previews to regenerate the Link Deck README home screen screenshots.'
