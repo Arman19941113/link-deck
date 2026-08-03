@@ -61,6 +61,129 @@ describe('useLinkEditorForm', () => {
     )
   })
 
+  it('matches a built-in icon only when an added auto URL loses focus', () => {
+    const { form } = renderLinkEditorForm()
+
+    act(() => {
+      form.current.setUrl('https://www.google.com/search')
+    })
+
+    expect(form.current.iconMode).toBe('auto')
+    expect(form.current.builtinIcon).toBeNull()
+
+    act(() => {
+      form.current.handleUrlBlur()
+    })
+
+    expect(form.current.iconMode).toBe('builtin')
+    expect(form.current.builtinIcon).toEqual({
+      type: 'builtin',
+      slug: 'material-icon-theme:google',
+      title: 'Google',
+      hex: '000000',
+    })
+  })
+
+  it('prefers a product icon that matches both the subdomain and registrable domain', () => {
+    const { form } = renderLinkEditorForm()
+
+    act(() => {
+      form.current.setUrl('https://gemini.google.com/')
+    })
+    act(() => {
+      form.current.handleUrlBlur()
+    })
+
+    expect(form.current.builtinIcon).toEqual({
+      type: 'builtin',
+      slug: 'simple-icons:googlegemini',
+      title: 'Gemini',
+      hex: '3186FF',
+    })
+  })
+
+  it('updates an automatically matched icon on a later URL blur', () => {
+    const { form } = renderLinkEditorForm()
+
+    act(() => {
+      form.current.setUrl('https://google.com')
+    })
+    act(() => {
+      form.current.handleUrlBlur()
+    })
+    act(() => {
+      form.current.setUrl('https://github.com')
+    })
+    act(() => {
+      form.current.handleUrlBlur()
+    })
+
+    expect(form.current.builtinIcon).toMatchObject({
+      slug: 'simple-icons:github',
+      title: 'GitHub',
+    })
+  })
+
+  it('keeps the previous automatic icon when the next URL has no match', () => {
+    const { form } = renderLinkEditorForm()
+
+    act(() => {
+      form.current.setUrl('https://google.com')
+    })
+    act(() => {
+      form.current.handleUrlBlur()
+    })
+    const matchedIcon = form.current.builtinIcon
+
+    act(() => {
+      form.current.setUrl('https://example.com')
+    })
+    act(() => {
+      form.current.handleUrlBlur()
+    })
+
+    expect(form.current.builtinIcon).toEqual(matchedIcon)
+  })
+
+  it('does not replace a manually selected built-in icon', () => {
+    const { form } = renderLinkEditorForm()
+    const manualIcon = {
+      type: 'builtin',
+      slug: 'simple-icons:notion',
+      title: 'Notion',
+      hex: '000000',
+    } as const
+
+    act(() => {
+      form.current.setUrl('https://google.com')
+    })
+    act(() => {
+      form.current.handleUrlBlur()
+    })
+    act(() => {
+      form.current.handleBuiltinIconChange(manualIcon)
+      form.current.setUrl('https://github.com')
+    })
+    act(() => {
+      form.current.handleUrlBlur()
+    })
+
+    expect(form.current.builtinIcon).toEqual(manualIcon)
+  })
+
+  it('does not match built-in icons while editing a link', () => {
+    const editingLink = link('existing', 'default', 'Existing')
+    const { form } = renderLinkEditorForm({ link: editingLink })
+
+    act(() => {
+      form.current.setUrl('https://google.com')
+      form.current.handleUrlBlur()
+    })
+
+    expect(form.current.iconMode).toBe('auto')
+    expect(form.current.builtinIcon).toBeNull()
+  })
+
   it('submits an edited link with the existing id and URL icon', async () => {
     const editingLink = link('github', 'default', 'GitHub', {
       icon: { type: 'url', url: 'https://github.com/icon.png' },

@@ -145,6 +145,22 @@ export function createBuiltinIconRef(icon: BuiltinIconOption): BuiltinIconValue 
   }
 }
 
+/** Finds the highest-priority built-in icon matching normalized domain keywords. */
+export function findBuiltinIconByNameKeywords(keywords: readonly string[]): BuiltinIconValue | null {
+  const normalizedKeywords = [...new Set(keywords.map(normalizeSearchValue).filter(Boolean))]
+
+  if (normalizedKeywords.length === 0) {
+    return null
+  }
+
+  const [matchedIcon] = builtinIconsData
+    .map(icon => createIconMatch(icon, normalizedKeywords))
+    .filter(match => match.matchedKeywordCount > 0)
+    .toSorted(compareIconMatches)
+
+  return matchedIcon ? createBuiltinIconRef(toSearchResult(matchedIcon.icon)) : null
+}
+
 /** Searches built-in icons by brand title. */
 export function searchBuiltinIcons(query: string): BuiltinIconOption[] {
   const normalizedQuery = normalizeSearchValue(query)
@@ -175,6 +191,29 @@ function toSearchResult(icon: BuiltinIconData): BuiltinIconOption {
     source: icon.source,
     sourceLabel: icon.sourceLabel,
   }
+}
+
+function createIconMatch(icon: BuiltinIconData, normalizedKeywords: readonly string[]) {
+  const normalizedName = normalizeSearchValue(icon.name)
+
+  return {
+    icon,
+    matchedKeywordCount: normalizedKeywords.filter(keyword => normalizedName.includes(keyword)).length,
+    exactMatchCount: normalizedKeywords.filter(keyword => normalizedName === keyword).length,
+  }
+}
+
+function compareIconMatches(
+  left: ReturnType<typeof createIconMatch>,
+  right: ReturnType<typeof createIconMatch>,
+): number {
+  return (
+    right.matchedKeywordCount - left.matchedKeywordCount ||
+    right.exactMatchCount - left.exactMatchCount ||
+    right.icon.popularityScore - left.icon.popularityScore ||
+    left.icon.name.length - right.icon.name.length ||
+    left.icon.key.localeCompare(right.icon.key)
+  )
 }
 
 /** Normalizes brand titles into a compact search key. */

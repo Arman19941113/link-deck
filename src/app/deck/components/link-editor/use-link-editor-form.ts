@@ -13,10 +13,11 @@ import {
   MAX_ICON_FILE_SIZE,
   type IconMode,
 } from './constants'
-import { DEFAULT_BUILTIN_ICON } from '@/components/builtin-icon/builtin-icon-registry'
+import { DEFAULT_BUILTIN_ICON, findBuiltinIconByNameKeywords } from '@/components/builtin-icon/builtin-icon-registry'
 import { DEFAULT_CATEGORY_ID, sortCategoriesByOrder } from '@/domain/deck/categories'
 import type { UpsertLinkInput } from '@/domain/deck/link-upsert-plan'
 import type { SavedLinkIcon } from '@/domain/deck/icon-types'
+import { getLinkDomainKeywords } from '@/domain/deck/link-url'
 import type { Category, SavedLink, StoredIconFile } from '@/domain/deck/types'
 
 type BuiltinIconValue = Extract<SavedLinkIcon, { type: 'builtin' }>
@@ -62,6 +63,7 @@ export function useLinkEditorForm({
   )
   const [iconUrl, setIconUrl] = useState(link?.icon.type === 'url' ? link.icon.url : '')
   const [iconFile, setIconFile] = useState<File | null>(null)
+  const isBuiltinIconAutoMatchedRef = useRef(false)
   const pendingFileIconPreviewUrlRef = useRef<string | null>(null)
   const [pendingFileIconPreviewUrl, setPendingFileIconPreviewUrl] = useState<string | null>(null)
   const [existingFileIconPreview, setExistingFileIconPreview] = useState<SavedIconPreview | null>(null)
@@ -149,6 +151,7 @@ export function useLinkEditorForm({
 
   /** Updates the icon mode and clears stale state for sources that are no longer active. */
   function handleIconModeChange(nextIconMode: IconMode): void {
+    isBuiltinIconAutoMatchedRef.current = false
     setIconMode(nextIconMode)
 
     if (nextIconMode === 'builtin' && !builtinIcon) {
@@ -159,6 +162,30 @@ export function useLinkEditorForm({
       clearSelectedIconFile()
     }
 
+    setError(null)
+  }
+
+  /** Applies a built-in icon suggestion when an added link URL loses focus. */
+  function handleUrlBlur(): void {
+    if (link || (iconMode !== 'auto' && !isBuiltinIconAutoMatchedRef.current)) {
+      return
+    }
+
+    const matchedIcon = findBuiltinIconByNameKeywords(getLinkDomainKeywords(url))
+
+    if (!matchedIcon) {
+      return
+    }
+
+    isBuiltinIconAutoMatchedRef.current = true
+    setBuiltinIcon(matchedIcon)
+    setIconMode('builtin')
+  }
+
+  /** Stores a manually selected built-in icon and prevents later URL changes from replacing it. */
+  function handleBuiltinIconChange(icon: BuiltinIconValue): void {
+    isBuiltinIconAutoMatchedRef.current = false
+    setBuiltinIcon(icon)
     setError(null)
   }
 
@@ -272,9 +299,11 @@ export function useLinkEditorForm({
     currentFilePreviewUrl,
     editorTitle,
     error,
+    handleBuiltinIconChange,
     handleIconFileChange,
     handleIconModeChange,
     handleSubmit,
+    handleUrlBlur,
     hasCategories,
     iconMode,
     iconUrl,
@@ -283,7 +312,6 @@ export function useLinkEditorForm({
     name,
     note,
     selectedCategoryId,
-    setBuiltinIcon,
     setCategoryId,
     setError,
     setIconUrl,

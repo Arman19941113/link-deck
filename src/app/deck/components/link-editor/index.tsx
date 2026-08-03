@@ -128,6 +128,7 @@ function LinkEditorForm({
             disabled={form.isSaving}
             aria-invalid={!form.url.trim() && Boolean(form.error)}
             onChange={event => form.setUrl(event.target.value)}
+            onBlur={form.handleUrlBlur}
           />
         </div>
 
@@ -213,10 +214,7 @@ function LinkEditorForm({
           currentFileMeta={form.currentFileMeta}
           currentFilePreviewUrl={form.currentFilePreviewUrl}
           isIconFileInvalid={form.isIconFileInvalid}
-          onBuiltinIconChange={icon => {
-            form.setBuiltinIcon(icon)
-            form.setError(null)
-          }}
+          onBuiltinIconChange={form.handleBuiltinIconChange}
           onIconFileChange={form.handleIconFileChange}
           onIconModeChange={form.handleIconModeChange}
           onIconUrlChange={form.setIconUrl}

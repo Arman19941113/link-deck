@@ -1,5 +1,7 @@
 // Provides deck link URL normalization, origin extraction, and favicon URL helpers.
 
+import { parse as parseDomain } from 'tldts'
+
 const HTTP_PROTOCOLS = new Set(['http:', 'https:'])
 const EXPLICIT_HTTP_SCHEME = /^https?:\/\//i
 const HOST_PORT_PREFIX = /^([^/?#\s:]+):\d+(?=$|[/?#])/
@@ -25,6 +27,25 @@ export function getAutoFaviconUrl(value: string): string | null {
   }
 
   return `${origin}/favicon.ico`
+}
+
+/** Extracts subdomain and registrable domain labels used to match built-in brand icons. */
+export function getLinkDomainKeywords(value: string): string[] {
+  const hostname = parseHttpUrl(value)?.hostname
+
+  if (!hostname) {
+    return []
+  }
+
+  const { domainWithoutSuffix, subdomain } = parseDomain(hostname)
+
+  if (!domainWithoutSuffix) {
+    return []
+  }
+
+  const subdomainKeywords = subdomain?.split('.').filter(keyword => keyword && keyword !== 'www') ?? []
+
+  return [...new Set([...subdomainKeywords, domainWithoutSuffix])]
 }
 
 /** Checks whether raw input contains a path, query, or hash fragment. */
