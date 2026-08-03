@@ -44,6 +44,16 @@ export function BuiltinIconPicker({
     onConfirm?.(icon)
   }
 
+  function handleSearchChange(nextQuery: string): void {
+    setQuery(nextQuery)
+
+    const firstResult = searchBuiltinIcons(nextQuery)[0]
+
+    if (firstResult && firstResult.key !== value?.slug) {
+      onChange(createBuiltinIconRef(firstResult))
+    }
+  }
+
   function handleSearchKeyDown(event: KeyboardEvent<HTMLInputElement>): void {
     if (event.key !== 'Enter' || event.nativeEvent.isComposing || !value) {
       return
@@ -105,7 +115,7 @@ export function BuiltinIconPicker({
           value={query}
           placeholder={t('linkEditor.icon.searchPlaceholder')}
           disabled={disabled}
-          onChange={event => setQuery(event.target.value)}
+          onChange={event => handleSearchChange(event.target.value)}
           onKeyDown={handleSearchKeyDown}
         />
       </div>
