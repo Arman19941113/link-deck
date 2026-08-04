@@ -210,7 +210,7 @@ catalogs:
       version: 0.2.7
 
 overrides:
-  vite: npm:@voidzero-dev/vite-plus-core@latest
+  vite: npm:@voidzero-dev/vite-plus-core@^0.2.7
   vitest: 4.1.9
 
 importers:
