@@ -61,7 +61,27 @@ describe('useLinkEditorForm', () => {
     )
   })
 
-  it('matches a built-in icon only when an added auto URL loses focus', () => {
+  it('matches a built-in icon when submitting an added URL without blurring', async () => {
+    const { form, upsertLink } = renderLinkEditorForm()
+
+    act(() => {
+      form.current.setUrl('https://github.com/')
+    })
+    await submit(form.current.handleSubmit)
+
+    expect(upsertLink).toHaveBeenCalledWith(
+      expect.objectContaining({
+        icon: {
+          type: 'builtin',
+          slug: 'simple-icons:github',
+          title: 'GitHub',
+          hex: '181717',
+        },
+      }),
+    )
+  })
+
+  it('matches a built-in icon when an added auto URL loses focus', () => {
     const { form } = renderLinkEditorForm()
 
     act(() => {

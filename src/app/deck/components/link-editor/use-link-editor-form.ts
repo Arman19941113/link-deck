@@ -165,21 +165,31 @@ export function useLinkEditorForm({
     setError(null)
   }
 
-  /** Applies a built-in icon suggestion when an added link URL loses focus. */
-  function handleUrlBlur(): void {
+  /** Finds a built-in icon suggestion for an added link that still uses automatic icon selection. */
+  function findAutomaticBuiltinIcon(): BuiltinIconValue | null {
     if (link || (iconMode !== 'auto' && !isBuiltinIconAutoMatchedRef.current)) {
-      return
+      return null
     }
 
-    const matchedIcon = findBuiltinIconByNameKeywords(getLinkDomainKeywords(url))
+    return findBuiltinIconByNameKeywords(getLinkDomainKeywords(url))
+  }
+
+  /** Applies a built-in icon suggestion and returns it for immediate submit usage. */
+  function applyAutomaticBuiltinIcon(): BuiltinIconValue | null {
+    const matchedIcon = findAutomaticBuiltinIcon()
 
     if (!matchedIcon) {
-      return
+      return null
     }
 
     isBuiltinIconAutoMatchedRef.current = true
     setBuiltinIcon(matchedIcon)
     setIconMode('builtin')
+    return matchedIcon
+  }
+
+  function handleUrlBlur(): void {
+    applyAutomaticBuiltinIcon()
   }
 
   /** Stores a manually selected built-in icon and prevents later URL changes from replacing it. */
@@ -242,32 +252,36 @@ export function useLinkEditorForm({
       return
     }
 
-    if (iconMode === 'builtin' && !builtinIcon) {
+    const automaticallyMatchedBuiltinIcon = applyAutomaticBuiltinIcon()
+    const submittedIconMode = automaticallyMatchedBuiltinIcon ? 'builtin' : iconMode
+    const submittedBuiltinIcon = automaticallyMatchedBuiltinIcon ?? builtinIcon
+
+    if (submittedIconMode === 'builtin' && !submittedBuiltinIcon) {
       showError(t('linkEditor.errors.chooseBuiltinIcon'))
       return
     }
 
-    if (iconMode === 'url' && !trimmedIconUrl) {
+    if (submittedIconMode === 'url' && !trimmedIconUrl) {
       showError(t('linkEditor.errors.enterIconUrl'))
       return
     }
 
-    if (iconMode === 'file' && iconFile && !ACCEPTED_ICON_MIME_TYPES.has(iconFile.type)) {
+    if (submittedIconMode === 'file' && iconFile && !ACCEPTED_ICON_MIME_TYPES.has(iconFile.type)) {
       showError(t('linkEditor.errors.chooseIconFileType'))
       return
     }
 
-    if (iconMode === 'file' && iconFile && iconFile.size > MAX_ICON_FILE_SIZE) {
+    if (submittedIconMode === 'file' && iconFile && iconFile.size > MAX_ICON_FILE_SIZE) {
       showError(t('linkEditor.errors.iconFileTooLarge'))
       return
     }
 
-    if (iconMode === 'file' && !iconFile && link?.icon.type !== 'file') {
+    if (submittedIconMode === 'file' && !iconFile && link?.icon.type !== 'file') {
       showError(t('linkEditor.errors.chooseLocalIconFile'))
       return
     }
 
-    const icon = createSubmittedIcon(iconMode, trimmedIconUrl, builtinIcon, link)
+    const icon = createSubmittedIcon(submittedIconMode, trimmedIconUrl, submittedBuiltinIcon, link)
 
     setIsSaving(true)
     setError(null)
@@ -280,7 +294,7 @@ export function useLinkEditorForm({
         url: trimmedUrl,
         note,
         icon,
-        iconFile: iconMode === 'file' ? iconFile : null,
+        iconFile: submittedIconMode === 'file' ? iconFile : null,
       })
       onSavedLink?.(savedLink, link ? 'edit' : 'add')
       onOpenChange(false)
