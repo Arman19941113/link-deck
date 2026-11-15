@@ -1,5 +1,6 @@
 // Link add and edit editor that composes form layout with link editor state.
 
+import { useRef } from 'react'
 import { IconSourceFields } from './icon-source-fields'
 import { useLinkEditorForm } from './use-link-editor-form'
 import { useTranslation } from 'react-i18next'
@@ -84,6 +85,7 @@ function LinkEditorForm({
   upsertLink,
 }: LinkEditorFormProps) {
   const { t } = useTranslation()
+  const saveButtonRef = useRef<HTMLButtonElement>(null)
   const form = useLinkEditorForm({
     link,
     defaultCategoryId,
@@ -93,6 +95,15 @@ function LinkEditorForm({
     onOpenChange,
     upsertLink,
   })
+
+  function focusSaveAfterIconConfirm(event: Event): void {
+    const saveButton = saveButtonRef.current
+
+    if (saveButton && !saveButton.disabled) {
+      event.preventDefault()
+      saveButton.focus()
+    }
+  }
 
   return (
     <DialogContent
@@ -215,6 +226,7 @@ function LinkEditorForm({
           currentFilePreviewUrl={form.currentFilePreviewUrl}
           isIconFileInvalid={form.isIconFileInvalid}
           onBuiltinIconChange={form.handleBuiltinIconChange}
+          onBuiltinIconConfirmAutoFocus={focusSaveAfterIconConfirm}
           onIconFileChange={form.handleIconFileChange}
           onIconModeChange={form.handleIconModeChange}
           onIconUrlChange={form.setIconUrl}
@@ -231,6 +243,7 @@ function LinkEditorForm({
             {t('common.cancel')}
           </Button>
           <Button
+            ref={saveButtonRef}
             type="submit"
             size={displaySizeConfig.control.buttonSize}
             disabled={form.isSaving || !form.hasCategories}

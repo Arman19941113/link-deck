@@ -91,6 +91,29 @@ test('tabs from the link URL to the title while matching a built-in icon', async
   await expect(title).toBeFocused()
 })
 
+test('focuses Save link after confirming a built-in icon', async ({ page }) => {
+  await page.goto('/')
+
+  await page.getByRole('button', { name: 'Add link' }).click()
+  const editor = page.getByRole('dialog', { name: 'Add link' })
+  await editor.getByLabel('Link URL').fill('https://example.com/icon-focus')
+  await editor.getByLabel('Title').fill('Icon Focus Link')
+  await editor.getByRole('radio', { name: 'Built-in icon' }).press('Space')
+
+  const picker = page.getByRole('dialog', { name: 'Choose built-in icon' })
+  const search = picker.getByLabel('Search built-in icons')
+  await search.fill('GitHub')
+  await search.press('Enter')
+
+  await expect(picker).toBeHidden()
+  await expect(editor.getByRole('button', { name: 'GitHub' })).toBeVisible()
+  await expect(editor.getByRole('button', { name: 'Save link' })).toBeFocused()
+
+  await page.keyboard.press('Enter')
+  await expect(editor).toBeHidden()
+  await expect(page.getByRole('link', { name: 'Open Icon Focus Link' })).toBeVisible()
+})
+
 test('captures desktop and mobile smoke screenshots', async ({ page }) => {
   await mkdir(screenshotDir, { recursive: true })
 

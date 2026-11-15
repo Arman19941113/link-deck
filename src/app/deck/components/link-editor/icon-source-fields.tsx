@@ -30,6 +30,7 @@ type IconSourceFieldsProps = {
   currentFilePreviewUrl: string | null
   isIconFileInvalid: boolean
   onBuiltinIconChange: (icon: BuiltinIconValue) => void
+  onBuiltinIconConfirmAutoFocus: (event: Event) => void
   onIconFileChange: (event: ChangeEvent<HTMLInputElement>) => void
   onIconModeChange: (mode: IconMode) => void
   onIconUrlChange: (url: string) => void
@@ -60,6 +61,7 @@ export function IconSourceFields({
   currentFilePreviewUrl,
   isIconFileInvalid,
   onBuiltinIconChange,
+  onBuiltinIconConfirmAutoFocus,
   onIconFileChange,
   onIconModeChange,
   onIconUrlChange,
@@ -143,6 +145,7 @@ export function IconSourceFields({
             displaySizeConfig={displaySizeConfig}
             className={fieldClassName}
             onChange={onBuiltinIconChange}
+            onConfirmAutoFocus={onBuiltinIconConfirmAutoFocus}
           />
         ) : null}
 

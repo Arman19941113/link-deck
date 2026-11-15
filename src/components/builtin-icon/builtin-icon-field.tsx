@@ -1,6 +1,6 @@
 // Form field that shows the current built-in icon and opens the chooser dialog.
 
-import { forwardRef, useCallback, useImperativeHandle, useMemo, useState } from 'react'
+import { forwardRef, useCallback, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { getBuiltinIconMetadata, type BuiltinIconValue } from './builtin-icon-registry'
@@ -25,6 +25,7 @@ type BuiltinIconFieldProps = {
   disabled?: boolean
   displaySizeConfig: DisplaySizeConfig
   onChange: (icon: BuiltinIconValue) => void
+  onConfirmAutoFocus?: (event: Event) => void
 }
 
 export type BuiltinIconFieldHandle = {
@@ -33,12 +34,13 @@ export type BuiltinIconFieldHandle = {
 
 /** Shows the current built-in icon and opens the secondary chooser dialog. */
 export const BuiltinIconField = forwardRef<BuiltinIconFieldHandle, BuiltinIconFieldProps>(function BuiltinIconField(
-  { value, className, disabled = false, displaySizeConfig, onChange },
+  { value, className, disabled = false, displaySizeConfig, onChange, onConfirmAutoFocus },
   ref,
 ) {
   const { t } = useTranslation()
   const [pickerOpen, setPickerOpen] = useState(false)
   const [draftIcon, setDraftIcon] = useState<BuiltinIconValue | null>(value)
+  const confirmedRef = useRef(false)
   const selectedIcon = useMemo(() => (value ? getBuiltinIconMetadata(value) : null), [value])
 
   /** Opens the chooser with the current saved draft value. */
@@ -65,8 +67,16 @@ export const BuiltinIconField = forwardRef<BuiltinIconFieldHandle, BuiltinIconFi
       return
     }
 
+    confirmedRef.current = true
     onChange(icon)
     setPickerOpen(false)
+  }
+
+  function handleCloseAutoFocus(event: Event): void {
+    if (confirmedRef.current) {
+      confirmedRef.current = false
+      onConfirmAutoFocus?.(event)
+    }
   }
 
   return (
@@ -104,6 +114,7 @@ export const BuiltinIconField = forwardRef<BuiltinIconFieldHandle, BuiltinIconFi
             'grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden',
             displaySizeConfig.dialog.surfaceClassName,
           )}
+          onCloseAutoFocus={handleCloseAutoFocus}
         >
           <DialogHeader className={displaySizeConfig.dialog.headerClassName}>
             <DialogTitle className={displaySizeConfig.dialog.titleClassName}>
