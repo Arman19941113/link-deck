@@ -1,8 +1,10 @@
-// Bridges Testing Library Jest-DOM matcher types to Vite+ test imports.
+// Bridges Testing Library Jest-DOM matchers to Vitest 5's matcher types.
 
 import type { TestingLibraryMatchers } from '@testing-library/jest-dom/matchers'
 
-declare module 'vite-plus/test' {
-  interface Assertion<T = unknown> extends TestingLibraryMatchers<unknown, T> {}
-  interface AsymmetricMatchersContaining extends TestingLibraryMatchers<unknown, unknown> {}
+declare module 'vitest' {
+  interface Matchers<R extends void | Promise<void> = void | Promise<void>> extends TestingLibraryMatchers<
+    unknown,
+    R
+  > {}
 }

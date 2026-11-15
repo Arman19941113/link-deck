@@ -29,16 +29,14 @@ if (!testWindow.ResizeObserver) {
 }
 
 if (!testWindow.matchMedia) {
-  testWindow.matchMedia = vi.fn().mockImplementation(
-    (query: string): MediaQueryList => ({
-      matches: false,
-      media: query,
-      onchange: null,
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-      addListener: vi.fn(),
-      removeListener: vi.fn(),
-      dispatchEvent: vi.fn(),
-    }),
-  )
+  testWindow.matchMedia = vi.fn().mockImplementation((query: string): MediaQueryList => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  }))
 }
