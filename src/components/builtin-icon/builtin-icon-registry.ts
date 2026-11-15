@@ -161,7 +161,7 @@ export function findBuiltinIconByNameKeywords(keywords: readonly string[]): Buil
   return matchedIcon ? createBuiltinIconRef(toSearchResult(matchedIcon.icon)) : null
 }
 
-/** Searches built-in icons by brand title and search aliases. */
+/** Searches built-in icons by brand title, search aliases, and domain aliases. */
 export function searchBuiltinIcons(query: string): BuiltinIconOption[] {
   const normalizedQuery = normalizeSearchValue(query)
 
@@ -177,7 +177,9 @@ export function searchBuiltinIcons(query: string): BuiltinIconOption[] {
 function getSearchIndex(): SearchIndexEntry[] {
   searchIndex ??= builtinIconsData.map(icon => ({
     icon: toSearchResult(icon),
-    normalizedSearchTerms: [icon.title, ...(icon.searchAliases ?? [])].map(normalizeSearchValue),
+    normalizedSearchTerms: [icon.title, ...(icon.searchAliases ?? []), ...(icon.domainAliases ?? [])].map(
+      normalizeSearchValue,
+    ),
   }))
 
   return searchIndex

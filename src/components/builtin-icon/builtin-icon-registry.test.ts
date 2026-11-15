@@ -8,6 +8,10 @@ describe('searchBuiltinIcons', () => {
   it.each(['豆包', 'Doubao'])('finds Doubao when searching for %s', query => {
     expect(searchBuiltinIcons(query)).toEqual([expect.objectContaining({ key: 'custom:doubao' })])
   })
+
+  it.each(['ChatGPT', 'openai'])('finds OpenAI when searching for %s', query => {
+    expect(searchBuiltinIcons(query)).toEqual([expect.objectContaining({ key: 'logos:openai-icon' })])
+  })
 })
 
 describe('findBuiltinIconByNameKeywords', () => {
