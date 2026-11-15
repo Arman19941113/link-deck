@@ -67,10 +67,19 @@ pnpm install
 pnpm dev
 ```
 
-常用检查：
+检查代码格式、代码规范和类型。
 
 ```bash
 pnpm check
+```
+
+在项目根目录运行测试。首次运行端到端测试前，先安装 Chromium。
+
+```bash
+pnpm test
+
+pnpm exec playwright install chromium
+pnpm test:e2e
 ```
 
 生产构建：

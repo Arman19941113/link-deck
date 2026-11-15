@@ -67,10 +67,19 @@ pnpm install
 pnpm dev
 ```
 
-Useful checks:
+Run formatting, lint, and type checks.
 
 ```bash
 pnpm check
+```
+
+Run tests from the project root. Install Chromium before the first end-to-end run.
+
+```bash
+pnpm test
+
+pnpm exec playwright install chromium
+pnpm test:e2e
 ```
 
 Production build:
