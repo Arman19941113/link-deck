@@ -2,7 +2,13 @@
 
 import { describe, expect, it } from 'vite-plus/test'
 
-import { findBuiltinIconByNameKeywords } from './builtin-icon-registry'
+import { findBuiltinIconByNameKeywords, searchBuiltinIcons } from './builtin-icon-registry'
+
+describe('searchBuiltinIcons', () => {
+  it.each(['豆包', 'Doubao'])('finds Doubao when searching for %s', query => {
+    expect(searchBuiltinIcons(query)).toEqual([expect.objectContaining({ key: 'custom:doubao' })])
+  })
+})
 
 describe('findBuiltinIconByNameKeywords', () => {
   it('prefers an exact name match over a higher-priority containing match', () => {

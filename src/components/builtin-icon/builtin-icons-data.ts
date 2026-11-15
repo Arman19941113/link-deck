@@ -11,6 +11,7 @@ export type BuiltinIconData = {
   name: string
   domainAliases?: readonly string[]
   title: string
+  searchAliases?: readonly string[]
   /** Curated 0-100 familiarity score for ranking built-in icon suggestions. */
   popularityScore: number
   color: string

@@ -27,7 +27,7 @@ export type BuiltinIconRenderModel =
 
 type SearchIndexEntry = {
   icon: BuiltinIconOption
-  normalizedTitle: string
+  normalizedSearchTerms: string[]
 }
 
 let searchIndex: SearchIndexEntry[] | null = null
@@ -161,7 +161,7 @@ export function findBuiltinIconByNameKeywords(keywords: readonly string[]): Buil
   return matchedIcon ? createBuiltinIconRef(toSearchResult(matchedIcon.icon)) : null
 }
 
-/** Searches built-in icons by brand title. */
+/** Searches built-in icons by brand title and search aliases. */
 export function searchBuiltinIcons(query: string): BuiltinIconOption[] {
   const normalizedQuery = normalizeSearchValue(query)
 
@@ -170,14 +170,14 @@ export function searchBuiltinIcons(query: string): BuiltinIconOption[] {
   }
 
   return getSearchIndex()
-    .filter(({ normalizedTitle }) => normalizedTitle.includes(normalizedQuery))
+    .filter(({ normalizedSearchTerms }) => normalizedSearchTerms.some(term => term.includes(normalizedQuery)))
     .map(({ icon }) => icon)
 }
 
 function getSearchIndex(): SearchIndexEntry[] {
   searchIndex ??= builtinIconsData.map(icon => ({
     icon: toSearchResult(icon),
-    normalizedTitle: normalizeSearchValue(icon.title),
+    normalizedSearchTerms: [icon.title, ...(icon.searchAliases ?? [])].map(normalizeSearchValue),
   }))
 
   return searchIndex
@@ -221,7 +221,7 @@ function compareIconMatches(
   )
 }
 
-/** Normalizes brand titles into a compact search key. */
+/** Normalizes search terms while preserving letters and numbers from any script. */
 function normalizeSearchValue(value: string): string {
-  return value.toLocaleLowerCase().replace(/[^a-z0-9]+/g, '')
+  return value.toLocaleLowerCase().replace(/[^\p{L}\p{N}]+/gu, '')
 }

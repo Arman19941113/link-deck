@@ -64,6 +64,7 @@ describe('useLinkEditorForm', () => {
   it.each([
     { url: 'https://github.com/', slug: 'simple-icons:github', title: 'GitHub', hex: '181717' },
     { url: 'https://chatgpt.com', slug: 'logos:openai-icon', title: 'OpenAI', hex: '000000' },
+    { url: 'https://www.doubao.com/', slug: 'custom:doubao', title: 'Doubao', hex: 'CAE4FF' },
   ])('matches a built-in icon when submitting $url without blurring', async ({ url, slug, title, hex }) => {
     const { form, upsertLink } = renderLinkEditorForm()
 
