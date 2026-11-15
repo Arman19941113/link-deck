@@ -1,7 +1,7 @@
 // Shared confirmation dialog for deleting a link from the deck.
 
 import type { KeyboardEvent, MouseEvent, PointerEvent } from 'react'
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import type { SavedLink } from '@/domain/deck/types'
@@ -38,11 +38,9 @@ export function DeleteLinkDialog({
   const [isDeleting, setIsDeleting] = useState(false)
   const deleteActionRef = useRef<HTMLButtonElement>(null)
 
-  useEffect(() => {
-    if (!open) {
-      setIsDeleting(false)
-    }
-  }, [open])
+  if (!open && isDeleting) {
+    setIsDeleting(false)
+  }
 
   async function handleConfirmDelete(): Promise<void> {
     if (!link || isDeleting) {

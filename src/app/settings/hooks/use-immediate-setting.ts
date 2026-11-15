@@ -1,24 +1,24 @@
 // Keeps settings controls responsive while committing changes through app-level actions.
 
-import { startTransition, useEffect, useState } from 'react'
+import { startTransition, useState } from 'react'
 
 /** Mirrors a committed setting locally, then schedules the app-wide update after user changes. */
 export function useImmediateSetting<TValue>(
   value: TValue,
   onChange: (value: TValue) => void,
 ): readonly [TValue, (value: TValue) => void] {
-  const [localValue, setLocalValue] = useState<TValue>(value)
+  const [setting, setSetting] = useState({ committedValue: value, localValue: value })
 
-  useEffect(() => {
-    setLocalValue(value)
-  }, [value])
+  if (!Object.is(setting.committedValue, value)) {
+    setSetting({ committedValue: value, localValue: value })
+  }
 
   function commitValue(nextValue: TValue): void {
-    setLocalValue(nextValue)
+    setSetting(current => (Object.is(current.localValue, nextValue) ? current : { ...current, localValue: nextValue }))
     startTransition(() => {
       onChange(nextValue)
     })
   }
 
-  return [localValue, commitValue] as const
+  return [setting.localValue, commitValue] as const
 }

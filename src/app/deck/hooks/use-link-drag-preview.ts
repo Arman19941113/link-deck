@@ -32,6 +32,11 @@ export function useLinkDragPreview({
   const [dragLinkIdsByCategoryId, setDragLinkIdsByCategoryId] = useState<LinkIdsByCategoryId | null>(null)
   const dragLinkIdsByCategoryIdRef = useRef<LinkIdsByCategoryId | null>(null)
   const baseLinkIdsByCategoryId = useMemo(() => createLinkIdsByCategoryId(categories, links), [categories, links])
+
+  if (dragLinkIdsByCategoryId && areLinkIdsByCategoryIdEqual(baseLinkIdsByCategoryId, dragLinkIdsByCategoryId)) {
+    setDragLinkIdsByCategoryId(null)
+  }
+
   const previewSections = useMemo(
     () =>
       dragLinkIdsByCategoryId && isLinkDragEnabled
@@ -41,12 +46,10 @@ export function useLinkDragPreview({
   )
 
   useEffect(() => {
-    if (!dragLinkIdsByCategoryId || !areLinkIdsByCategoryIdEqual(baseLinkIdsByCategoryId, dragLinkIdsByCategoryId)) {
-      return
+    if (!dragLinkIdsByCategoryId) {
+      dragLinkIdsByCategoryIdRef.current = null
     }
-
-    resetLinkDragState()
-  }, [baseLinkIdsByCategoryId, dragLinkIdsByCategoryId])
+  }, [dragLinkIdsByCategoryId])
 
   /** Records the initial id groups before sorting starts. */
   function handleLinkDragStart(event: DragStartEvent): void {

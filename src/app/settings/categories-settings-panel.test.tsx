@@ -2,11 +2,13 @@
 
 import { createRef } from 'react'
 import userEvent from '@testing-library/user-event'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { act, fireEvent, render, renderHook, screen } from '@testing-library/react'
+import type { DragEndEvent } from '@dnd-kit/core'
 import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 
 import i18n from '@/i18n'
 import { CategoriesSettingsPanel } from './categories-settings-panel'
+import { useCategorySettingsViewModel } from './hooks/use-category-settings-view-model'
 import type { Category } from '@/domain/deck/types'
 
 vi.mock('@dnd-kit/sortable', async importOriginal => {
@@ -71,6 +73,37 @@ describe('CategoriesSettingsPanel', () => {
     await user.click(screen.getByRole('button', { name: '删除 工具' }))
     expect(viewModel.requestDelete).toHaveBeenCalledWith(expect.objectContaining({ id: 'tools' }))
   })
+})
+
+it('shows an optimistic category order until the deck reports that order', async () => {
+  const initialCategories = [category('default', '默认', 1), category('tools', '工具', 2)]
+  const committedCategories = [category('tools', '工具箱', 1), category('default', '默认', 2)]
+  const reorderCategoryList = vi.fn().mockResolvedValue(undefined)
+  const { result, rerender } = renderHook(
+    categories =>
+      useCategorySettingsViewModel({
+        categories,
+        links: [],
+        addCategory: vi.fn(),
+        renameCategory: vi.fn(),
+        deleteCategory: vi.fn(),
+        reorderCategoryList,
+        settingsError: { error: null, clearError: vi.fn(), showError: vi.fn() },
+      }),
+    { initialProps: initialCategories },
+  )
+
+  await act(async () => {
+    result.current.handleCategoryDragEnd({ active: { id: 'tools' }, over: { id: 'default' } } as DragEndEvent)
+  })
+  expect(reorderCategoryList).toHaveBeenCalledWith('tools', 'default')
+  expect(result.current.categoryRows.map(row => row.id)).toEqual(['tools', 'default'])
+
+  rerender(committedCategories)
+  expect(result.current.categoryRows).toEqual(committedCategories)
+
+  rerender(initialCategories)
+  expect(result.current.categoryRows).toEqual(initialCategories)
 })
 
 type CategoryPanelViewModelOptions = {

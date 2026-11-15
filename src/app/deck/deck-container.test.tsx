@@ -1,11 +1,14 @@
 // Verifies the main deck page container behavior through rendered user interactions.
 
 import userEvent from '@testing-library/user-event'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { act, fireEvent, render, renderHook, screen } from '@testing-library/react'
+import type { DragOverEvent } from '@dnd-kit/react'
 import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 
 import i18n from '@/i18n'
+import { DeleteLinkDialog } from './components/delete-link-dialog'
 import { DeckContainer } from './deck-container'
+import { useLinkDragPreview } from './hooks/use-link-drag-preview'
 import { getDisplaySizeConfig } from '@/app/display-size-config'
 import type { DeckLinkHandlers, IconFileLoader } from '@/app/deck/deck-board-types'
 import type { SettingsTab } from '@/app/settings/types'
@@ -140,6 +143,24 @@ describe('DeckContainer', () => {
     expect(actions.onEditLink).toHaveBeenCalledWith(links[0])
   })
 
+  it('resets the busy state when a deletion dialog is closed and reopened', async () => {
+    const user = userEvent.setup()
+    const props = {
+      link: createLinks()[0],
+      displaySizeConfig: getDisplaySizeConfig('normal'),
+      onOpenChange: vi.fn(),
+      onConfirmDelete: vi.fn(() => new Promise<void>(() => {})),
+    }
+    const { rerender } = render(<DeleteLinkDialog {...props} open />)
+
+    await user.click(screen.getByRole('button', { name: '删除' }))
+    expect(screen.getByRole('button', { name: '删除中...' })).toBeDisabled()
+
+    rerender(<DeleteLinkDialog {...props} open={false} />)
+    rerender(<DeleteLinkDialog {...props} open />)
+    expect(screen.getByRole('button', { name: '删除' })).toBeEnabled()
+  })
+
   it('renders the empty deck state after initialization when there are no sections', () => {
     renderDeck({
       categories: [],
@@ -150,6 +171,43 @@ describe('DeckContainer', () => {
     expect(screen.getByRole('heading', { level: 2, name: '还没有链接' })).toBeInTheDocument()
     expect(screen.getByText('使用“添加链接”保存第一个链接。')).toBeInTheDocument()
   })
+})
+
+it('clears the link drag preview and drop target when the deck catches up', () => {
+  const categories = createCategories()
+  const links = createLinks()
+  const baseSections = selectSearchMatchedSections(categories, links, '', 'manual')
+  const moveLinkToCategory = vi.fn().mockResolvedValue(undefined)
+  const { result, rerender } = renderHook(
+    ({ links, baseSections }) =>
+      useLinkDragPreview({ categories, links, baseSections, isLinkDragEnabled: true, moveLinkToCategory }),
+    { initialProps: { links, baseSections } },
+  )
+  const operation = {
+    source: { id: 'github', data: { categoryId: 'default', linkId: 'github', type: 'link' } },
+    target: { id: 'notion', data: { categoryId: 'tools', linkId: 'notion', type: 'link' } },
+  } as unknown as DragOverEvent['operation']
+
+  act(() => {
+    result.current.handleLinkDragStart({ operation, cancelable: false })
+    result.current.handleLinkDragOver({ operation, cancelable: true, defaultPrevented: false, preventDefault: vi.fn() })
+  })
+  expect(result.current.previewSections[1].links.map(link => link.id)).toEqual(['github', 'notion'])
+
+  const committedLinks = [
+    { ...links[0], categoryId: 'tools' },
+    { ...links[1], order: 2 },
+  ]
+  const committedSections = selectSearchMatchedSections(categories, committedLinks, '', 'manual')
+  rerender({ links: committedLinks, baseSections: committedSections })
+  expect(result.current.previewSections).toBe(committedSections)
+
+  rerender({ links, baseSections })
+  act(() => {
+    result.current.handleLinkDragEnd({ operation: { ...operation, target: null }, canceled: false, suspend: vi.fn() })
+  })
+  expect(moveLinkToCategory).not.toHaveBeenCalled()
+  expect(result.current.previewSections).toBe(baseSections)
 })
 
 type RenderDeckOptions = {

@@ -52,6 +52,11 @@ export function useCategorySettingsViewModel({
   const [draggedCategoryId, setDraggedCategoryId] = useState<string | null>(null)
   const [draggedCategoryWidth, setDraggedCategoryWidth] = useState<number | null>(null)
   const [optimisticCategories, setOptimisticCategories] = useState<Category[] | null>(null)
+
+  if (optimisticCategories && haveSameCategoryOrder(categories, optimisticCategories)) {
+    setOptimisticCategories(null)
+  }
+
   const categoryRows = useMemo(
     () =>
       applyCategoryEditingName(
@@ -83,14 +88,6 @@ export function useCategorySettingsViewModel({
     editingCategoryNameInputRef.current?.focus()
     editingCategoryNameInputRef.current?.select()
   }, [editingCategoryId])
-
-  useEffect(() => {
-    if (!optimisticCategories || !haveSameCategoryOrder(categories, optimisticCategories)) {
-      return
-    }
-
-    setOptimisticCategories(null)
-  }, [categories, optimisticCategories])
 
   /** Adds the category through the deck action as soon as the input is submitted. */
   function addCategoryFromInput(): void {
