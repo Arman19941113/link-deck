@@ -61,22 +61,20 @@ describe('useLinkEditorForm', () => {
     )
   })
 
-  it('matches a built-in icon when submitting an added URL without blurring', async () => {
+  it.each([
+    { url: 'https://github.com/', slug: 'simple-icons:github', title: 'GitHub', hex: '181717' },
+    { url: 'https://chatgpt.com', slug: 'logos:openai-icon', title: 'OpenAI', hex: '000000' },
+  ])('matches a built-in icon when submitting $url without blurring', async ({ url, slug, title, hex }) => {
     const { form, upsertLink } = renderLinkEditorForm()
 
     act(() => {
-      form.current.setUrl('https://github.com/')
+      form.current.setUrl(url)
     })
     await submit(form.current.handleSubmit)
 
     expect(upsertLink).toHaveBeenCalledWith(
       expect.objectContaining({
-        icon: {
-          type: 'builtin',
-          slug: 'simple-icons:github',
-          title: 'GitHub',
-          hex: '181717',
-        },
+        icon: { type: 'builtin', slug, title, hex },
       }),
     )
   })

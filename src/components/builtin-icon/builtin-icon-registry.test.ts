@@ -38,7 +38,7 @@ describe('findBuiltinIconByNameKeywords', () => {
     })
   })
 
-  it('returns null when no icon name contains the keyword', () => {
-    expect(findBuiltinIconByNameKeywords(['definitelymissing'])).toBeNull()
+  it.each(['chatgp', 'definitelymissing'])('returns null when no icon name or exact alias matches %s', keyword => {
+    expect(findBuiltinIconByNameKeywords([keyword])).toBeNull()
   })
 })

@@ -195,11 +195,16 @@ function toSearchResult(icon: BuiltinIconData): BuiltinIconOption {
 
 function createIconMatch(icon: BuiltinIconData, normalizedKeywords: readonly string[]) {
   const normalizedName = normalizeSearchValue(icon.name)
+  const normalizedAliases = icon.domainAliases?.map(normalizeSearchValue) ?? []
 
   return {
     icon,
-    matchedKeywordCount: normalizedKeywords.filter(keyword => normalizedName.includes(keyword)).length,
-    exactMatchCount: normalizedKeywords.filter(keyword => normalizedName === keyword).length,
+    matchedKeywordCount: normalizedKeywords.filter(
+      keyword => normalizedName.includes(keyword) || normalizedAliases.includes(keyword),
+    ).length,
+    exactMatchCount: normalizedKeywords.filter(
+      keyword => normalizedName === keyword || normalizedAliases.includes(keyword),
+    ).length,
   }
 }
 

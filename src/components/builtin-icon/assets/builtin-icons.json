@@ -1299,6 +1299,7 @@
     "key": "logos:openai-icon",
     "source": "logos",
     "name": "openai-icon",
+    "domainAliases": ["chatgpt"],
     "title": "OpenAI",
     "popularityScore": 95,
     "color": "000000",
