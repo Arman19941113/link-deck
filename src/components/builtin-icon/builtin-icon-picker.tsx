@@ -20,15 +20,17 @@ import { BuiltinIconPreviewTile } from './builtin-icon-preview'
 
 export type BuiltinIconPickerProps = {
   value: BuiltinIconValue | null
+  currentIcon: BuiltinIconValue | null
   disabled?: boolean
   displaySizeConfig: DisplaySizeConfig
-  onChange: (icon: BuiltinIconValue) => void
+  onChange: (icon: BuiltinIconValue | null) => void
   onConfirm?: (icon: BuiltinIconValue) => void
 }
 
 /** Lets the user search and choose a serializable built-in icon reference. */
 export function BuiltinIconPicker({
   value,
+  currentIcon,
   disabled = false,
   displaySizeConfig,
   onChange,
@@ -48,9 +50,10 @@ export function BuiltinIconPicker({
     setQuery(nextQuery)
 
     const firstResult = searchBuiltinIcons(nextQuery)[0]
+    const nextIcon = firstResult ? createBuiltinIconRef(firstResult) : currentIcon
 
-    if (firstResult && firstResult.key !== value?.slug) {
-      onChange(createBuiltinIconRef(firstResult))
+    if (nextIcon?.slug !== value?.slug) {
+      onChange(nextIcon)
     }
   }
 

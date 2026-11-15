@@ -128,6 +128,7 @@ export const BuiltinIconField = forwardRef<BuiltinIconFieldHandle, BuiltinIconFi
           <div className="min-h-0">
             <BuiltinIconPicker
               value={draftIcon}
+              currentIcon={value}
               disabled={disabled}
               displaySizeConfig={displaySizeConfig}
               onChange={setDraftIcon}
