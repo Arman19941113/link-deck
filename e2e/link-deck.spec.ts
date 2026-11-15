@@ -67,6 +67,30 @@ test('creates a link from the toolbar and finds it with search', async ({ page }
   await expect(page.getByText('Created by Playwright')).toBeVisible()
 })
 
+test('tabs from the link URL to the title while matching a built-in icon', async ({ page }) => {
+  await page.goto('/')
+
+  await page.getByRole('button', { name: 'Add link' }).click()
+  const dialog = page.getByRole('dialog', { name: 'Add link' })
+  const url = dialog.getByLabel('Link URL')
+  const title = dialog.getByLabel('Title')
+  await url.fill('https://chatgpt.com/?temporary-chat=true')
+  await expect(dialog.getByRole('radio', { name: 'Auto', exact: true })).toBeChecked()
+
+  await page.keyboard.press('Tab')
+
+  await expect(dialog.getByRole('button', { name: 'OpenAI' })).toBeVisible()
+  await expect(title).toBeFocused()
+
+  await page.keyboard.press('Shift+Tab')
+  await expect(url).toBeFocused()
+  await url.fill('https://github.com/')
+  await page.keyboard.press('Tab')
+
+  await expect(dialog.getByRole('button', { name: 'GitHub' })).toBeVisible()
+  await expect(title).toBeFocused()
+})
+
 test('captures desktop and mobile smoke screenshots', async ({ page }) => {
   await mkdir(screenshotDir, { recursive: true })
 

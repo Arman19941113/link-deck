@@ -1,7 +1,7 @@
 // Coordinates link editor form state, validation, previews, and submit handling.
 
 import type { ChangeEvent, FormEvent } from 'react'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { startTransition, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
@@ -189,7 +189,10 @@ export function useLinkEditorForm({
   }
 
   function handleUrlBlur(): void {
-    applyAutomaticBuiltinIcon()
+    // Let focus settle before replacing icon controls, or the dialog may reclaim it mid-Tab.
+    startTransition(() => {
+      applyAutomaticBuiltinIcon()
+    })
   }
 
   /** Stores a manually selected built-in icon and prevents later URL changes from replacing it. */
